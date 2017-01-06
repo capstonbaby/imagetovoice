@@ -7,8 +7,7 @@ using System.Web.Http;
 
 namespace CapstoneProject.WebAPI.Controllers
 {
-    public class DemoController : ApiController
+    public class TestTestController : ApiController
     {
-
     }
 }
