@@ -17,7 +17,7 @@ namespace CapstoneProject.WebAPI.Controllers
     public class ComputerVisionController : ApiController
     {
        
-        [Route("demo")]
+        [Route("detect")]
         [HttpPost]
         public async Task<HttpResponseMessage> GetDetailPicture(FormDataCollection formDataCollection)
         {
@@ -38,10 +38,10 @@ namespace CapstoneProject.WebAPI.Controllers
             HttpResponseMessage response;
 
             //string test = @"{'Url':'http://media.tumblr.com/045760551922a84cea95b3d09355aa6a/tumblr_inline_mh841fxg9I1qz4rgp.gif'}";
-            string test = @"{'Url':'"+ urlImage+"'}";
+            string body = @"{'Url':'"+ urlImage+"'}";
 
             // Request body
-            byte[] byteData = Encoding.UTF8.GetBytes(test);
+            byte[] byteData = Encoding.UTF8.GetBytes(body);
 
             using (var content = new ByteArrayContent(byteData))
             {
