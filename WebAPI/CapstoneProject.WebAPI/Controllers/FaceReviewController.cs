@@ -50,6 +50,40 @@ namespace CapstoneProject.WebAPI.Controllers
             return response;
         }
 
+        [Route("getgroupbyid")]
+        [HttpGet]
+        public async Task<HttpResponseMessage> GetGroupById(string personGroupId)
+        {
+            var client = new HttpClient();
+
+            // Request headers
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
+
+            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId;
+
+            HttpResponseMessage response;
+            response = await client.GetAsync(uri);
+
+            return response;
+        }
+
+        [Route("getgroups")]
+        [HttpGet]
+        public async Task<HttpResponseMessage> GetGroups()
+        {
+            var client = new HttpClient();
+
+            // Request headers
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
+
+            string uri = "https://api.projectoxford.ai/face/v1.0/persongroups";
+
+            HttpResponseMessage response;
+            response = await client.GetAsync(uri);
+
+            return response;
+        }
+
         [Route("createperson")]
         [HttpPost]
         public async Task<HttpResponseMessage> CreatePerson(FormDataCollection formDataCollection)
@@ -78,6 +112,43 @@ namespace CapstoneProject.WebAPI.Controllers
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 response = await client.PostAsync(uri, content);
             }
+
+            return response;
+        }
+
+        [Route("getpersonbyid")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> GetPersonById(FormDataCollection formDataCollection)
+        {
+            var personGroupId = formDataCollection["personGroupId"];
+            var personId = formDataCollection["personId"];
+
+            var client = new HttpClient();
+
+            // Request headers
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
+
+            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId + "/persons/" + personId;
+
+            HttpResponseMessage response;
+            response = await client.GetAsync(uri);
+
+            return response;
+        }
+
+        [Route("getpeopleingroup")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> GetPeopleInGroup(FormDataCollection formDataCollection)
+        {
+            var client = new HttpClient();
+            var personGroupId = formDataCollection["personGroupId"];
+            // Request headers
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
+
+            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId + "/persons";
+
+            HttpResponseMessage response;
+            response = await client.GetAsync(uri);
 
             return response;
         }
