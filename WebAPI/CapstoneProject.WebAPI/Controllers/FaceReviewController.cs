@@ -1,5 +1,7 @@
 ﻿using CapstoneProject.WebAPI.Common;
 using CapstoneProject.WebAPI.Models;
+using Microsoft.ProjectOxford.Face;
+using Microsoft.ProjectOxford.Face.Contract;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,6 +21,8 @@ namespace CapstoneProject.WebAPI.Controllers
     [RoutePrefix("api/face")]
     public class FaceReviewController : ApiController
     {
+        private readonly FaceServiceClient faceServiceClient = new FaceServiceClient(Assets.KEY_FACE_REVIEW);
+
         [Route("creategroup")]
         [HttpPost]
         public async Task<HttpResponseMessage> CreateGroup(FormDataCollection formDataCollection)
@@ -215,7 +219,20 @@ namespace CapstoneProject.WebAPI.Controllers
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 response = await client.PostAsync(uri, content);
             }
-            return response;
+
+            TrainingStatus status = null;
+
+            while (true)
+            {
+                status = await faceServiceClient.GetPersonGroupTrainingStatusAsync(personGroupId);
+
+                if (status.Status != Status.Running)
+                {
+                    return response;
+                }
+
+                await Task.Delay(1000);
+            }
         }
 
         [Route("createfaceid")]
