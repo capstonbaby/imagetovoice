@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">CameraSurfaceView</string>
+    <string name="action_settings">Settings</string>
+    <string name="choose">Choose Image</string>
+    <string name="upload">Upload</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="notification_fail">Image failed to upload...</string>
+    <string name="notification_share_link">Share link</string>
+    <string name="notifaction_success">Successfully uploaded</string>
+    <string name="notification_progress">Uploading image...</string>
+    <string name="notification_training_progress">Training...</string>
+    <string name="ip_address">IP Address</string>
+    <string name="view_detect">View Detect</string>
+    <string name="face_detect">Face Detect</string>
+    <string name="train">Train</string>
+    <string name="save">save</string>
+    <string name="spinner_title">Person Groups</string>
+
+</resources>
