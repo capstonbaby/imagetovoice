@@ -269,7 +269,7 @@ namespace CapstoneProject.WebAPI.Controllers
             return response;
         }
 
-        [Route("umbala")]
+        [Route("identify")]
         [HttpPost]
         public async Task<HttpResponseMessage> DetectPerson(FormDataCollection formDataCollection)
         {
