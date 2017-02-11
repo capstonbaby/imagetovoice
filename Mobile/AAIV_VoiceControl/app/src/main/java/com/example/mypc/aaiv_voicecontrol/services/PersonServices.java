@@ -1,8 +1,6 @@
 package com.example.mypc.aaiv_voicecontrol.services;
 
 import android.content.Context;
-import android.os.AsyncTask;
-import android.widget.Toast;
 
 import com.example.mypc.aaiv_voicecontrol.AddPersonActivity;
 import com.example.mypc.aaiv_voicecontrol.Constants;
@@ -21,8 +19,6 @@ import java.util.List;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -104,26 +100,14 @@ public class PersonServices {
         }
     }
 
-    public void TrainPersonGroup(String personGroupId) {
+    public Call<Void> TrainPersonGroup(String personGroupId) {
         Retrofit retrofit = getRetrofitFaceDetect();
         PersonApi faceDetectApi = retrofit.create(PersonApi.class);
 
         notificationHelper = new NotificationHelper(mAddPersonContext);
         notificationHelper.createTrainingStatusNotification();
 
-        faceDetectApi.trainPersonGroup(personGroupId)
-                .enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-
-                        Toast.makeText(mAddPersonContext, "Train Completed", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                        Toast.makeText(mAddPersonContext, "Train Failed", Toast.LENGTH_LONG).show();
-                    }
-                });
+        return faceDetectApi.trainPersonGroup(personGroupId);
     }
 
     public Retrofit getRetrofitFaceDetect() {

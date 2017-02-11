@@ -1,30 +1,39 @@
 package com.example.mypc.aaiv_voicecontrol;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.GridView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.example.mypc.aaiv_voicecontrol.person_model.AddPersonFaceResponse;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.example.mypc.aaiv_voicecontrol.person_model.AddPersonResponse;
-import com.example.mypc.aaiv_voicecontrol.person_model.PersonApi;
 import com.example.mypc.aaiv_voicecontrol.person_model.PersonGroup;
 import com.example.mypc.aaiv_voicecontrol.services.PersonServices;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import id.zelory.compressor.Compressor;
+import me.nereo.multi_image_selector.MultiImageSelector;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -35,8 +44,9 @@ public class AddPersonActivity extends AppCompatActivity implements AdapterView.
     private TextInputLayout txtPersonName;
     private TextInputLayout txtPersonDes;
     private Spinner sp_personGroups;
-    private ImageView iv_person;
     private Button bt_cretePerson;
+    private FloatingActionButton fab_add_image;
+    private ProgressBar progressBar;
 
     private String personGroupId;
 
@@ -46,6 +56,22 @@ public class AddPersonActivity extends AppCompatActivity implements AdapterView.
         return context;
     }
 
+    private static final int REQUEST_IMAGE = 1;
+
+    private GridView gridView;
+    private GridViewAdapter gridAdapter;
+
+    private ArrayList<String> mImagePaths;
+    private ArrayList<String> mCompressedImagePaths = new ArrayList<>();
+
+    private Handler mHandler;
+    private HandlerThread mBackgroundThread;
+
+    private static final Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+            "cloud_name", "debwqzo2g",
+            "api_key", "852288139213848",
+            "api_secret", "qsuCuMnpTZ11_WxuIuQ5kPZmdr4"));
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,20 +79,21 @@ public class AddPersonActivity extends AppCompatActivity implements AdapterView.
 
         context = getApplicationContext();
 
-        Constants.setApiHost("192.168.1.76");
+        Constants.setApiHost("192.168.1.99");
         Toast.makeText(this, Constants.getApiHost(), Toast.LENGTH_LONG).show();
 
         txtPersonName = (TextInputLayout) findViewById(R.id.input_layout_name);
         txtPersonDes = (TextInputLayout) findViewById(R.id.input_layout_des);
         sp_personGroups = (Spinner) findViewById(R.id.sp_person_group);
-        iv_person = (ImageView) findViewById(R.id.iv_person_preview);
         bt_cretePerson = (Button) findViewById(R.id.bt_create);
+        fab_add_image = (FloatingActionButton) findViewById(R.id.fab_add_image);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        sp_personGroups.setOnItemSelectedListener(AddPersonActivity.this);
 
         new PersonServices().GetPersonGroups().enqueue(new Callback<List<PersonGroup>>() {
             @Override
             public void onResponse(Call<List<PersonGroup>> call, Response<List<PersonGroup>> response) {
+                sp_personGroups.setOnItemSelectedListener(AddPersonActivity.this);
                 ArrayAdapter<PersonGroup> dataAdapter =
                         new ArrayAdapter<>(AddPersonActivity.this, android.R.layout.simple_spinner_item, response.body());
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -79,28 +106,100 @@ public class AddPersonActivity extends AppCompatActivity implements AdapterView.
             }
         });
 
-        Intent intent = getIntent();
-        if (intent != null) {
-            mImageLink = intent.getStringExtra("imageLink");
-
-            if (mImageLink != null) {
-                Glide.with(this).load(mImageLink).centerCrop().into(iv_person);
+        fab_add_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MultiImageSelector.create(AddPersonActivity.this)
+                        .showCamera(true) // show camera or not. true by default
+                        .count(3) // max select image size, 9 by default. used width #.multi()
+                        .multi() // multi mode, default mode;
+                        .start(AddPersonActivity.this, REQUEST_IMAGE);
             }
-        }
+        });
 
         bt_cretePerson.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("GroupId", txtPersonName + " | " + personGroupId);
-                CreatePerson(
-                        txtPersonName.getEditText().getText().toString(),
-                        txtPersonDes.getEditText().getText().toString(),
-                        personGroupId,
-                        mImageLink
-                );
+                Log.d("GroupId", txtPersonName.getEditText().getText().toString() + " | " + personGroupId);
+                CreatePerson(txtPersonName.getEditText().getText().toString(), txtPersonDes.getEditText().getText().toString(), personGroupId);
             }
         });
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        StartThread();
+    }
+
+    @Override
+    protected void onPause() {
+        StopThread();
+        super.onPause();
+    }
+
+    private void StartThread() {
+        mBackgroundThread = new HandlerThread("AddPersonBackground");
+        mBackgroundThread.start();
+        mHandler = new Handler(mBackgroundThread.getLooper());
+    }
+
+    private void StopThread() {
+        mBackgroundThread.quitSafely();
+        try {
+            mBackgroundThread.join();
+            mBackgroundThread = null;
+            mHandler = null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        StartThread();
+
+        mImagePaths = null;
+
+        if (requestCode != REQUEST_IMAGE) {
+            return;
+        }
+
+        if (resultCode != RESULT_OK) {
+            return;
+        }
+
+        mImagePaths = data.getStringArrayListExtra(MultiImageSelector.EXTRA_RESULT);
+        //Safety check to prevent null pointer exception
+        if (mImagePaths == null || mImagePaths.isEmpty() || mImagePaths.size() > 3) return;
+
+        gridView = (GridView) findViewById(R.id.gridView);
+        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, mImagePaths);
+        gridView.setAdapter(gridAdapter);
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (String path :
+                        mImagePaths) {
+                    try {
+                        File imageFile = new File(path);
+                        File compressedImage = Compressor.getDefault(AddPersonActivity.this).compressToFile(imageFile);
+                        Map uploadResult = null;
+                        uploadResult = cloudinary.uploader().upload(compressedImage, ObjectUtils.emptyMap());
+                        String url = (String) uploadResult.get("url");
+
+                        mCompressedImagePaths.add(url);
+                        Log.d("ImagePath", url);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -115,29 +214,34 @@ public class AddPersonActivity extends AppCompatActivity implements AdapterView.
 
     }
 
-    public void CreatePerson(String name, final String des, final String personGroupId, final String urlImage) {
+    public void CreatePerson(String name, final String des, final String personGroupId) {
 
-        new PersonServices().CreatePerson(name, des, personGroupId).enqueue(new Callback<AddPersonResponse>() {
+        final PersonServices personServices = new PersonServices();
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        personServices.CreatePerson(name, des, personGroupId).enqueue(new Callback<AddPersonResponse>() {
             @Override
             public void onResponse(Call<AddPersonResponse> call, Response<AddPersonResponse> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(AddPersonActivity.this, response.body().getPersonId(), Toast.LENGTH_LONG).show();
+                    final String personId = response.body().getPersonId();
 
-                    new PersonServices().AddPersonFace(personGroupId, response.body().getPersonId(), urlImage, des)
-                            .enqueue(new Callback<AddPersonFaceResponse>() {
-                                @Override
-                                public void onResponse(Call<AddPersonFaceResponse> call, Response<AddPersonFaceResponse> response) {
-                                    if (response.isSuccessful()) {
-                                        Toast.makeText(AddPersonActivity.this, "Done !", Toast.LENGTH_SHORT).show();
-                                        new PersonServices().TrainPersonGroup(personGroupId);
-                                    }
-                                }
+                    Toast.makeText(AddPersonActivity.this, personId, Toast.LENGTH_LONG).show();
 
-                                @Override
-                                public void onFailure(Call<AddPersonFaceResponse> call, Throwable t) {
-                                    Toast.makeText(AddPersonActivity.this, "Add person face failed", Toast.LENGTH_LONG).show();
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (String imgurl :
+                                    mCompressedImagePaths) {
+                                try {
+                                    personServices.AddPersonFace(personGroupId, personId, imgurl, des).execute();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
                                 }
-                            });
+                            }
+                            TrainGroup(personGroupId);
+                        }
+                    });
 
                 } else {
                     Toast.makeText(AddPersonActivity.this, "Create Person Failed", Toast.LENGTH_LONG).show();
@@ -148,6 +252,36 @@ public class AddPersonActivity extends AppCompatActivity implements AdapterView.
             public void onFailure(Call<AddPersonResponse> call, Throwable t) {
                 Toast.makeText(AddPersonActivity.this, "Create Person Process Failed", Toast.LENGTH_LONG).show();
                 t.printStackTrace();
+            }
+        });
+    }
+
+    public void TrainGroup(final String personGroupId) {
+        final PersonServices personServices = new PersonServices();
+        personServices.TrainPersonGroup(personGroupId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                progressBar.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
+                });
+                Toast.makeText(AddPersonActivity.this, "Train Completed", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                new AlertDialog.Builder(AddPersonActivity.this)
+                        .setTitle("Train Group Failed")
+                        .setMessage("Try Again ?")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                TrainGroup(personGroupId);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null).show();
             }
         });
     }

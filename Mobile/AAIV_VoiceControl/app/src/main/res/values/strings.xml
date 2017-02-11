@@ -11,4 +11,16 @@
     <string name="person_des">Descriptions</string>
     <string name="bt_create_person">create person</string>
     <string name="spinner_title">Person Groups</string>
+    <string name="capture_button">capture_button</string>
+    <string name="face_capture_button">Face Capture Button</string>
+    <string name="object_capture_button">Object Capture Button</string>
+    <string name="create_person_button">Create Person Button</string>
+    <string name="picture">Picture</string>
+    <string name="description_info">Info</string>
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_cloudiary_test">CloudiaryTest</string>
 </resources>

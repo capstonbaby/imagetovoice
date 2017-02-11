@@ -61,9 +61,11 @@ public class MainActivity extends AppCompatActivity {
     String faceIds = "";
 
     String uploadResponse;
+    String capture_mode;
     Upload upload;
     File takenPicture;
     public NotificationHelper notificationHelper = new NotificationHelper(this);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Constants.setApiHost("192.168.1.76");
+        Constants.setApiHost("192.168.1.99");
         Toast.makeText(this, Constants.getApiHost(), Toast.LENGTH_LONG).show();
 
         iv_preview = (ImageView) findViewById(R.id.iv_preview);
@@ -88,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         if (intent != null) {
             returnImagePath = intent.getStringExtra("filePath");
             Glide.with(this).load(returnImagePath).into(iv_preview);
+            capture_mode = intent.getStringExtra("capture_mode");
             uploadImage(returnImagePath);
         }
 
@@ -133,9 +136,26 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         if (response.isSuccessful()) {
-                            notificationHelper.createUploadedNotification(response);
+                            //notificationHelper.createUploadedNotification(response);
                             uploadResponse = response.body().data.link;
-                            startSpeechToText("What now ?");
+                            //startSpeechToText("What now ?");
+
+                            if (capture_mode != null) {
+                                switch (capture_mode) {
+                                    case "face":
+                                        IdentifyPerson(uploadResponse);
+                                        break;
+                                    case "object":
+                                        Toast.makeText(MainActivity.this, "Object Detect Activity", Toast.LENGTH_LONG).show();
+                                        break;
+                                    case "create":
+                                        Intent intent = new Intent(MainActivity.this, AddPersonActivity.class);
+                                        intent.putExtra("imageLink", uploadResponse);
+                                        startActivity(intent);
+                                        break;
+                                    default: break;
+                                }
+                            }
                         }
                     }
 
@@ -194,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
                     String text = results.get(0);
                     switch (text) {
                         case "capture": {
-                            Intent intent = new Intent(this, CameraActivity.class);
+                            Intent intent = new Intent(this, CameraActivity_2.class);
                             startActivity(intent);
                             break;
                         }
@@ -243,42 +263,42 @@ public class MainActivity extends AppCompatActivity {
 //                        if (mPersonGroupList != null) {
 //                            for (final PersonGroup group :
 //                                    mPersonGroupList) {
-                                service.IdentifyPerson("111", faceIds).enqueue(new Callback<List<FaceIdentifyResponse>>() {
-                                    @Override
-                                    public void onResponse(Call<List<FaceIdentifyResponse>> call, Response<List<FaceIdentifyResponse>> response) {
-                                        for (FaceIdentifyResponse faceIdentified :
-                                                response.body()) {
-                                            Log.d("Identify", "Candidates for faceId: " + faceIdentified.faceId);
-                                            for (Candidate candidate :
-                                                    faceIdentified.candidates) {
-                                                Log.d("Identify", candidate.personId);
-                                                service.GetPersonById("111", candidate.personId)
-                                                        .enqueue(new Callback<Person>() {
-                                                            @Override
-                                                            public void onResponse(Call<Person> call, Response<Person> response) {
-                                                                Log.d("Person", response.body().name);
-                                                                Log.d("Person", response.body().userData);
+                service.IdentifyPerson("friend", faceIds).enqueue(new Callback<List<FaceIdentifyResponse>>() {
+                    @Override
+                    public void onResponse(Call<List<FaceIdentifyResponse>> call, Response<List<FaceIdentifyResponse>> response) {
+                        for (FaceIdentifyResponse faceIdentified :
+                                response.body()) {
+                            Log.d("Identify", "Candidates for faceId: " + faceIdentified.faceId);
+                            for (Candidate candidate :
+                                    faceIdentified.candidates) {
+                                Log.d("Identify", candidate.personId);
+                                service.GetPersonById("friend", candidate.personId)
+                                        .enqueue(new Callback<Person>() {
+                                            @Override
+                                            public void onResponse(Call<Person> call, Response<Person> response) {
+                                                Log.d("Person", response.body().name);
+                                                Log.d("Person", response.body().userData);
 
-                                                                Toast.makeText(MainActivity.this,
-                                                                        response.body().name + ". " + response.body().userData, Toast.LENGTH_LONG).show();
-                                                            }
-
-                                                            @Override
-                                                            public void onFailure(Call<Person> call, Throwable t) {
-                                                                Log.e("Person", "Can't get person");
-                                                                Toast.makeText(MainActivity.this, "Can't get identified person", Toast.LENGTH_LONG).show();
-                                                            }
-                                                        });
+                                                Toast.makeText(MainActivity.this,
+                                                        response.body().name + ". " + response.body().userData, Toast.LENGTH_LONG).show();
                                             }
-                                        }
-                                    }
 
-                                    @Override
-                                    public void onFailure(Call<List<FaceIdentifyResponse>> call, Throwable t) {
-                                        Toast.makeText(MainActivity.this, "Identify Person Failed", Toast.LENGTH_SHORT).show();
-                                        t.printStackTrace();
-                                    }
-                                });
+                                            @Override
+                                            public void onFailure(Call<Person> call, Throwable t) {
+                                                Log.e("Person", "Can't get person");
+                                                Toast.makeText(MainActivity.this, "Can't get identified person", Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<FaceIdentifyResponse>> call, Throwable t) {
+                        Toast.makeText(MainActivity.this, "Identify Person Failed", Toast.LENGTH_SHORT).show();
+                        t.printStackTrace();
+                    }
+                });
 //                            }
 //                        } else {
 //                            Toast.makeText(MainActivity.this, "Cannot get person groups", Toast.LENGTH_SHORT).show();
