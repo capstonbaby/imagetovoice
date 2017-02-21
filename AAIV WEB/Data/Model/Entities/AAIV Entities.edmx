@@ -5,16 +5,6 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="CapstoneModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="__MigrationHistory">
-          <Key>
-            <PropertyRef Name="MigrationId" />
-            <PropertyRef Name="ContextKey" />
-          </Key>
-          <Property Name="MigrationId" Type="nvarchar" MaxLength="150" Nullable="false" />
-          <Property Name="ContextKey" Type="nvarchar" MaxLength="300" Nullable="false" />
-          <Property Name="Model" Type="varbinary(max)" Nullable="false" />
-          <Property Name="ProductVersion" Type="nvarchar" MaxLength="32" Nullable="false" />
-        </EntityType>
         <EntityType Name="AspNetRoles">
           <Key>
             <PropertyRef Name="Id" />
@@ -66,16 +56,17 @@
           <Property Name="AccessFailedCount" Type="int" Nullable="false" />
           <Property Name="UserName" Type="nvarchar" MaxLength="256" Nullable="false" />
         </EntityType>
-        <EntityType Name="tbl_Face">
+        <EntityType Name="Face">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FaceId" Type="nvarchar" MaxLength="30" Nullable="false" />
           <Property Name="PersonID" Type="int" Nullable="false" />
           <Property Name="ImageURL" Type="nvarchar(max)" Nullable="false" />
           <Property Name="Active" Type="bit" Nullable="false" />
         </EntityType>
-        <EntityType Name="tbl_Log">
+        <EntityType Name="Log">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
@@ -83,28 +74,38 @@
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
           <Property Name="UserID" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="ImageURL" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="ImageType" Type="int" Nullable="false" />
           <Property Name="Active" Type="bit" Nullable="false" />
         </EntityType>
-        <EntityType Name="tbl_Person">
+        <EntityType Name="Person">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PersonId" Type="nvarchar" MaxLength="30" Nullable="false" />
           <Property Name="PersonGroupID" Type="int" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="Description" Type="nvarchar" MaxLength="250" />
           <Property Name="Gender" Type="bit" Nullable="false" />
-          <Property Name="ImageURL" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="ImageURL" Type="nvarchar(max)" />
           <Property Name="Active" Type="bit" Nullable="false" />
         </EntityType>
-        <EntityType Name="tbl_PersonGroup">
+        <EntityType Name="PersonGroup">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="UserID" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="PersonGroupName" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="Description" Type="nvarchar" MaxLength="250" />
+          <Property Name="Active" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="User_PersonGroup_Mapping">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserId" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="PersonGroupId" Type="int" Nullable="false" />
           <Property Name="Active" Type="bit" Nullable="false" />
         </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
@@ -164,64 +165,76 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_tbl_Face_tbl_Person">
-          <End Role="tbl_Person" Type="Self.tbl_Person" Multiplicity="1" />
-          <End Role="tbl_Face" Type="Self.tbl_Face" Multiplicity="*" />
+          <End Role="Person" Type="Self.Person" Multiplicity="1" />
+          <End Role="Face" Type="Self.Face" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="tbl_Person">
+            <Principal Role="Person">
               <PropertyRef Name="ID" />
             </Principal>
-            <Dependent Role="tbl_Face">
+            <Dependent Role="Face">
               <PropertyRef Name="PersonID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_tbl_Log_AspNetUsers">
           <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1" />
-          <End Role="tbl_Log" Type="Self.tbl_Log" Multiplicity="*" />
+          <End Role="Log" Type="Self.Log" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AspNetUsers">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="tbl_Log">
+            <Dependent Role="Log">
               <PropertyRef Name="UserID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_tbl_Person_tbl_PersonGroup">
-          <End Role="tbl_PersonGroup" Type="Self.tbl_PersonGroup" Multiplicity="1" />
-          <End Role="tbl_Person" Type="Self.tbl_Person" Multiplicity="*" />
+          <End Role="PersonGroup" Type="Self.PersonGroup" Multiplicity="1" />
+          <End Role="Person" Type="Self.Person" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="tbl_PersonGroup">
+            <Principal Role="PersonGroup">
               <PropertyRef Name="ID" />
             </Principal>
-            <Dependent Role="tbl_Person">
+            <Dependent Role="Person">
               <PropertyRef Name="PersonGroupID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_tbl_PersonGroup_AspNetUsers">
+        <Association Name="FK_User_PersonGroup_Mapping_AspNetUsers">
           <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1" />
-          <End Role="tbl_PersonGroup" Type="Self.tbl_PersonGroup" Multiplicity="*" />
+          <End Role="User_PersonGroup_Mapping" Type="Self.User_PersonGroup_Mapping" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AspNetUsers">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="tbl_PersonGroup">
-              <PropertyRef Name="UserID" />
+            <Dependent Role="User_PersonGroup_Mapping">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User_PersonGroup_Mapping_PersonGroup">
+          <End Role="PersonGroup" Type="Self.PersonGroup" Multiplicity="1" />
+          <End Role="User_PersonGroup_Mapping" Type="Self.User_PersonGroup_Mapping" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PersonGroup">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="User_PersonGroup_Mapping">
+              <PropertyRef Name="PersonGroupId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="CapstoneModelStoreContainer">
-          <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserClaims" EntityType="Self.AspNetUserClaims" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogins" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserRoles" EntityType="Self.AspNetUserRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tbl_Face" EntityType="Self.tbl_Face" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tbl_Log" EntityType="Self.tbl_Log" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tbl_Person" EntityType="Self.tbl_Person" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tbl_PersonGroup" EntityType="Self.tbl_PersonGroup" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Face" EntityType="Self.Face" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Log" EntityType="Self.Log" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Person" EntityType="Self.Person" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PersonGroup" EntityType="Self.PersonGroup" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="User_PersonGroup_Mapping" EntityType="Self.User_PersonGroup_Mapping" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
@@ -239,20 +252,24 @@
             <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
           </AssociationSet>
           <AssociationSet Name="FK_tbl_Face_tbl_Person" Association="Self.FK_tbl_Face_tbl_Person">
-            <End Role="tbl_Person" EntitySet="tbl_Person" />
-            <End Role="tbl_Face" EntitySet="tbl_Face" />
+            <End Role="Person" EntitySet="Person" />
+            <End Role="Face" EntitySet="Face" />
           </AssociationSet>
           <AssociationSet Name="FK_tbl_Log_AspNetUsers" Association="Self.FK_tbl_Log_AspNetUsers">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-            <End Role="tbl_Log" EntitySet="tbl_Log" />
+            <End Role="Log" EntitySet="Log" />
           </AssociationSet>
           <AssociationSet Name="FK_tbl_Person_tbl_PersonGroup" Association="Self.FK_tbl_Person_tbl_PersonGroup">
-            <End Role="tbl_PersonGroup" EntitySet="tbl_PersonGroup" />
-            <End Role="tbl_Person" EntitySet="tbl_Person" />
+            <End Role="PersonGroup" EntitySet="PersonGroup" />
+            <End Role="Person" EntitySet="Person" />
           </AssociationSet>
-          <AssociationSet Name="FK_tbl_PersonGroup_AspNetUsers" Association="Self.FK_tbl_PersonGroup_AspNetUsers">
+          <AssociationSet Name="FK_User_PersonGroup_Mapping_AspNetUsers" Association="Self.FK_User_PersonGroup_Mapping_AspNetUsers">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-            <End Role="tbl_PersonGroup" EntitySet="tbl_PersonGroup" />
+            <End Role="User_PersonGroup_Mapping" EntitySet="User_PersonGroup_Mapping" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_PersonGroup_Mapping_PersonGroup" Association="Self.FK_User_PersonGroup_Mapping_PersonGroup">
+            <End Role="PersonGroup" EntitySet="PersonGroup" />
+            <End Role="User_PersonGroup_Mapping" EntitySet="User_PersonGroup_Mapping" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -260,15 +277,15 @@
     <edmx:ConceptualModels>
       <Schema Namespace="CapstoneModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="CapstoneEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="C__MigrationHistory" EntityType="CapstoneModel.C__MigrationHistory" />
           <EntitySet Name="AspNetRoles" EntityType="CapstoneModel.AspNetRole" />
           <EntitySet Name="AspNetUserClaims" EntityType="CapstoneModel.AspNetUserClaim" />
           <EntitySet Name="AspNetUserLogins" EntityType="CapstoneModel.AspNetUserLogin" />
           <EntitySet Name="AspNetUsers" EntityType="CapstoneModel.AspNetUser" />
-          <EntitySet Name="tbl_Face" EntityType="CapstoneModel.tbl_Face" />
-          <EntitySet Name="tbl_Log" EntityType="CapstoneModel.tbl_Log" />
-          <EntitySet Name="tbl_Person" EntityType="CapstoneModel.tbl_Person" />
-          <EntitySet Name="tbl_PersonGroup" EntityType="CapstoneModel.tbl_PersonGroup" />
+          <EntitySet Name="Faces" EntityType="CapstoneModel.Face" />
+          <EntitySet Name="Logs" EntityType="CapstoneModel.Log" />
+          <EntitySet Name="People" EntityType="CapstoneModel.Person" />
+          <EntitySet Name="PersonGroups" EntityType="CapstoneModel.PersonGroup" />
+          <EntitySet Name="User_PersonGroup_Mapping" EntityType="CapstoneModel.User_PersonGroup_Mapping" />
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="CapstoneModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaim" EntitySet="AspNetUserClaims" />
@@ -279,35 +296,29 @@
           </AssociationSet>
           <AssociationSet Name="FK_tbl_Log_AspNetUsers" Association="CapstoneModel.FK_tbl_Log_AspNetUsers">
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
-            <End Role="tbl_Log" EntitySet="tbl_Log" />
+            <End Role="Log" EntitySet="Logs" />
           </AssociationSet>
-          <AssociationSet Name="FK_tbl_PersonGroup_AspNetUsers" Association="CapstoneModel.FK_tbl_PersonGroup_AspNetUsers">
+          <AssociationSet Name="FK_User_PersonGroup_Mapping_AspNetUsers" Association="CapstoneModel.FK_User_PersonGroup_Mapping_AspNetUsers">
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
-            <End Role="tbl_PersonGroup" EntitySet="tbl_PersonGroup" />
+            <End Role="User_PersonGroup_Mapping" EntitySet="User_PersonGroup_Mapping" />
           </AssociationSet>
           <AssociationSet Name="FK_tbl_Face_tbl_Person" Association="CapstoneModel.FK_tbl_Face_tbl_Person">
-            <End Role="tbl_Person" EntitySet="tbl_Person" />
-            <End Role="tbl_Face" EntitySet="tbl_Face" />
+            <End Role="Person" EntitySet="People" />
+            <End Role="Face" EntitySet="Faces" />
           </AssociationSet>
           <AssociationSet Name="FK_tbl_Person_tbl_PersonGroup" Association="CapstoneModel.FK_tbl_Person_tbl_PersonGroup">
-            <End Role="tbl_PersonGroup" EntitySet="tbl_PersonGroup" />
-            <End Role="tbl_Person" EntitySet="tbl_Person" />
+            <End Role="PersonGroup" EntitySet="PersonGroups" />
+            <End Role="Person" EntitySet="People" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_PersonGroup_Mapping_PersonGroup" Association="CapstoneModel.FK_User_PersonGroup_Mapping_PersonGroup">
+            <End Role="PersonGroup" EntitySet="PersonGroups" />
+            <End Role="User_PersonGroup_Mapping" EntitySet="User_PersonGroup_Mapping" />
           </AssociationSet>
           <AssociationSet Name="AspNetUserRoles" Association="CapstoneModel.AspNetUserRoles">
             <End Role="AspNetRole" EntitySet="AspNetRoles" />
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
           </AssociationSet>
         </EntityContainer>
-        <EntityType Name="C__MigrationHistory">
-          <Key>
-            <PropertyRef Name="MigrationId" />
-            <PropertyRef Name="ContextKey" />
-          </Key>
-          <Property Name="MigrationId" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
-          <Property Name="ContextKey" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
-          <Property Name="Model" Type="Binary" Nullable="false" MaxLength="Max" FixedLength="false" />
-          <Property Name="ProductVersion" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
-        </EntityType>
         <EntityType Name="AspNetRole">
           <Key>
             <PropertyRef Name="Id" />
@@ -355,21 +366,22 @@
           <Property Name="UserName" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="AspNetUserClaims" Relationship="CapstoneModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" FromRole="AspNetUser" ToRole="AspNetUserClaim" />
           <NavigationProperty Name="AspNetUserLogins" Relationship="CapstoneModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUser" ToRole="AspNetUserLogin" />
-          <NavigationProperty Name="tbl_Log" Relationship="CapstoneModel.FK_tbl_Log_AspNetUsers" FromRole="AspNetUser" ToRole="tbl_Log" />
-          <NavigationProperty Name="tbl_PersonGroup" Relationship="CapstoneModel.FK_tbl_PersonGroup_AspNetUsers" FromRole="AspNetUser" ToRole="tbl_PersonGroup" />
+          <NavigationProperty Name="Logs" Relationship="CapstoneModel.FK_tbl_Log_AspNetUsers" FromRole="AspNetUser" ToRole="Log" />
+          <NavigationProperty Name="User_PersonGroup_Mapping" Relationship="CapstoneModel.FK_User_PersonGroup_Mapping_AspNetUsers" FromRole="AspNetUser" ToRole="User_PersonGroup_Mapping" />
           <NavigationProperty Name="AspNetRoles" Relationship="CapstoneModel.AspNetUserRoles" FromRole="AspNetUser" ToRole="AspNetRole" />
         </EntityType>
-        <EntityType Name="tbl_Face">
+        <EntityType Name="Face">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FaceId" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
           <Property Name="PersonID" Type="Int32" Nullable="false" />
           <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Person" Relationship="CapstoneModel.FK_tbl_Face_tbl_Person" FromRole="tbl_Face" ToRole="tbl_Person" />
+          <NavigationProperty Name="Person" Relationship="CapstoneModel.FK_tbl_Face_tbl_Person" FromRole="Face" ToRole="Person" />
         </EntityType>
-        <EntityType Name="tbl_Log">
+        <EntityType Name="Log">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
@@ -377,34 +389,46 @@
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UserID" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ImageType" Type="Int32" Nullable="false" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="AspNetUser" Relationship="CapstoneModel.FK_tbl_Log_AspNetUsers" FromRole="tbl_Log" ToRole="AspNetUser" />
+          <NavigationProperty Name="AspNetUser" Relationship="CapstoneModel.FK_tbl_Log_AspNetUsers" FromRole="Log" ToRole="AspNetUser" />
         </EntityType>
-        <EntityType Name="tbl_Person">
+        <EntityType Name="Person">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PersonId" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
           <Property Name="PersonGroupID" Type="Int32" Nullable="false" />
           <Property Name="Name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="Description" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
           <Property Name="Gender" Type="Boolean" Nullable="false" />
-          <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ImageURL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="tbl_Face" Relationship="CapstoneModel.FK_tbl_Face_tbl_Person" FromRole="tbl_Person" ToRole="tbl_Face" />
-          <NavigationProperty Name="tbl_PersonGroup" Relationship="CapstoneModel.FK_tbl_Person_tbl_PersonGroup" FromRole="tbl_Person" ToRole="tbl_PersonGroup" />
+          <NavigationProperty Name="Faces" Relationship="CapstoneModel.FK_tbl_Face_tbl_Person" FromRole="Person" ToRole="Face" />
+          <NavigationProperty Name="PersonGroup" Relationship="CapstoneModel.FK_tbl_Person_tbl_PersonGroup" FromRole="Person" ToRole="PersonGroup" />
         </EntityType>
-        <EntityType Name="tbl_PersonGroup">
+        <EntityType Name="PersonGroup">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="UserID" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="PersonGroupName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="Description" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="AspNetUser" Relationship="CapstoneModel.FK_tbl_PersonGroup_AspNetUsers" FromRole="tbl_PersonGroup" ToRole="AspNetUser" />
-          <NavigationProperty Name="tbl_Person" Relationship="CapstoneModel.FK_tbl_Person_tbl_PersonGroup" FromRole="tbl_PersonGroup" ToRole="tbl_Person" />
+          <NavigationProperty Name="People" Relationship="CapstoneModel.FK_tbl_Person_tbl_PersonGroup" FromRole="PersonGroup" ToRole="Person" />
+          <NavigationProperty Name="User_PersonGroup_Mapping" Relationship="CapstoneModel.FK_User_PersonGroup_Mapping_PersonGroup" FromRole="PersonGroup" ToRole="User_PersonGroup_Mapping" />
+        </EntityType>
+        <EntityType Name="User_PersonGroup_Mapping">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="PersonGroupId" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="AspNetUser" Relationship="CapstoneModel.FK_User_PersonGroup_Mapping_AspNetUsers" FromRole="User_PersonGroup_Mapping" ToRole="AspNetUser" />
+          <NavigationProperty Name="PersonGroup" Relationship="CapstoneModel.FK_User_PersonGroup_Mapping_PersonGroup" FromRole="User_PersonGroup_Mapping" ToRole="PersonGroup" />
         </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Type="CapstoneModel.AspNetUser" Role="AspNetUser" Multiplicity="1">
@@ -436,49 +460,61 @@
         </Association>
         <Association Name="FK_tbl_Log_AspNetUsers">
           <End Type="CapstoneModel.AspNetUser" Role="AspNetUser" Multiplicity="1" />
-          <End Type="CapstoneModel.tbl_Log" Role="tbl_Log" Multiplicity="*" />
+          <End Type="CapstoneModel.Log" Role="Log" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AspNetUser">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="tbl_Log">
+            <Dependent Role="Log">
               <PropertyRef Name="UserID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_tbl_PersonGroup_AspNetUsers">
+        <Association Name="FK_User_PersonGroup_Mapping_AspNetUsers">
           <End Type="CapstoneModel.AspNetUser" Role="AspNetUser" Multiplicity="1" />
-          <End Type="CapstoneModel.tbl_PersonGroup" Role="tbl_PersonGroup" Multiplicity="*" />
+          <End Type="CapstoneModel.User_PersonGroup_Mapping" Role="User_PersonGroup_Mapping" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AspNetUser">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="tbl_PersonGroup">
-              <PropertyRef Name="UserID" />
+            <Dependent Role="User_PersonGroup_Mapping">
+              <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_tbl_Face_tbl_Person">
-          <End Type="CapstoneModel.tbl_Person" Role="tbl_Person" Multiplicity="1" />
-          <End Type="CapstoneModel.tbl_Face" Role="tbl_Face" Multiplicity="*" />
+          <End Type="CapstoneModel.Person" Role="Person" Multiplicity="1" />
+          <End Type="CapstoneModel.Face" Role="Face" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="tbl_Person">
+            <Principal Role="Person">
               <PropertyRef Name="ID" />
             </Principal>
-            <Dependent Role="tbl_Face">
+            <Dependent Role="Face">
               <PropertyRef Name="PersonID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_tbl_Person_tbl_PersonGroup">
-          <End Type="CapstoneModel.tbl_PersonGroup" Role="tbl_PersonGroup" Multiplicity="1" />
-          <End Type="CapstoneModel.tbl_Person" Role="tbl_Person" Multiplicity="*" />
+          <End Type="CapstoneModel.PersonGroup" Role="PersonGroup" Multiplicity="1" />
+          <End Type="CapstoneModel.Person" Role="Person" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="tbl_PersonGroup">
+            <Principal Role="PersonGroup">
               <PropertyRef Name="ID" />
             </Principal>
-            <Dependent Role="tbl_Person">
+            <Dependent Role="Person">
               <PropertyRef Name="PersonGroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User_PersonGroup_Mapping_PersonGroup">
+          <End Type="CapstoneModel.PersonGroup" Role="PersonGroup" Multiplicity="1" />
+          <End Type="CapstoneModel.User_PersonGroup_Mapping" Role="User_PersonGroup_Mapping" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PersonGroup">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="User_PersonGroup_Mapping">
+              <PropertyRef Name="PersonGroupId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -492,16 +528,6 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="CapstoneModelStoreContainer" CdmEntityContainer="CapstoneEntities">
-          <EntitySetMapping Name="C__MigrationHistory">
-            <EntityTypeMapping TypeName="CapstoneModel.C__MigrationHistory">
-              <MappingFragment StoreEntitySet="__MigrationHistory">
-                <ScalarProperty Name="ProductVersion" ColumnName="ProductVersion" />
-                <ScalarProperty Name="Model" ColumnName="Model" />
-                <ScalarProperty Name="ContextKey" ColumnName="ContextKey" />
-                <ScalarProperty Name="MigrationId" ColumnName="MigrationId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="AspNetRoles">
             <EntityTypeMapping TypeName="CapstoneModel.AspNetRole">
               <MappingFragment StoreEntitySet="AspNetRoles">
@@ -547,20 +573,22 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="tbl_Face">
-            <EntityTypeMapping TypeName="CapstoneModel.tbl_Face">
-              <MappingFragment StoreEntitySet="tbl_Face">
+          <EntitySetMapping Name="Faces">
+            <EntityTypeMapping TypeName="CapstoneModel.Face">
+              <MappingFragment StoreEntitySet="Face">
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="ImageURL" ColumnName="ImageURL" />
                 <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="FaceId" ColumnName="FaceId" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="tbl_Log">
-            <EntityTypeMapping TypeName="CapstoneModel.tbl_Log">
-              <MappingFragment StoreEntitySet="tbl_Log">
+          <EntitySetMapping Name="Logs">
+            <EntityTypeMapping TypeName="CapstoneModel.Log">
+              <MappingFragment StoreEntitySet="Log">
                 <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="ImageType" ColumnName="ImageType" />
                 <ScalarProperty Name="ImageURL" ColumnName="ImageURL" />
                 <ScalarProperty Name="UserID" ColumnName="UserID" />
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
@@ -568,26 +596,36 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="tbl_Person">
-            <EntityTypeMapping TypeName="CapstoneModel.tbl_Person">
-              <MappingFragment StoreEntitySet="tbl_Person">
+          <EntitySetMapping Name="People">
+            <EntityTypeMapping TypeName="CapstoneModel.Person">
+              <MappingFragment StoreEntitySet="Person">
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="ImageURL" ColumnName="ImageURL" />
                 <ScalarProperty Name="Gender" ColumnName="Gender" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="PersonGroupID" ColumnName="PersonGroupID" />
+                <ScalarProperty Name="PersonId" ColumnName="PersonId" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="tbl_PersonGroup">
-            <EntityTypeMapping TypeName="CapstoneModel.tbl_PersonGroup">
-              <MappingFragment StoreEntitySet="tbl_PersonGroup">
+          <EntitySetMapping Name="PersonGroups">
+            <EntityTypeMapping TypeName="CapstoneModel.PersonGroup">
+              <MappingFragment StoreEntitySet="PersonGroup">
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="PersonGroupName" ColumnName="PersonGroupName" />
-                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="User_PersonGroup_Mapping">
+            <EntityTypeMapping TypeName="CapstoneModel.User_PersonGroup_Mapping">
+              <MappingFragment StoreEntitySet="User_PersonGroup_Mapping">
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="PersonGroupId" ColumnName="PersonGroupId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>

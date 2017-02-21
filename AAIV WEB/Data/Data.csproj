@@ -81,19 +81,19 @@
     <Compile Include="Model\Entities\AspNetUserLogin.cs">
       <DependentUpon>AAIV Entities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\Entities\C__MigrationHistory.cs">
+    <Compile Include="Model\Entities\Face.cs">
       <DependentUpon>AAIV Entities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\Entities\tbl_Face.cs">
+    <Compile Include="Model\Entities\Log.cs">
       <DependentUpon>AAIV Entities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\Entities\tbl_Log.cs">
+    <Compile Include="Model\Entities\Person.cs">
       <DependentUpon>AAIV Entities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\Entities\tbl_Person.cs">
+    <Compile Include="Model\Entities\PersonGroup.cs">
       <DependentUpon>AAIV Entities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\Entities\tbl_PersonGroup.cs">
+    <Compile Include="Model\Entities\User_PersonGroup_Mapping.cs">
       <DependentUpon>AAIV Entities.tt</DependentUpon>
     </Compile>
     <Compile Include="Model\ViewModels\AspNetRoleViewModelGen.cs">
@@ -108,19 +108,19 @@
     <Compile Include="Model\ViewModels\AspNetUserViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\ViewModels\C__MigrationHistoryViewModelGen.cs">
+    <Compile Include="Model\ViewModels\FaceViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\ViewModels\tbl_FaceViewModelGen.cs">
+    <Compile Include="Model\ViewModels\LogViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\ViewModels\tbl_LogViewModelGen.cs">
+    <Compile Include="Model\ViewModels\PersonGroupViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\ViewModels\tbl_PersonGroupViewModelGen.cs">
+    <Compile Include="Model\ViewModels\PersonViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\ViewModels\tbl_PersonViewModelGen.cs">
+    <Compile Include="Model\ViewModels\User_PersonGroup_MappingViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Model\ViewModels\ViewModel.cs">
@@ -142,7 +142,16 @@
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
     <Compile Include="Repository\BaseRepository.cs" />
-    <Compile Include="Repository\C__MigrationHistoryRepositoryGen.cs">
+    <Compile Include="Repository\FaceRepositoryGen.cs">
+      <DependentUpon>Repositories.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Repository\LogRepositoryGen.cs">
+      <DependentUpon>Repositories.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Repository\PersonGroupRepositoryGen.cs">
+      <DependentUpon>Repositories.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Repository\PersonRepositoryGen.cs">
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
     <Compile Include="Repository\Repositories.cs">
@@ -150,16 +159,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
-    <Compile Include="Repository\tbl_FaceRepositoryGen.cs">
-      <DependentUpon>Repositories.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Repository\tbl_LogRepositoryGen.cs">
-      <DependentUpon>Repositories.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Repository\tbl_PersonGroupRepositoryGen.cs">
-      <DependentUpon>Repositories.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Repository\tbl_PersonRepositoryGen.cs">
+    <Compile Include="Repository\User_PersonGroup_MappingRepositoryGen.cs">
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
     <Compile Include="Service\AspNetRoleServiceGen.cs">
@@ -175,7 +175,16 @@
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
     <Compile Include="Service\BaseService.cs" />
-    <Compile Include="Service\C__MigrationHistoryServiceGen.cs">
+    <Compile Include="Service\FaceServiceGen.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Service\LogServiceGen.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Service\PersonGroupServiceGen.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Service\PersonServiceGen.cs">
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
     <Compile Include="Service\Services.cs">
@@ -183,16 +192,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
-    <Compile Include="Service\tbl_FaceServiceGen.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Service\tbl_LogServiceGen.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Service\tbl_PersonGroupServiceGen.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Service\tbl_PersonServiceGen.cs">
+    <Compile Include="Service\User_PersonGroup_MappingServiceGen.cs">
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
   </ItemGroup>

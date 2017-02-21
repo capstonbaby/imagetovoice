@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Constants.setApiHost("192.168.1.99");
+        Constants.setApiHost("192.168.43.51");
         Toast.makeText(this, Constants.getApiHost(), Toast.LENGTH_LONG).show();
 
         iv_preview = (ImageView) findViewById(R.id.iv_preview);

@@ -71,6 +71,7 @@ import id.zelory.compressor.Compressor;
 public class Camera2Fragment extends Fragment
         implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
 
+
     private int capture_mode;
     private static final int FACE_CAPTURE_MODE = 1;
     private static final int OBJECT_CAPTURE_MODE = 2;
@@ -906,6 +907,12 @@ public class Camera2Fragment extends Fragment
             case R.id.object_capture_button: {
                 capture_mode = OBJECT_CAPTURE_MODE;
                 takePicture();
+//                mBackgroundHandler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        new MainServices().IdentifyPerson("http://res.cloudinary.com/debwqzo2g/image/upload/v1486958052/ep9pgjz9rh4udwudyf90.jpg");
+//                    }
+//                });
                 break;
             }
             case R.id.create_person_button: {
@@ -984,6 +991,7 @@ public class Camera2Fragment extends Fragment
                                     mResult.setText(result);
                                 }
                             });
+                            break;
                         }
                         case OBJECT_CAPTURE_MODE: {
                             final VisionResponse response = services.DetectVision(url);
@@ -1002,7 +1010,8 @@ public class Camera2Fragment extends Fragment
                                     }
                                 });
                             }
-                        }
+                            break;
+                        } default: break;
                     }
                 } else {
                     mResult.post(new Runnable() {
@@ -1111,4 +1120,6 @@ public class Camera2Fragment extends Fragment
                     .create();
         }
     }
+
+
 }

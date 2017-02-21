@@ -13,7 +13,6 @@ import com.example.mypc.aaiv_voicecontrol.person_model.Person;
 import com.example.mypc.aaiv_voicecontrol.person_model.PersonApi;
 import com.example.mypc.aaiv_voicecontrol.person_model.PersonGroup;
 
-import java.io.IOException;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -82,22 +81,13 @@ public class PersonServices {
         return faceDetectApi.getPersonGroup();
     }
 
-    public List<PersonGroup> GetPersonGroupSync(){
+    public Call<List<PersonGroup>> GetPersonGroupSync(){
         Retrofit retrofit = getRetrofitFaceDetect();
 
         PersonApi faceDetectApi = retrofit.create(PersonApi.class);
         Call<List<PersonGroup>> call =  faceDetectApi.getPersonGroup();
-        try {
-            personGroups  =  call.execute().body();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        while(true){
-            if(personGroups != null){
-                return personGroups;
-            }
-        }
+        return call;
     }
 
     public Call<Void> TrainPersonGroup(String personGroupId) {

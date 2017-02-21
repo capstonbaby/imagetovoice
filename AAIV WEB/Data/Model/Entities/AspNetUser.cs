@@ -19,8 +19,8 @@ namespace Data.Model.Entities
         {
             this.AspNetUserClaims = new HashSet<AspNetUserClaim>();
             this.AspNetUserLogins = new HashSet<AspNetUserLogin>();
-            this.tbl_Log = new HashSet<tbl_Log>();
-            this.tbl_PersonGroup = new HashSet<tbl_PersonGroup>();
+            this.Logs = new HashSet<Log>();
+            this.User_PersonGroup_Mapping = new HashSet<User_PersonGroup_Mapping>();
             this.AspNetRoles = new HashSet<AspNetRole>();
         }
     
@@ -42,9 +42,9 @@ namespace Data.Model.Entities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AspNetUserLogin> AspNetUserLogins { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tbl_Log> tbl_Log { get; set; }
+        public virtual ICollection<Log> Logs { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tbl_PersonGroup> tbl_PersonGroup { get; set; }
+        public virtual ICollection<User_PersonGroup_Mapping> User_PersonGroup_Mapping { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AspNetRole> AspNetRoles { get; set; }
     }

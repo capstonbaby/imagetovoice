@@ -79,7 +79,7 @@ public class AddPersonActivity extends AppCompatActivity implements AdapterView.
 
         context = getApplicationContext();
 
-        Constants.setApiHost("192.168.1.99");
+        Constants.setApiHost("192.168.43.51");
         Toast.makeText(this, Constants.getApiHost(), Toast.LENGTH_LONG).show();
 
         txtPersonName = (TextInputLayout) findViewById(R.id.input_layout_name);
