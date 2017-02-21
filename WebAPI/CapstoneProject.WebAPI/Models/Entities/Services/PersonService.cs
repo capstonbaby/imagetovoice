@@ -1,15 +1,14 @@
-﻿using CapstoneProject.WebAPI.Models.ViewModels;
-using System;
-using System.Collections.Generic;
+﻿using AutoMapper.QueryableExtensions;
+using CapstoneProject.WebAPI.Models.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace CapstoneProject.WebAPI.Models.Entities.Services
 {
     public partial interface IPersonService
     {
         Task CreatePersonAsync(PersonViewModel model);
+        IQueryable<Person> GetAllPerson();
     }
 
     public partial class PersonService
@@ -18,6 +17,12 @@ namespace CapstoneProject.WebAPI.Models.Entities.Services
         {
             var person = model.ToEntity();
             await CreateAsync(person);
+        }
+
+        public IQueryable<Person> GetAllPerson()
+        {
+            var entity = GetActive();
+            return entity;
         }
     }
 }
