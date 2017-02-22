@@ -12,17 +12,17 @@ namespace CapstoneProject.WebAPI.Models.ViewModels
     using System;
     using System.Collections.Generic;
     
-    public partial class LogViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<CapstoneProject.WebAPI.Models.Entities.Log>
+    public partial class sysdiagramViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<CapstoneProject.WebAPI.Models.Entities.sysdiagram>
     {
     	
-    			public virtual int ID { get; set; }
-    			public virtual System.DateTime CreatedDate { get; set; }
-    			public virtual string UserID { get; set; }
-    			public virtual string ImageURL { get; set; }
-    			public virtual bool Active { get; set; }
+    			public virtual string name { get; set; }
+    			public virtual int principal_id { get; set; }
+    			public virtual int diagram_id { get; set; }
+    			public virtual Nullable<int> version { get; set; }
+    			public virtual byte[] definition { get; set; }
     	
-    	public LogViewModel() : base() { }
-    	public LogViewModel(CapstoneProject.WebAPI.Models.Entities.Log entity) : base(entity) { }
+    	public sysdiagramViewModel() : base() { }
+    	public sysdiagramViewModel(CapstoneProject.WebAPI.Models.Entities.sysdiagram entity) : base(entity) { }
     
     }
 }

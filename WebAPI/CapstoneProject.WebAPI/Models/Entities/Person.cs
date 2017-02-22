@@ -19,14 +19,14 @@ namespace CapstoneProject.WebAPI.Models.Entities
         {
             this.Faces = new HashSet<Face>();
         }
-
+    
         public int ID { get; set; }
         public string PersonId { get; set; }
         public int PersonGroupID { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public bool Active { get; set; }
-
+    
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Face> Faces { get; set; }
         public virtual PersonGroup PersonGroup { get; set; }

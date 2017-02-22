@@ -12,14 +12,12 @@ namespace CapstoneProject.WebAPI.Models.Entities
     using System;
     using System.Collections.Generic;
     
-    public partial class Log
+    public partial class sysdiagram
     {
-        public int ID { get; set; }
-        public System.DateTime CreatedDate { get; set; }
-        public string UserID { get; set; }
-        public string ImageURL { get; set; }
-        public bool Active { get; set; }
-    
-        public virtual AspNetUser AspNetUser { get; set; }
+        public string name { get; set; }
+        public int principal_id { get; set; }
+        public int diagram_id { get; set; }
+        public Nullable<int> version { get; set; }
+        public byte[] definition { get; set; }
     }
 }

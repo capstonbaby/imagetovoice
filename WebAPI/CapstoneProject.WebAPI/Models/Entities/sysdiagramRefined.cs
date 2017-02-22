@@ -12,14 +12,7 @@ namespace CapstoneProject.WebAPI.Models.Entities
     using System;
     using System.Collections.Generic;
     
-    public partial class Log
+    public partial class sysdiagram : SkyWeb.DatVM.Data.IEntity
     {
-        public int ID { get; set; }
-        public System.DateTime CreatedDate { get; set; }
-        public string UserID { get; set; }
-        public string ImageURL { get; set; }
-        public bool Active { get; set; }
-    
-        public virtual AspNetUser AspNetUser { get; set; }
     }
 }

@@ -5,6 +5,16 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="CapstoneModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="__MigrationHistory">
+          <Key>
+            <PropertyRef Name="MigrationId" />
+            <PropertyRef Name="ContextKey" />
+          </Key>
+          <Property Name="MigrationId" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="ContextKey" Type="nvarchar" MaxLength="300" Nullable="false" />
+          <Property Name="Model" Type="varbinary(max)" Nullable="false" />
+          <Property Name="ProductVersion" Type="nvarchar" MaxLength="32" Nullable="false" />
+        </EntityType>
         <EntityType Name="AspNetRoles">
           <Key>
             <PropertyRef Name="Id" />
@@ -74,7 +84,6 @@
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
           <Property Name="UserID" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="ImageURL" Type="nvarchar(max)" Nullable="false" />
-          <Property Name="ImageType" Type="int" Nullable="false" />
           <Property Name="Active" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="Person">
@@ -96,6 +105,16 @@
           <Property Name="PersonGroupName" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="Description" Type="nvarchar" MaxLength="250" />
           <Property Name="Active" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
         </EntityType>
         <EntityType Name="User_PersonGroup_Mapping">
           <Key>
@@ -162,7 +181,19 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Person_PersonGroup">
+        <Association Name="FK_Log_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1" />
+          <End Role="Log" Type="Self.Log" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Log">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Person_PersonGroup1">
           <End Role="PersonGroup" Type="Self.PersonGroup" Multiplicity="1" />
           <End Role="Person" Type="Self.Person" Multiplicity="*" />
           <ReferentialConstraint>
@@ -183,18 +214,6 @@
             </Principal>
             <Dependent Role="Face">
               <PropertyRef Name="PersonID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_tbl_Log_AspNetUsers">
-          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1" />
-          <End Role="Log" Type="Self.Log" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetUsers">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Log">
-              <PropertyRef Name="UserID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -223,6 +242,7 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="CapstoneModelStoreContainer">
+          <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserClaims" EntityType="Self.AspNetUserClaims" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogins" Schema="dbo" store:Type="Tables" />
@@ -232,6 +252,7 @@
           <EntitySet Name="Log" EntityType="Self.Log" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Person" EntityType="Self.Person" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PersonGroup" EntityType="Self.PersonGroup" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User_PersonGroup_Mapping" EntityType="Self.User_PersonGroup_Mapping" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
@@ -249,17 +270,17 @@
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
           </AssociationSet>
-          <AssociationSet Name="FK_Person_PersonGroup" Association="Self.FK_Person_PersonGroup">
+          <AssociationSet Name="FK_Log_AspNetUsers" Association="Self.FK_Log_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="Log" EntitySet="Log" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Person_PersonGroup1" Association="Self.FK_Person_PersonGroup1">
             <End Role="PersonGroup" EntitySet="PersonGroup" />
             <End Role="Person" EntitySet="Person" />
           </AssociationSet>
           <AssociationSet Name="FK_tbl_Face_tbl_Person" Association="Self.FK_tbl_Face_tbl_Person">
             <End Role="Person" EntitySet="Person" />
             <End Role="Face" EntitySet="Face" />
-          </AssociationSet>
-          <AssociationSet Name="FK_tbl_Log_AspNetUsers" Association="Self.FK_tbl_Log_AspNetUsers">
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-            <End Role="Log" EntitySet="Log" />
           </AssociationSet>
           <AssociationSet Name="FK_User_PersonGroup_Mapping_AspNetUsers" Association="Self.FK_User_PersonGroup_Mapping_AspNetUsers">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
@@ -275,6 +296,7 @@
     <edmx:ConceptualModels>
       <Schema Namespace="CapstoneModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="CapstoneEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="C__MigrationHistory" EntityType="CapstoneModel.C__MigrationHistory" />
           <EntitySet Name="AspNetRoles" EntityType="CapstoneModel.AspNetRole" />
           <EntitySet Name="AspNetUserClaims" EntityType="CapstoneModel.AspNetUserClaim" />
           <EntitySet Name="AspNetUserLogins" EntityType="CapstoneModel.AspNetUserLogin" />
@@ -283,6 +305,7 @@
           <EntitySet Name="Logs" EntityType="CapstoneModel.Log" />
           <EntitySet Name="People" EntityType="CapstoneModel.Person" />
           <EntitySet Name="PersonGroups" EntityType="CapstoneModel.PersonGroup" />
+          <EntitySet Name="sysdiagrams" EntityType="CapstoneModel.sysdiagram" />
           <EntitySet Name="User_PersonGroup_Mapping" EntityType="CapstoneModel.User_PersonGroup_Mapping" />
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="CapstoneModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
@@ -292,7 +315,7 @@
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
             <End Role="AspNetUserLogin" EntitySet="AspNetUserLogins" />
           </AssociationSet>
-          <AssociationSet Name="FK_tbl_Log_AspNetUsers" Association="CapstoneModel.FK_tbl_Log_AspNetUsers">
+          <AssociationSet Name="FK_Log_AspNetUsers" Association="CapstoneModel.FK_Log_AspNetUsers">
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
             <End Role="Log" EntitySet="Logs" />
           </AssociationSet>
@@ -304,7 +327,7 @@
             <End Role="Person" EntitySet="People" />
             <End Role="Face" EntitySet="Faces" />
           </AssociationSet>
-          <AssociationSet Name="FK_Person_PersonGroup" Association="CapstoneModel.FK_Person_PersonGroup">
+          <AssociationSet Name="FK_Person_PersonGroup1" Association="CapstoneModel.FK_Person_PersonGroup1">
             <End Role="PersonGroup" EntitySet="PersonGroups" />
             <End Role="Person" EntitySet="People" />
           </AssociationSet>
@@ -317,6 +340,16 @@
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
           </AssociationSet>
         </EntityContainer>
+        <EntityType Name="C__MigrationHistory">
+          <Key>
+            <PropertyRef Name="MigrationId" />
+            <PropertyRef Name="ContextKey" />
+          </Key>
+          <Property Name="MigrationId" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="ContextKey" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Name="Model" Type="Binary" Nullable="false" MaxLength="Max" FixedLength="false" />
+          <Property Name="ProductVersion" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
+        </EntityType>
         <EntityType Name="AspNetRole">
           <Key>
             <PropertyRef Name="Id" />
@@ -364,7 +397,7 @@
           <Property Name="UserName" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="AspNetUserClaims" Relationship="CapstoneModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" FromRole="AspNetUser" ToRole="AspNetUserClaim" />
           <NavigationProperty Name="AspNetUserLogins" Relationship="CapstoneModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUser" ToRole="AspNetUserLogin" />
-          <NavigationProperty Name="Logs" Relationship="CapstoneModel.FK_tbl_Log_AspNetUsers" FromRole="AspNetUser" ToRole="Log" />
+          <NavigationProperty Name="Logs" Relationship="CapstoneModel.FK_Log_AspNetUsers" FromRole="AspNetUser" ToRole="Log" />
           <NavigationProperty Name="User_PersonGroup_Mapping" Relationship="CapstoneModel.FK_User_PersonGroup_Mapping_AspNetUsers" FromRole="AspNetUser" ToRole="User_PersonGroup_Mapping" />
           <NavigationProperty Name="AspNetRoles" Relationship="CapstoneModel.AspNetUserRoles" FromRole="AspNetUser" ToRole="AspNetRole" />
         </EntityType>
@@ -387,9 +420,8 @@
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UserID" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="ImageType" Type="Int32" Nullable="false" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="AspNetUser" Relationship="CapstoneModel.FK_tbl_Log_AspNetUsers" FromRole="Log" ToRole="AspNetUser" />
+          <NavigationProperty Name="AspNetUser" Relationship="CapstoneModel.FK_Log_AspNetUsers" FromRole="Log" ToRole="AspNetUser" />
         </EntityType>
         <EntityType Name="Person">
           <Key>
@@ -402,7 +434,7 @@
           <Property Name="Description" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Faces" Relationship="CapstoneModel.FK_tbl_Face_tbl_Person" FromRole="Person" ToRole="Face" />
-          <NavigationProperty Name="PersonGroup" Relationship="CapstoneModel.FK_Person_PersonGroup" FromRole="Person" ToRole="PersonGroup" />
+          <NavigationProperty Name="PersonGroup" Relationship="CapstoneModel.FK_Person_PersonGroup1" FromRole="Person" ToRole="PersonGroup" />
         </EntityType>
         <EntityType Name="PersonGroup">
           <Key>
@@ -412,8 +444,18 @@
           <Property Name="PersonGroupName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="Description" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="People" Relationship="CapstoneModel.FK_Person_PersonGroup" FromRole="PersonGroup" ToRole="Person" />
+          <NavigationProperty Name="People" Relationship="CapstoneModel.FK_Person_PersonGroup1" FromRole="PersonGroup" ToRole="Person" />
           <NavigationProperty Name="User_PersonGroup_Mapping" Relationship="CapstoneModel.FK_User_PersonGroup_Mapping_PersonGroup" FromRole="PersonGroup" ToRole="User_PersonGroup_Mapping" />
+        </EntityType>
+        <EntityType Name="sysdiagram">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <EntityType Name="User_PersonGroup_Mapping">
           <Key>
@@ -454,7 +496,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_tbl_Log_AspNetUsers">
+        <Association Name="FK_Log_AspNetUsers">
           <End Type="CapstoneModel.AspNetUser" Role="AspNetUser" Multiplicity="1" />
           <End Type="CapstoneModel.Log" Role="Log" Multiplicity="*" />
           <ReferentialConstraint>
@@ -490,7 +532,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Person_PersonGroup">
+        <Association Name="FK_Person_PersonGroup1">
           <End Type="CapstoneModel.PersonGroup" Role="PersonGroup" Multiplicity="1" />
           <End Type="CapstoneModel.Person" Role="Person" Multiplicity="*" />
           <ReferentialConstraint>
@@ -524,6 +566,16 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="CapstoneModelStoreContainer" CdmEntityContainer="CapstoneEntities">
+          <EntitySetMapping Name="C__MigrationHistory">
+            <EntityTypeMapping TypeName="CapstoneModel.C__MigrationHistory">
+              <MappingFragment StoreEntitySet="__MigrationHistory">
+                <ScalarProperty Name="ProductVersion" ColumnName="ProductVersion" />
+                <ScalarProperty Name="Model" ColumnName="Model" />
+                <ScalarProperty Name="ContextKey" ColumnName="ContextKey" />
+                <ScalarProperty Name="MigrationId" ColumnName="MigrationId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="AspNetRoles">
             <EntityTypeMapping TypeName="CapstoneModel.AspNetRole">
               <MappingFragment StoreEntitySet="AspNetRoles">
@@ -584,7 +636,6 @@
             <EntityTypeMapping TypeName="CapstoneModel.Log">
               <MappingFragment StoreEntitySet="Log">
                 <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="ImageType" ColumnName="ImageType" />
                 <ScalarProperty Name="ImageURL" ColumnName="ImageURL" />
                 <ScalarProperty Name="UserID" ColumnName="UserID" />
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
@@ -611,6 +662,17 @@
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="PersonGroupName" ColumnName="PersonGroupName" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="CapstoneModel.sysdiagram">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="definition" ColumnName="definition" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

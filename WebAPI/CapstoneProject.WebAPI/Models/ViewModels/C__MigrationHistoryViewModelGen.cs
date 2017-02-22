@@ -12,17 +12,16 @@ namespace CapstoneProject.WebAPI.Models.ViewModels
     using System;
     using System.Collections.Generic;
     
-    public partial class LogViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<CapstoneProject.WebAPI.Models.Entities.Log>
+    public partial class C__MigrationHistoryViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<CapstoneProject.WebAPI.Models.Entities.C__MigrationHistory>
     {
     	
-    			public virtual int ID { get; set; }
-    			public virtual System.DateTime CreatedDate { get; set; }
-    			public virtual string UserID { get; set; }
-    			public virtual string ImageURL { get; set; }
-    			public virtual bool Active { get; set; }
+    			public virtual string MigrationId { get; set; }
+    			public virtual string ContextKey { get; set; }
+    			public virtual byte[] Model { get; set; }
+    			public virtual string ProductVersion { get; set; }
     	
-    	public LogViewModel() : base() { }
-    	public LogViewModel(CapstoneProject.WebAPI.Models.Entities.Log entity) : base(entity) { }
+    	public C__MigrationHistoryViewModel() : base() { }
+    	public C__MigrationHistoryViewModel(CapstoneProject.WebAPI.Models.Entities.C__MigrationHistory entity) : base(entity) { }
     
     }
 }

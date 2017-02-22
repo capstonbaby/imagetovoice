@@ -7,19 +7,20 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CapstoneProject.WebAPI.Models.Entities
+namespace CapstoneProject.WebAPI.Models.Entities.Repositories
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Log
-    {
-        public int ID { get; set; }
-        public System.DateTime CreatedDate { get; set; }
-        public string UserID { get; set; }
-        public string ImageURL { get; set; }
-        public bool Active { get; set; }
     
-        public virtual AspNetUser AspNetUser { get; set; }
+    public partial interface IC__MigrationHistoryRepository : SkyWeb.DatVM.Data.IBaseRepository<C__MigrationHistory>
+    {
+    }
+    
+    public partial class C__MigrationHistoryRepository : SkyWeb.DatVM.Data.BaseRepository<C__MigrationHistory>, IC__MigrationHistoryRepository
+    {
+    	public C__MigrationHistoryRepository(System.Data.Entity.DbContext dbContext) : base(dbContext)
+        {
+        }
     }
 }

@@ -7,19 +7,20 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CapstoneProject.WebAPI.Models.Entities
+namespace CapstoneProject.WebAPI.Models.Entities.Services
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Log
-    {
-        public int ID { get; set; }
-        public System.DateTime CreatedDate { get; set; }
-        public string UserID { get; set; }
-        public string ImageURL { get; set; }
-        public bool Active { get; set; }
     
-        public virtual AspNetUser AspNetUser { get; set; }
+    public partial interface IsysdiagramService : SkyWeb.DatVM.Data.IBaseService<sysdiagram>
+    {
+    }
+    
+    public partial class sysdiagramService : SkyWeb.DatVM.Data.BaseService<sysdiagram>, IsysdiagramService
+    {
+        public sysdiagramService(SkyWeb.DatVM.Data.IUnitOfWork unitOfWork, Repositories.IsysdiagramRepository repository) : base(unitOfWork, repository)
+        {
+        }
     }
 }
