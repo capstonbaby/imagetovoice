@@ -18,6 +18,7 @@ namespace CapstoneProject.WebAPI.Models.Entities
         public System.DateTime CreatedDate { get; set; }
         public string UserID { get; set; }
         public string ImageURL { get; set; }
+        public string Name { get; set; }
         public bool Active { get; set; }
     
         public virtual AspNetUser AspNetUser { get; set; }
