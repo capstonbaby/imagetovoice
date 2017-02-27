@@ -180,6 +180,7 @@
     <Compile Include="ApiEndPoint.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\await.cs" />
     <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\EmotionController.cs" />
     <Compile Include="Models\Entities\AspNetRole.cs">
@@ -224,12 +225,6 @@
     <Compile Include="Common\Assets.cs" />
     <Compile Include="Controllers\ComputerVisionController.cs" />
     <Compile Include="Controllers\FaceReviewController.cs" />
-    <Compile Include="Models\Entities\C__MigrationHistory.cs">
-      <DependentUpon>CapstoneModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Entities\C__MigrationHistoryRefined.cs">
-      <DependentUpon>EntityRefinery.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Entities\EntityRefinery.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -275,9 +270,6 @@
     <Compile Include="Models\Entities\Repositories\AspNetUserRepositoryGen.cs">
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\Repositories\C__MigrationHistoryRepositoryGen.cs">
-      <DependentUpon>Repositories.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Entities\Repositories\FaceRepositoryGen.cs">
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
@@ -295,9 +287,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\Repositories\sysdiagramRepositoryGen.cs">
-      <DependentUpon>Repositories.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Entities\Repositories\User_PersonGroup_MappingRepositoryGen.cs">
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
@@ -311,9 +300,6 @@
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Services\AspNetUserServiceGen.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Entities\Services\C__MigrationHistoryServiceGen.cs">
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Services\FaceServiceGen.cs">
@@ -334,17 +320,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\Services\sysdiagramServiceGen.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Entities\Services\User_PersonGroup_MappingServiceGen.cs">
       <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Entities\sysdiagram.cs">
-      <DependentUpon>CapstoneModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Entities\sysdiagramRefined.cs">
-      <DependentUpon>EntityRefinery.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\User_PersonGroup_MappingRefined.cs">
       <DependentUpon>EntityRefinery.tt</DependentUpon>
@@ -361,9 +338,6 @@
     <Compile Include="Models\ViewModels\AspNetUserViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\ViewModels\C__MigrationHistoryViewModelGen.cs">
-      <DependentUpon>ViewModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\ViewModels\FaceViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
@@ -374,9 +348,6 @@
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ViewModels\PersonViewModelGen.cs">
-      <DependentUpon>ViewModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\ViewModels\sysdiagramViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ViewModels\User_PersonGroup_MappingViewModelGen.cs">

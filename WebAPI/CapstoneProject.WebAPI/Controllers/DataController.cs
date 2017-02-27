@@ -16,18 +16,42 @@ namespace CapstoneProject.WebAPI.Controllers
 {
     public class DataController : BaseController
     {
-        public async Task<JsonResult> CreatePerson(PersonViewModel model)
+        public async Task<JsonResult> CreatePerson(PersonViewModel model, int logId)
         {
             var service = this.Service<IPersonService>();
+            var logService = this.Service<ILogService>();
+            var faceService = this.Service<IFaceService>();
 
+            //TODO: ADD PERSON GROUP ID AFTER IMPLEMENT AUTHORIZATION
+            model.PersonGroupID = 2;
+            model.Active = true;
             try
             {
                 await service.CreatePersonAsync(model);
+
+                var log = logService.Get(logId);
+                await logService.DeactivateAsync(log);
+
                 return Json(new { message = "Create Person Successfully" });
             }
             catch (Exception ex)
             {
                 return Json(new { message = "Create Person Failed", error = ex });
+            }
+        }
+
+        public async Task<JsonResult> DeactiveLog(int logId)
+        {
+            try
+            {
+                var service = this.Service<ILogService>();
+                var log = service.Get(logId);
+                await service.DeactivateAsync(log);
+                return Json(new { message = "Deactive Log File Successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { message = "Deactive Log File Failled", error = ex.Message });
             }
         }
 
@@ -86,6 +110,7 @@ namespace CapstoneProject.WebAPI.Controllers
                 id = q.ID,
                 imgUrl = q.ImageURL,
                 createdate = q.CreatedDate.ToString("dd/mm/yyyy hh:mm:ss"),
+                name = q.Name
             }));
         }
 
