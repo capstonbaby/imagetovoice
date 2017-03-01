@@ -126,5 +126,38 @@ namespace CapstoneProject.WebAPI.Controllers
                 imgUrl = model.ImageURL,
             });
         }
+
+        //Object
+
+        public async Task<JsonResult> CreateLogObject(LogObjectViewModel model)
+        {
+            var service = this.Service<ILogObjectService>();
+
+            model.CreatedDate = DateTime.Now;
+            model.UserID = "36a65953-8d12-46cd-9500-fc33e9123aaf";
+
+            model.Active = true;
+
+            var entity = model.ToEntity();
+
+            try
+            {
+                await service.CreateAsync(entity);
+                return Json(new
+                {
+                    message = "Create Log Successfully",
+                    response = new
+                    {
+                        logId = entity.ID,
+                        createdate = entity.CreatedDate.ToString("dd/mm/yyyy hh:mm:ss")
+                    }
+                });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { message = "Create Log Failed", error = ex.Message });
+            }
+        }
     }
 }
