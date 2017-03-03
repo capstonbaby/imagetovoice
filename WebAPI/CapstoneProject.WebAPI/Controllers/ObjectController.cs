@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -21,6 +23,7 @@ namespace CapstoneProject.WebAPI.Controllers
         public async Task<HttpResponseMessage> Detect(FormDataCollection formDataCollection)
         {
             string urlImage = formDataCollection["url"];
+            string conceptDescription = "";
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -31,12 +34,35 @@ namespace CapstoneProject.WebAPI.Controllers
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine("success");
+                String strRespone = await response.Content.ReadAsStringAsync();
+                var data = (JObject)JsonConvert.DeserializeObject(strRespone);
+                Double value = Double.Parse(data["outputs"][0]["data"]["concepts"][0]["value"].ToString());
+                if(value > 0.6)
+                {
+                    string conceptId = data["outputs"][0]["data"]["concepts"][0]["id"].ToString();
+                    var dataApi = new DataController();
+                    conceptDescription = dataApi.getDescriptionConcept(conceptId);
+                }
+                else
+                {
+                    conceptDescription = "error";
+                }
+                
+                return new HttpResponseMessage()
+                {
+                    Content = new StringContent(conceptDescription, Encoding.UTF8, "text/html"),
+                };
             }
             else
             {
-                Console.WriteLine("error");
+                return new HttpResponseMessage()
+                {
+                    Content = new StringContent("error", Encoding.UTF8, "text/html"),
+                };
             }
-            return response;
+            //return response;
+
+            
 
         }
     }

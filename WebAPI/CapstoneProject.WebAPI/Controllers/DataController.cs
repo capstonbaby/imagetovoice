@@ -159,5 +159,13 @@ namespace CapstoneProject.WebAPI.Controllers
                 return Json(new { message = "Create Log Failed", error = ex.Message });
             }
         }
+
+        public string getDescriptionConcept(string conceptid)
+        {
+            var service = this.Service<IConceptService>();
+            var model = service.GetActive(q => q.ConceptId.Equals(conceptid)).First();
+
+            return model.ConceptDescription;
+        }
     }
 }
