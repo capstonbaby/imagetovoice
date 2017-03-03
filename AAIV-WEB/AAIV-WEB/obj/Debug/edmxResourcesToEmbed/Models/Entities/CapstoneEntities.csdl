@@ -1,22 +1,75 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Schema Namespace="CapstoneModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="CapstoneEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="C__MigrationHistory" EntityType="CapstoneModel.C__MigrationHistory" />
+    <EntitySet Name="AspNetRoles" EntityType="CapstoneModel.AspNetRole" />
+    <EntitySet Name="AspNetUserClaims" EntityType="CapstoneModel.AspNetUserClaim" />
+    <EntitySet Name="AspNetUserLogins" EntityType="CapstoneModel.AspNetUserLogin" />
+    <EntitySet Name="AspNetUsers" EntityType="CapstoneModel.AspNetUser" />
+    <EntitySet Name="Concepts" EntityType="CapstoneModel.Concept" />
+    <EntitySet Name="Faces" EntityType="CapstoneModel.Face" />
+    <EntitySet Name="Logs" EntityType="CapstoneModel.Log" />
+    <EntitySet Name="LogObjects" EntityType="CapstoneModel.LogObject" />
+    <EntitySet Name="People" EntityType="CapstoneModel.Person" />
+    <EntitySet Name="PersonGroups" EntityType="CapstoneModel.PersonGroup" />
+    <EntitySet Name="Pictures" EntityType="CapstoneModel.Picture" />
+    <EntitySet Name="sysdiagrams" EntityType="CapstoneModel.sysdiagram" />
+    <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="CapstoneModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
+      <End Role="AspNetUser" EntitySet="AspNetUsers" />
+      <End Role="AspNetUserClaim" EntitySet="AspNetUserClaims" />
+    </AssociationSet>
+    <AssociationSet Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" Association="CapstoneModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
+      <End Role="AspNetUser" EntitySet="AspNetUsers" />
+      <End Role="AspNetUserLogin" EntitySet="AspNetUserLogins" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AspNetUsers_PersonGroup" Association="CapstoneModel.FK_AspNetUsers_PersonGroup">
+      <End Role="PersonGroup" EntitySet="PersonGroups" />
+      <End Role="AspNetUser" EntitySet="AspNetUsers" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Log_AspNetUsers" Association="CapstoneModel.FK_Log_AspNetUsers">
+      <End Role="AspNetUser" EntitySet="AspNetUsers" />
+      <End Role="Log" EntitySet="Logs" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tbl_Face_tbl_Person" Association="CapstoneModel.FK_tbl_Face_tbl_Person">
+      <End Role="Person" EntitySet="People" />
+      <End Role="Face" EntitySet="Faces" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Person_PersonGroup1" Association="CapstoneModel.FK_Person_PersonGroup1">
+      <End Role="PersonGroup" EntitySet="PersonGroups" />
+      <End Role="Person" EntitySet="People" />
+    </AssociationSet>
+    <AssociationSet Name="AspNetUserRoles" Association="CapstoneModel.AspNetUserRoles">
+      <End Role="AspNetRole" EntitySet="AspNetRoles" />
+      <End Role="AspNetUser" EntitySet="AspNetUsers" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="C__MigrationHistory">
+    <Key>
+      <PropertyRef Name="MigrationId" />
+      <PropertyRef Name="ContextKey" />
+    </Key>
+    <Property Name="MigrationId" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="ContextKey" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Name="Model" Type="Binary" Nullable="false" MaxLength="Max" FixedLength="false" />
+    <Property Name="ProductVersion" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
+  </EntityType>
   <EntityType Name="AspNetRole">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-    <Property Name="Name" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
-    <NavigationProperty Name="AspNetUsers" Relationship="Self.AspNetUserRoles" FromRole="AspNetRoles" ToRole="AspNetUsers" />
+    <Property Name="Id" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="AspNetUsers" Relationship="CapstoneModel.AspNetUserRoles" FromRole="AspNetRole" ToRole="AspNetUser" />
   </EntityType>
   <EntityType Name="AspNetUserClaim">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
     <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="UserId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="UserId" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
     <Property Name="ClaimType" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="ClaimValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-    <NavigationProperty Name="AspNetUser" Relationship="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" FromRole="AspNetUserClaims" ToRole="AspNetUsers" />
+    <NavigationProperty Name="AspNetUser" Relationship="CapstoneModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" FromRole="AspNetUserClaim" ToRole="AspNetUser" />
   </EntityType>
   <EntityType Name="AspNetUserLogin">
     <Key>
@@ -24,16 +77,16 @@
       <PropertyRef Name="ProviderKey" />
       <PropertyRef Name="UserId" />
     </Key>
-    <Property Name="LoginProvider" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-    <Property Name="ProviderKey" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-    <Property Name="UserId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-    <NavigationProperty Name="AspNetUser" Relationship="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUserLogins" ToRole="AspNetUsers" />
+    <Property Name="LoginProvider" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="ProviderKey" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="UserId" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="AspNetUser" Relationship="CapstoneModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUserLogin" ToRole="AspNetUser" />
   </EntityType>
   <EntityType Name="AspNetUser">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Id" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
     <Property Name="Email" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
     <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
     <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
@@ -44,12 +97,23 @@
     <Property Name="LockoutEndDateUtc" Type="DateTime" Precision="3" />
     <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
     <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
-    <Property Name="UserName" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
-    <NavigationProperty Name="AspNetUserClaims" Relationship="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" FromRole="AspNetUsers" ToRole="AspNetUserClaims" />
-    <NavigationProperty Name="AspNetUserLogins" Relationship="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUsers" ToRole="AspNetUserLogins" />
-    <NavigationProperty Name="Logs" Relationship="Self.FK_tbl_Log_AspNetUsers" FromRole="AspNetUsers" ToRole="Log" />
-    <NavigationProperty Name="User_PersonGroup_Mapping" Relationship="Self.FK_User_PersonGroup_Mapping_AspNetUsers" FromRole="AspNetUsers" ToRole="User_PersonGroup_Mapping" />
-    <NavigationProperty Name="AspNetRoles" Relationship="Self.AspNetUserRoles" FromRole="AspNetUsers" ToRole="AspNetRoles" />
+    <Property Name="UserName" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
+    <Property Name="PersonGroupId" Type="Int32" />
+    <NavigationProperty Name="AspNetUserClaims" Relationship="CapstoneModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" FromRole="AspNetUser" ToRole="AspNetUserClaim" />
+    <NavigationProperty Name="AspNetUserLogins" Relationship="CapstoneModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUser" ToRole="AspNetUserLogin" />
+    <NavigationProperty Name="PersonGroup" Relationship="CapstoneModel.FK_AspNetUsers_PersonGroup" FromRole="AspNetUser" ToRole="PersonGroup" />
+    <NavigationProperty Name="Logs" Relationship="CapstoneModel.FK_Log_AspNetUsers" FromRole="AspNetUser" ToRole="Log" />
+    <NavigationProperty Name="AspNetRoles" Relationship="CapstoneModel.AspNetUserRoles" FromRole="AspNetUser" ToRole="AspNetRole" />
+  </EntityType>
+  <EntityType Name="Concept">
+    <Key>
+      <PropertyRef Name="ConceptId" />
+    </Key>
+    <Property Name="ConceptId" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="ConceptName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="ConceptDescription" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="CreateDate" Type="DateTime" Precision="3" />
+    <Property Name="Active" Type="Boolean" Nullable="false" />
   </EntityType>
   <EntityType Name="Face">
     <Key>
@@ -58,9 +122,9 @@
     <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
     <Property Name="PersonID" Type="Int32" Nullable="false" />
     <Property Name="PersistedFaceId" Type="String" MaxLength="36" FixedLength="true" Unicode="true" />
-    <Property Name="ImageURL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="Active" Type="Boolean" Nullable="false" />
-    <NavigationProperty Name="Person" Relationship="Self.FK_tbl_Face_tbl_Person" FromRole="Face" ToRole="Person" />
+    <NavigationProperty Name="Person" Relationship="CapstoneModel.FK_tbl_Face_tbl_Person" FromRole="Face" ToRole="Person" />
   </EntityType>
   <EntityType Name="Log">
     <Key>
@@ -68,80 +132,111 @@
     </Key>
     <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
     <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-    <Property Name="UserID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-    <Property Name="ImageURL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
-    <Property Name="ImageType" Type="Int32" Nullable="false" />
+    <Property Name="UserID" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
     <Property Name="Active" Type="Boolean" Nullable="false" />
-    <NavigationProperty Name="AspNetUser" Relationship="Self.FK_tbl_Log_AspNetUsers" FromRole="Log" ToRole="AspNetUsers" />
+    <NavigationProperty Name="AspNetUser" Relationship="CapstoneModel.FK_Log_AspNetUsers" FromRole="Log" ToRole="AspNetUser" />
+  </EntityType>
+  <EntityType Name="LogObject">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="UserID" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="Active" Type="Boolean" Nullable="false" />
   </EntityType>
   <EntityType Name="Person">
     <Key>
       <PropertyRef Name="ID" />
     </Key>
     <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="PersonId" Type="String" MaxLength="30" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="PersonId" Type="String" Nullable="false" MaxLength="36" FixedLength="false" Unicode="true" />
     <Property Name="PersonGroupID" Type="Int32" Nullable="false" />
-    <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
     <Property Name="Description" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
     <Property Name="Active" Type="Boolean" Nullable="false" />
-    <NavigationProperty Name="Faces" Relationship="Self.FK_tbl_Face_tbl_Person" FromRole="Person" ToRole="Face" />
-    <NavigationProperty Name="PersonGroup" Relationship="Self.FK_Person_PersonGroup1" FromRole="Person" ToRole="PersonGroup" />
+    <NavigationProperty Name="Faces" Relationship="CapstoneModel.FK_tbl_Face_tbl_Person" FromRole="Person" ToRole="Face" />
+    <NavigationProperty Name="PersonGroup" Relationship="CapstoneModel.FK_Person_PersonGroup1" FromRole="Person" ToRole="PersonGroup" />
   </EntityType>
   <EntityType Name="PersonGroup">
     <Key>
       <PropertyRef Name="ID" />
     </Key>
     <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="PersonGroupName" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="PersonGroupName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
     <Property Name="Description" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
     <Property Name="Active" Type="Boolean" Nullable="false" />
-    <NavigationProperty Name="People" Relationship="Self.FK_Person_PersonGroup1" FromRole="PersonGroup" ToRole="Person" />
-    <NavigationProperty Name="User_PersonGroup_Mapping" Relationship="Self.FK_User_PersonGroup_Mapping_PersonGroup" FromRole="PersonGroup" ToRole="User_PersonGroup_Mapping" />
+    <NavigationProperty Name="AspNetUsers" Relationship="CapstoneModel.FK_AspNetUsers_PersonGroup" FromRole="PersonGroup" ToRole="AspNetUser" />
+    <NavigationProperty Name="People" Relationship="CapstoneModel.FK_Person_PersonGroup1" FromRole="PersonGroup" ToRole="Person" />
   </EntityType>
-  <EntityType Name="User_PersonGroup_Mapping">
+  <EntityType Name="Picture">
     <Key>
-      <PropertyRef Name="ID" />
+      <PropertyRef Name="PictureId" />
     </Key>
-    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="UserId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-    <Property Name="PersonGroupId" Type="Int32" Nullable="false" />
+    <Property Name="PictureId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ConceptId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="Active" Type="Boolean" Nullable="false" />
-    <NavigationProperty Name="AspNetUser" Relationship="Self.FK_User_PersonGroup_Mapping_AspNetUsers" FromRole="User_PersonGroup_Mapping" ToRole="AspNetUsers" />
-    <NavigationProperty Name="PersonGroup" Relationship="Self.FK_User_PersonGroup_Mapping_PersonGroup" FromRole="User_PersonGroup_Mapping" ToRole="PersonGroup" />
+  </EntityType>
+  <EntityType Name="sysdiagram">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="principal_id" Type="Int32" Nullable="false" />
+    <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version" Type="Int32" />
+    <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
   </EntityType>
   <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
-    <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1">
+    <End Type="CapstoneModel.AspNetUser" Role="AspNetUser" Multiplicity="1">
       <OnDelete Action="Cascade" />
     </End>
-    <End Role="AspNetUserClaims" Type="Self.AspNetUserClaim" Multiplicity="*" />
+    <End Type="CapstoneModel.AspNetUserClaim" Role="AspNetUserClaim" Multiplicity="*" />
     <ReferentialConstraint>
-      <Principal Role="AspNetUsers">
+      <Principal Role="AspNetUser">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="AspNetUserClaims">
+      <Dependent Role="AspNetUserClaim">
         <PropertyRef Name="UserId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
   <Association Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
-    <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1">
+    <End Type="CapstoneModel.AspNetUser" Role="AspNetUser" Multiplicity="1">
       <OnDelete Action="Cascade" />
     </End>
-    <End Role="AspNetUserLogins" Type="Self.AspNetUserLogin" Multiplicity="*" />
+    <End Type="CapstoneModel.AspNetUserLogin" Role="AspNetUserLogin" Multiplicity="*" />
     <ReferentialConstraint>
-      <Principal Role="AspNetUsers">
+      <Principal Role="AspNetUser">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="AspNetUserLogins">
+      <Dependent Role="AspNetUserLogin">
         <PropertyRef Name="UserId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_tbl_Log_AspNetUsers">
-    <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1" />
-    <End Role="Log" Type="Self.Log" Multiplicity="*" />
+  <Association Name="FK_AspNetUsers_PersonGroup">
+    <End Type="CapstoneModel.PersonGroup" Role="PersonGroup" Multiplicity="0..1" />
+    <End Type="CapstoneModel.AspNetUser" Role="AspNetUser" Multiplicity="*" />
     <ReferentialConstraint>
-      <Principal Role="AspNetUsers">
+      <Principal Role="PersonGroup">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="AspNetUser">
+        <PropertyRef Name="PersonGroupId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Log_AspNetUsers">
+    <End Type="CapstoneModel.AspNetUser" Role="AspNetUser" Multiplicity="1" />
+    <End Type="CapstoneModel.Log" Role="Log" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AspNetUser">
         <PropertyRef Name="Id" />
       </Principal>
       <Dependent Role="Log">
@@ -149,21 +244,9 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_User_PersonGroup_Mapping_AspNetUsers">
-    <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1" />
-    <End Role="User_PersonGroup_Mapping" Type="Self.User_PersonGroup_Mapping" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="AspNetUsers">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="User_PersonGroup_Mapping">
-        <PropertyRef Name="UserId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
   <Association Name="FK_tbl_Face_tbl_Person">
-    <End Role="Person" Type="Self.Person" Multiplicity="1" />
-    <End Role="Face" Type="Self.Face" Multiplicity="*" />
+    <End Type="CapstoneModel.Person" Role="Person" Multiplicity="1" />
+    <End Type="CapstoneModel.Face" Role="Face" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="Person">
         <PropertyRef Name="ID" />
@@ -174,8 +257,8 @@
     </ReferentialConstraint>
   </Association>
   <Association Name="FK_Person_PersonGroup1">
-    <End Role="PersonGroup" Type="Self.PersonGroup" Multiplicity="1" />
-    <End Role="Person" Type="Self.Person" Multiplicity="*" />
+    <End Type="CapstoneModel.PersonGroup" Role="PersonGroup" Multiplicity="1" />
+    <End Type="CapstoneModel.Person" Role="Person" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="PersonGroup">
         <PropertyRef Name="ID" />
@@ -185,63 +268,8 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_User_PersonGroup_Mapping_PersonGroup">
-    <End Role="PersonGroup" Type="Self.PersonGroup" Multiplicity="1" />
-    <End Role="User_PersonGroup_Mapping" Type="Self.User_PersonGroup_Mapping" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="PersonGroup">
-        <PropertyRef Name="ID" />
-      </Principal>
-      <Dependent Role="User_PersonGroup_Mapping">
-        <PropertyRef Name="PersonGroupId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
   <Association Name="AspNetUserRoles">
-    <End Role="AspNetRoles" Type="Self.AspNetRole" Multiplicity="*" />
-    <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="*" />
+    <End Type="CapstoneModel.AspNetRole" Role="AspNetRole" Multiplicity="*" />
+    <End Type="CapstoneModel.AspNetUser" Role="AspNetUser" Multiplicity="*" />
   </Association>
-  <EntityContainer Name="CapstoneEntities" annotation:LazyLoadingEnabled="true">
-    <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRole" />
-    <EntitySet Name="AspNetUserClaims" EntityType="Self.AspNetUserClaim" />
-    <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogin" />
-    <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUser" />
-    <EntitySet Name="Faces" EntityType="Self.Face" />
-    <EntitySet Name="Logs" EntityType="Self.Log" />
-    <EntitySet Name="People" EntityType="Self.Person" />
-    <EntitySet Name="PersonGroups" EntityType="Self.PersonGroup" />
-    <EntitySet Name="User_PersonGroup_Mapping" EntityType="Self.User_PersonGroup_Mapping" />
-    <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
-      <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-      <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
-    </AssociationSet>
-    <AssociationSet Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
-      <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-      <End Role="AspNetUserLogins" EntitySet="AspNetUserLogins" />
-    </AssociationSet>
-    <AssociationSet Name="FK_tbl_Log_AspNetUsers" Association="Self.FK_tbl_Log_AspNetUsers">
-      <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-      <End Role="Log" EntitySet="Logs" />
-    </AssociationSet>
-    <AssociationSet Name="FK_User_PersonGroup_Mapping_AspNetUsers" Association="Self.FK_User_PersonGroup_Mapping_AspNetUsers">
-      <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-      <End Role="User_PersonGroup_Mapping" EntitySet="User_PersonGroup_Mapping" />
-    </AssociationSet>
-    <AssociationSet Name="FK_tbl_Face_tbl_Person" Association="Self.FK_tbl_Face_tbl_Person">
-      <End Role="Person" EntitySet="People" />
-      <End Role="Face" EntitySet="Faces" />
-    </AssociationSet>
-    <AssociationSet Name="FK_Person_PersonGroup1" Association="Self.FK_Person_PersonGroup1">
-      <End Role="PersonGroup" EntitySet="PersonGroups" />
-      <End Role="Person" EntitySet="People" />
-    </AssociationSet>
-    <AssociationSet Name="FK_User_PersonGroup_Mapping_PersonGroup" Association="Self.FK_User_PersonGroup_Mapping_PersonGroup">
-      <End Role="PersonGroup" EntitySet="PersonGroups" />
-      <End Role="User_PersonGroup_Mapping" EntitySet="User_PersonGroup_Mapping" />
-    </AssociationSet>
-    <AssociationSet Name="AspNetUserRoles" Association="Self.AspNetUserRoles">
-      <End Role="AspNetRoles" EntitySet="AspNetRoles" />
-      <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-    </AssociationSet>
-  </EntityContainer>
 </Schema>

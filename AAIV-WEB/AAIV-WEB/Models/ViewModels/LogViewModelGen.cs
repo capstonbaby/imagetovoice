@@ -19,7 +19,7 @@ namespace AAIV_WEB.Models.ViewModels
     			public virtual System.DateTime CreatedDate { get; set; }
     			public virtual string UserID { get; set; }
     			public virtual string ImageURL { get; set; }
-    			public virtual int ImageType { get; set; }
+    			public virtual string Name { get; set; }
     			public virtual bool Active { get; set; }
     	
     	public LogViewModel() : base() { }
