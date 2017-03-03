@@ -1,1 +1,0 @@
-this folder using for mobile application
