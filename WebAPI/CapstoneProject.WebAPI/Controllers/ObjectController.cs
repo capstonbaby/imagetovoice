@@ -37,7 +37,7 @@ namespace CapstoneProject.WebAPI.Controllers
                 String strRespone = await response.Content.ReadAsStringAsync();
                 var data = (JObject)JsonConvert.DeserializeObject(strRespone);
                 Double value = Double.Parse(data["outputs"][0]["data"]["concepts"][0]["value"].ToString());
-                if(value > 0.6)
+                if(value > 0.4)
                 {
                     string conceptId = data["outputs"][0]["data"]["concepts"][0]["id"].ToString();
                     var dataApi = new DataController();

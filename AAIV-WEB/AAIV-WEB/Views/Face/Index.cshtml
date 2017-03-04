@@ -2,9 +2,40 @@
 
 @{
     ViewBag.Title = "Index";
+    var i = 1;
 }
 
 <h1 class="page-header">Danh sách</h1>
 
-<a href="@Url.Action("NewPerson", "Face")">Create new</a>
+<a href="@Url.Action("NewPerson","Face")" class="btn btn-success pull-right"><i class="glyphicon glyphicon-plus"></i>Thêm mới</a>
+
+<table class="table table-hover">
+    <thead>
+         <tr>
+             <th>No</th>
+             <th>Ảnh đại diện</th>
+             <th>Tên</th>
+             <th>Thông tin</th>
+             <th></th>
+         </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td> @i</td>
+                <td> </td>
+                <td> @item.Name</td>
+                <td> @item.Description</td>
+                <td>
+                    <a href="#" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
+                    <a href="#" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
+                </td>
+            </tr>
+
+            i++;
+        }
+
+    </tbody>
+</table>
 

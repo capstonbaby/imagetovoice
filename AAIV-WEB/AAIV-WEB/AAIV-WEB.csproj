@@ -56,6 +56,10 @@
       <HintPath>..\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="CloudinaryDotNet, Version=1.0.30.0, Culture=neutral, PublicKeyToken=c8234dc617ae7841, processorArchitecture=MSIL">
+      <HintPath>..\packages\CloudinaryDotNet.1.0.30\lib\net40\CloudinaryDotNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -416,6 +420,7 @@
     <Compile Include="Models\ViewModels\LogViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ViewModels\PersonEditViewModel.cs" />
     <Compile Include="Models\ViewModels\PersonGroupViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
@@ -668,6 +673,7 @@
     <Content Include="Views\Account\Login_old.cshtml" />
     <Content Include="Views\Account\Register_old.cshtml" />
     <Content Include="Views\Face\Index.cshtml" />
+    <Content Include="Views\Face\NewPerson.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
