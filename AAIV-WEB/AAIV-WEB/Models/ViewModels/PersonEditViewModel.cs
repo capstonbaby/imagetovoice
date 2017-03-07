@@ -7,6 +7,6 @@ namespace AAIV_WEB.Models.ViewModels
 {
     public class PersonEditViewModel : PersonViewModel
     {
-        
+        public string PersonAvatars { get; set; }
     }
 }

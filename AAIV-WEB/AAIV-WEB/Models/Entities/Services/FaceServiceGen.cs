@@ -11,12 +11,12 @@ namespace AAIV_WEB.Models.Entities.Services
 {
     using System;
     using System.Collections.Generic;
-    
-    
+
+
     public partial interface IFaceService : SkyWeb.DatVM.Data.IBaseService<Face>
     {
     }
-    
+
     public partial class FaceService : SkyWeb.DatVM.Data.BaseService<Face>, IFaceService
     {
         public FaceService(SkyWeb.DatVM.Data.IUnitOfWork unitOfWork, Repositories.IFaceRepository repository) : base(unitOfWork, repository)
