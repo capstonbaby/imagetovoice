@@ -1,0 +1,23 @@
+﻿@model IEnumerable<PersonViewModel>
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<table class="table table-striped">
+    <thead>
+    <th>PersonID</th>
+    <th>Name</th>
+    <th>Des</th>
+    </thead>
+    <tbody>
+        @foreach (var item in this.Model)
+        {
+            <tr>
+                <td>@item.PersonId</td>
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+            </tr>
+        }
+    </tbody>
+</table>
