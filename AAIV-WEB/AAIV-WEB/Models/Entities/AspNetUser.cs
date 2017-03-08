@@ -20,6 +20,7 @@ namespace AAIV_WEB.Models.Entities
             this.AspNetUserClaims = new HashSet<AspNetUserClaim>();
             this.AspNetUserLogins = new HashSet<AspNetUserLogin>();
             this.Logs = new HashSet<Log>();
+            this.LogObjects = new HashSet<LogObject>();
             this.AspNetRoles = new HashSet<AspNetRole>();
         }
     
@@ -44,6 +45,8 @@ namespace AAIV_WEB.Models.Entities
         public virtual PersonGroup PersonGroup { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Log> Logs { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<LogObject> LogObjects { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AspNetRole> AspNetRoles { get; set; }
     }

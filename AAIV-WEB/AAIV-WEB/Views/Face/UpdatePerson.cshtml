@@ -1,0 +1,41 @@
+﻿@model PersonViewModel 
+@{
+    ViewBag.Title = "UpdatePerson";
+}
+
+<h1 class="page-header">Cập nhật thông tin</h1>
+
+
+<div class="panel-body">
+    <div class="col-md-6">
+
+
+        @using (Html.BeginForm("UpdatePerson", "Face", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+
+            @Html.HiddenFor(q => q.ID)
+            @Html.HiddenFor(q => q.PersonId)
+            @Html.HiddenFor(q => q.PersonGroupID)
+            @Html.HiddenFor(q => q.Active)
+
+            <div class="form-group">
+                <label>Tên</label>
+                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @placeholder = "Tên", })
+                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label>Thông tin</label>
+                @Html.TextAreaFor(m => m.Description, new { @class = "form-control", @placeholder = "Thông tin" })
+                @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label>Hình ảnh</label>
+                <input type="file" name="file" id="file" style="width: 100%;" multiple />
+            </div>
+
+            <input type="submit" value="Cập nhật" class="btn btn-primary" />
+        }
+    </div>
+</div>

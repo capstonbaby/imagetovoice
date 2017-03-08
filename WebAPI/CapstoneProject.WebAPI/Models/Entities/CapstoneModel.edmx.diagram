@@ -5,6 +5,7 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="e6c00601e4c84a8187b5baae5b9d6ab1" Name="Diagram1">
+<<<<<<< HEAD
         <EntityTypeShape EntityType="CapstoneModel.AspNetRole" Width="1.5" PointX="0.75" PointY="3" />
         <EntityTypeShape EntityType="CapstoneModel.AspNetUserClaim" Width="1.5" PointX="5.25" PointY="5.625" />
         <EntityTypeShape EntityType="CapstoneModel.AspNetUserLogin" Width="1.5" PointX="5.25" PointY="3" />
@@ -15,6 +16,18 @@
         <EntityTypeShape EntityType="CapstoneModel.LogObject" Width="1.5" PointX="7.75" PointY="3.75" />
         <EntityTypeShape EntityType="CapstoneModel.Person" Width="1.5" PointX="3" PointY="14" />
         <EntityTypeShape EntityType="CapstoneModel.PersonGroup" Width="1.5" PointX="0.75" PointY="5.75" />
+=======
+        <EntityTypeShape EntityType="CapstoneModel.AspNetRole" Width="1.5" PointX="0.75" PointY="2.625" />
+        <EntityTypeShape EntityType="CapstoneModel.AspNetUserClaim" Width="1.5" PointX="5.25" PointY="2.875" />
+        <EntityTypeShape EntityType="CapstoneModel.AspNetUserLogin" Width="1.5" PointX="5.25" PointY="8.125" />
+        <EntityTypeShape EntityType="CapstoneModel.AspNetUser" Width="1.5" PointX="3" PointY="4.375" />
+        <EntityTypeShape EntityType="CapstoneModel.Concept" Width="1.5" PointX="7.75" PointY="0.75" />
+        <EntityTypeShape EntityType="CapstoneModel.Face" Width="1.5" PointX="5.25" PointY="13" />
+        <EntityTypeShape EntityType="CapstoneModel.Log" Width="1.5" PointX="5.25" PointY="5.375" />
+        <EntityTypeShape EntityType="CapstoneModel.LogObject" Width="1.5" PointX="7.75" PointY="3.75" />
+        <EntityTypeShape EntityType="CapstoneModel.Person" Width="1.5" PointX="3" PointY="12.875" />
+        <EntityTypeShape EntityType="CapstoneModel.PersonGroup" Width="1.5" PointX="0.75" PointY="5.375" />
+>>>>>>> refs/remotes/origin/dev-sonnvh
         <EntityTypeShape EntityType="CapstoneModel.Picture" Width="1.5" PointX="7.75" PointY="6.75" />
         <AssociationConnector Association="CapstoneModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" />
         <AssociationConnector Association="CapstoneModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" />

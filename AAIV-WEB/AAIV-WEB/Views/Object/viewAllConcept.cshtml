@@ -1,0 +1,22 @@
+﻿@model IEnumerable<ConceptViewModel>
+@{
+    ViewBag.Title = "viewAllConcept";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Danh sách đồ vật</h2>
+<a href="@Url.Action("createObject", "Object")" class="btn btn-success">Tạo mới đồ vật</a>
+<br /><br />
+<table class="table table-striped">
+    <tbody>
+        @foreach (var items in this.Model)
+        {
+            <tr>
+                <td>@items.ConceptName</td>
+                <td>@items.ConceptDescription</td>
+                <td>@items.CreateDate</td>
+                <td><a href="@Url.Action("editConcept", new { conceptID = items.ConceptId })" class="btn btn-success">Sửa</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

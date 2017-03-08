@@ -402,8 +402,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
+<<<<<<< HEAD
     <Compile Include="Models\IdentityModel.cs" />
     <Compile Include="Models\ResponseModel.cs" />
+=======
+>>>>>>> refs/remotes/origin/dev-sonnvh
     <Compile Include="Models\ViewModels\AspNetRoleViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>

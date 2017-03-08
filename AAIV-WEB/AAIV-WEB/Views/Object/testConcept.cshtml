@@ -1,0 +1,23 @@
+﻿@model ConceptViewModel
+@{
+    ViewBag.Title = "testConcept";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Kiểm tra đồ vật</h2>
+<table class="table table-striped">
+    <tbody>
+        <tr>
+            <td>ID</td>
+            <td>Tên đồ vật</td>
+            <td>Mô tả đồ vật</td>
+            <td>Ngày tạo</td>
+        </tr>
+            <tr>
+                <td>@this.Model.ConceptId</td>
+                <td>@this.Model.ConceptName</td>
+                <td>@this.Model.ConceptDescription</td>
+                <td>@this.Model.CreateDate</td>
+            </tr>
+    </tbody>
+</table>
