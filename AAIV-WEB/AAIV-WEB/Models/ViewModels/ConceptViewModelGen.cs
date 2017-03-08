@@ -15,7 +15,7 @@ namespace AAIV_WEB.Models.ViewModels
     public partial class ConceptViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<Models.Entities.Concept>
     {
     	
-    			public virtual string ConceptId { get; set; }
+    			public virtual int ConceptId { get; set; }
     			public virtual string ConceptName { get; set; }
     			public virtual string ConceptDescription { get; set; }
     			public virtual Nullable<System.DateTime> CreateDate { get; set; }

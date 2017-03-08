@@ -15,8 +15,8 @@ namespace AAIV_WEB.Models.ViewModels
     public partial class PictureViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<Models.Entities.Picture>
     {
     	
-    			public virtual int PictureId { get; set; }
-    			public virtual string ConceptId { get; set; }
+    			public virtual string PictureId { get; set; }
+    			public virtual Nullable<int> ConceptId { get; set; }
     			public virtual string Description { get; set; }
     			public virtual string ImageURL { get; set; }
     			public virtual bool Active { get; set; }

@@ -14,10 +14,19 @@ namespace AAIV_WEB.Models.Entities
     
     public partial class Concept
     {
-        public string ConceptId { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Concept()
+        {
+            this.Pictures = new HashSet<Picture>();
+        }
+    
+        public int ConceptId { get; set; }
         public string ConceptName { get; set; }
         public string ConceptDescription { get; set; }
         public Nullable<System.DateTime> CreateDate { get; set; }
         public bool Active { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Picture> Pictures { get; set; }
     }
 }

@@ -1,0 +1,21 @@
+﻿@model IEnumerable<LogObjectViewModel>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Danh sách Log</h2>
+<a href="@Url.Action("createObject", "Object")" class="btn btn-success">Tạo mới đồ vật</a>
+<a href="@Url.Action("testPredict", "Object")" class="btn btn-success">Kiểm tra đồ vật</a>
+<br /><br />
+<table class="table table-striped">
+    <tbody>
+        @foreach(var items in this.Model)
+        {
+            <tr>
+                <td><img src="@items.ImageURL" style="with:100px; height:100px;"/></td>
+                <td>@items.CreatedDate</td>
+                <td><a href="@Url.Action("addObject", new { logId = items.ID })" class="btn btn-success">Thêm đồ vật</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
