@@ -451,6 +451,11 @@
     <Content Include="Content\dist\css\sb-admin-2.min.css" />
     <Content Include="Content\dist\js\sb-admin-2.js" />
     <Content Include="Content\dist\js\sb-admin-2.min.js" />
+    <Content Include="Content\sweetalert\sweetalert2.css" />
+    <Content Include="Content\sweetalert\sweetalert2.js" />
+    <Content Include="Content\sweetalert\sweetalert2.min.css" />
+    <Content Include="Content\sweetalert\sweetalert2.min.js" />
+    <Content Include="Content\thumbnail-gallery.css" />
     <Content Include="Content\vendor\bootstrap-social\bootstrap-social.css" />
     <Content Include="Content\vendor\bootstrap\css\bootstrap.css" />
     <Content Include="Content\vendor\bootstrap\css\bootstrap.min.css" />

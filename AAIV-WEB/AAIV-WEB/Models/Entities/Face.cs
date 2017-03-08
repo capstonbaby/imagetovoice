@@ -21,5 +21,7 @@ namespace AAIV_WEB.Models.Entities
         public bool Active { get; set; }
     
         public virtual Person Person { get; set; }
+
+        
     }
 }
