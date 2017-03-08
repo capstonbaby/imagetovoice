@@ -7,12 +7,20 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AAIV_WEB.Models.Entities
+namespace CapstoneProject.WebAPI.Models.Entities.Repositories
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class C__MigrationHistory : SkyWeb.DatVM.Data.IEntity
+    
+    public partial interface IsysdiagramRepository : SkyWeb.DatVM.Data.IBaseRepository<sysdiagram>
     {
+    }
+    
+    public partial class sysdiagramRepository : SkyWeb.DatVM.Data.BaseRepository<sysdiagram>, IsysdiagramRepository
+    {
+    	public sysdiagramRepository(System.Data.Entity.DbContext dbContext) : base(dbContext)
+        {
+        }
     }
 }

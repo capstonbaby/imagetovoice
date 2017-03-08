@@ -1,0 +1,7 @@
+
+c = []
+c.append("balo")
+modelClarifai.add_concepts(c)
+
+appClarifai.inputs.create_image_from_url(url='http://res.cloudinary.com/debwqzo2g/image/upload/v1488523315/mqpe7taigraayxmmrgmf.jpg', concepts=c)
+modelClarifai.train()

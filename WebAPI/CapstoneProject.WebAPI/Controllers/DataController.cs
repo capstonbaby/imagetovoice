@@ -1,4 +1,5 @@
-﻿using CapstoneProject.WebAPI.Models.Entities;
+﻿using CapstoneProject.WebAPI.Models;
+using CapstoneProject.WebAPI.Models.Entities;
 using CapstoneProject.WebAPI.Models.Entities.Services;
 using CapstoneProject.WebAPI.Models.ViewModels;
 using Newtonsoft.Json;
@@ -129,12 +130,12 @@ namespace CapstoneProject.WebAPI.Controllers
 
         //Object
 
-        public async Task<JsonResult> CreateLogObject(LogObjectViewModel model)
+        public async Task<JsonResult> CreateLogObject(LogObjectViewModel model, string userId)
         {
             var service = this.Service<ILogObjectService>();
 
             model.CreatedDate = DateTime.Now;
-            model.UserID = "36a65953-8d12-46cd-9500-fc33e9123aaf";
+            model.UserID = userId;
 
             model.Active = true;
 
@@ -160,12 +161,14 @@ namespace CapstoneProject.WebAPI.Controllers
             }
         }
 
-        public string getDescriptionConcept(string conceptid)
+        public string getDescriptionConcept(int conceptid)
         {
             var service = this.Service<IConceptService>();
             var model = service.GetActive(q => q.ConceptId.Equals(conceptid)).First();
 
             return model.ConceptDescription;
         }
+
+        
     }
 }

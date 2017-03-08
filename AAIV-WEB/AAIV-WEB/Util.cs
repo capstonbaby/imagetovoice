@@ -12,7 +12,7 @@ using System.Web;
 
 namespace AAIV_WEB
 {
-    public class Utils
+    public class Util
     {
         public static void SaveJpeg(string path, Image img, int quality)
         {

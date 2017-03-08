@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Schema Namespace="CapstoneModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
   <EntityContainer Name="CapstoneEntities" annotation:LazyLoadingEnabled="true">
-    <EntitySet Name="C__MigrationHistory" EntityType="CapstoneModel.C__MigrationHistory" />
     <EntitySet Name="AspNetRoles" EntityType="CapstoneModel.AspNetRole" />
     <EntitySet Name="AspNetUserClaims" EntityType="CapstoneModel.AspNetUserClaim" />
     <EntitySet Name="AspNetUserLogins" EntityType="CapstoneModel.AspNetUserLogin" />
@@ -30,6 +29,14 @@
       <End Role="AspNetUser" EntitySet="AspNetUsers" />
       <End Role="Log" EntitySet="Logs" />
     </AssociationSet>
+    <AssociationSet Name="FK_LogObject_AspNetUsers" Association="CapstoneModel.FK_LogObject_AspNetUsers">
+      <End Role="AspNetUser" EntitySet="AspNetUsers" />
+      <End Role="LogObject" EntitySet="LogObjects" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Picture_Concept" Association="CapstoneModel.FK_Picture_Concept">
+      <End Role="Concept" EntitySet="Concepts" />
+      <End Role="Picture" EntitySet="Pictures" />
+    </AssociationSet>
     <AssociationSet Name="FK_tbl_Face_tbl_Person" Association="CapstoneModel.FK_tbl_Face_tbl_Person">
       <End Role="Person" EntitySet="People" />
       <End Role="Face" EntitySet="Faces" />
@@ -43,16 +50,6 @@
       <End Role="AspNetUser" EntitySet="AspNetUsers" />
     </AssociationSet>
   </EntityContainer>
-  <EntityType Name="C__MigrationHistory">
-    <Key>
-      <PropertyRef Name="MigrationId" />
-      <PropertyRef Name="ContextKey" />
-    </Key>
-    <Property Name="MigrationId" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
-    <Property Name="ContextKey" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
-    <Property Name="Model" Type="Binary" Nullable="false" MaxLength="Max" FixedLength="false" />
-    <Property Name="ProductVersion" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
-  </EntityType>
   <EntityType Name="AspNetRole">
     <Key>
       <PropertyRef Name="Id" />
@@ -103,17 +100,19 @@
     <NavigationProperty Name="AspNetUserLogins" Relationship="CapstoneModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUser" ToRole="AspNetUserLogin" />
     <NavigationProperty Name="PersonGroup" Relationship="CapstoneModel.FK_AspNetUsers_PersonGroup" FromRole="AspNetUser" ToRole="PersonGroup" />
     <NavigationProperty Name="Logs" Relationship="CapstoneModel.FK_Log_AspNetUsers" FromRole="AspNetUser" ToRole="Log" />
+    <NavigationProperty Name="LogObjects" Relationship="CapstoneModel.FK_LogObject_AspNetUsers" FromRole="AspNetUser" ToRole="LogObject" />
     <NavigationProperty Name="AspNetRoles" Relationship="CapstoneModel.AspNetUserRoles" FromRole="AspNetUser" ToRole="AspNetRole" />
   </EntityType>
   <EntityType Name="Concept">
     <Key>
       <PropertyRef Name="ConceptId" />
     </Key>
-    <Property Name="ConceptId" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="ConceptId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
     <Property Name="ConceptName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
     <Property Name="ConceptDescription" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
     <Property Name="CreateDate" Type="DateTime" Precision="3" />
     <Property Name="Active" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="Pictures" Relationship="CapstoneModel.FK_Picture_Concept" FromRole="Concept" ToRole="Picture" />
   </EntityType>
   <EntityType Name="Face">
     <Key>
@@ -147,6 +146,7 @@
     <Property Name="UserID" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
     <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="Active" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="AspNetUser" Relationship="CapstoneModel.FK_LogObject_AspNetUsers" FromRole="LogObject" ToRole="AspNetUser" />
   </EntityType>
   <EntityType Name="Person">
     <Key>
@@ -176,11 +176,12 @@
     <Key>
       <PropertyRef Name="PictureId" />
     </Key>
-    <Property Name="PictureId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="ConceptId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="PictureId" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="false" />
+    <Property Name="ConceptId" Type="Int32" />
     <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
     <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="Active" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="Concept" Relationship="CapstoneModel.FK_Picture_Concept" FromRole="Picture" ToRole="Concept" />
   </EntityType>
   <EntityType Name="sysdiagram">
     <Key>
@@ -241,6 +242,30 @@
       </Principal>
       <Dependent Role="Log">
         <PropertyRef Name="UserID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_LogObject_AspNetUsers">
+    <End Type="CapstoneModel.AspNetUser" Role="AspNetUser" Multiplicity="1" />
+    <End Type="CapstoneModel.LogObject" Role="LogObject" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AspNetUser">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="LogObject">
+        <PropertyRef Name="UserID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Picture_Concept">
+    <End Type="CapstoneModel.Concept" Role="Concept" Multiplicity="0..1" />
+    <End Type="CapstoneModel.Picture" Role="Picture" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Concept">
+        <PropertyRef Name="ConceptId" />
+      </Principal>
+      <Dependent Role="Picture">
+        <PropertyRef Name="ConceptId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>

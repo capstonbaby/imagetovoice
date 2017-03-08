@@ -1,0 +1,37 @@
+﻿@model BigViewModel
+@{
+    ViewBag.Title = "addObject";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Thêm đồ vật</h2>
+<div>
+    @using (Html.BeginForm("addImageConcept", "Object", FormMethod.Post))
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <table style="width: auto;">
+                    <tr>
+                        <td style="width:250px;">
+                            <img src="@this.Model.ImageURL" style="max-width: 300px" />
+                            @Html.HiddenFor(q => q.ImageURL)
+                            @Html.HiddenFor(q => q.LogId)
+                        </td>
+                        <td style="width:250px;" rowspan="2"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="submit" value="Thêm" class="btn btn-success" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                @foreach (var item in this.Model.ConceptList)
+                {
+                    @Html.RadioButtonFor(q => q.ConceptId, item.ConceptId) @Html.Label(item.ConceptName) <br />
+                }
+            </div>
+        </div>
+    }
+</div>

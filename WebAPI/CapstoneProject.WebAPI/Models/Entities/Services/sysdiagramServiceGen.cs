@@ -13,13 +13,13 @@ namespace CapstoneProject.WebAPI.Models.Entities.Services
     using System.Collections.Generic;
     
     
-    public partial interface IUser_PersonGroup_MappingService : SkyWeb.DatVM.Data.IBaseService<User_PersonGroup_Mapping>
+    public partial interface IsysdiagramService : SkyWeb.DatVM.Data.IBaseService<sysdiagram>
     {
     }
     
-    public partial class User_PersonGroup_MappingService : SkyWeb.DatVM.Data.BaseService<User_PersonGroup_Mapping>, IUser_PersonGroup_MappingService
+    public partial class sysdiagramService : SkyWeb.DatVM.Data.BaseService<sysdiagram>, IsysdiagramService
     {
-        public User_PersonGroup_MappingService(SkyWeb.DatVM.Data.IUnitOfWork unitOfWork, Repositories.IUser_PersonGroup_MappingRepository repository) : base(unitOfWork, repository)
+        public sysdiagramService(SkyWeb.DatVM.Data.IUnitOfWork unitOfWork, Repositories.IsysdiagramRepository repository) : base(unitOfWork, repository)
         {
         }
     }

@@ -1,0 +1,3 @@
+- them lien ket giua concept vs picture
+- doi key picture thanh string
+- doi key concept thanh id (tu tang)

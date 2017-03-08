@@ -39,7 +39,7 @@ namespace CapstoneProject.WebAPI.Controllers
                 Double value = Double.Parse(data["outputs"][0]["data"]["concepts"][0]["value"].ToString());
                 if(value > 0.4)
                 {
-                    string conceptId = data["outputs"][0]["data"]["concepts"][0]["id"].ToString();
+                    int conceptId = int.Parse(data["outputs"][0]["data"]["concepts"][0]["id"].ToString());
                     var dataApi = new DataController();
                     conceptDescription = dataApi.getDescriptionConcept(conceptId);
                 }

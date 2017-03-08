@@ -5,23 +5,24 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="6d7c9e2ac98443e4b5afa48e518f1fcf" Name="Diagram1">
-        <EntityTypeShape EntityType="CapstoneModel.C__MigrationHistory" Width="1.5" PointX="7.75" PointY="0.75" />
-        <EntityTypeShape EntityType="CapstoneModel.AspNetRole" Width="1.5" PointX="0.75" PointY="3" />
-        <EntityTypeShape EntityType="CapstoneModel.AspNetUserClaim" Width="1.5" PointX="5.25" PointY="3" />
-        <EntityTypeShape EntityType="CapstoneModel.AspNetUserLogin" Width="1.5" PointX="5.25" PointY="5.75" />
-        <EntityTypeShape EntityType="CapstoneModel.AspNetUser" Width="1.5" PointX="3" PointY="4.625" />
-        <EntityTypeShape EntityType="CapstoneModel.Concept" Width="1.5" PointX="7.75" PointY="3.75" />
-        <EntityTypeShape EntityType="CapstoneModel.Face" Width="1.5" PointX="5.25" PointY="14.125" />
-        <EntityTypeShape EntityType="CapstoneModel.Log" Width="1.5" PointX="5.25" PointY="8.25" />
-        <EntityTypeShape EntityType="CapstoneModel.LogObject" Width="1.5" PointX="7.75" PointY="6.75" />
-        <EntityTypeShape EntityType="CapstoneModel.Person" Width="1.5" PointX="3" PointY="14" />
-        <EntityTypeShape EntityType="CapstoneModel.PersonGroup" Width="1.5" PointX="0.75" PointY="5.75" />
-        <EntityTypeShape EntityType="CapstoneModel.Picture" Width="1.5" PointX="9.75" PointY="0.75" />
-        <EntityTypeShape EntityType="CapstoneModel.sysdiagram" Width="1.5" PointX="9.75" PointY="3.75" />
+        <EntityTypeShape EntityType="CapstoneModel.AspNetRole" Width="1.5" PointX="0.75" PointY="4" />
+        <EntityTypeShape EntityType="CapstoneModel.AspNetUserClaim" Width="1.5" PointX="5.25" PointY="5.625" />
+        <EntityTypeShape EntityType="CapstoneModel.AspNetUserLogin" Width="1.5" PointX="5.25" PointY="11" />
+        <EntityTypeShape EntityType="CapstoneModel.AspNetUser" Width="1.5" PointX="3" PointY="5.75" />
+        <EntityTypeShape EntityType="CapstoneModel.Concept" Width="1.5" PointX="7.75" PointY="0.875" />
+        <EntityTypeShape EntityType="CapstoneModel.Face" Width="1.5" PointX="5.25" PointY="17.125" />
+        <EntityTypeShape EntityType="CapstoneModel.Log" Width="1.5" PointX="5.25" PointY="8.125" />
+        <EntityTypeShape EntityType="CapstoneModel.LogObject" Width="1.5" PointX="5.25" PointY="3" />
+        <EntityTypeShape EntityType="CapstoneModel.Person" Width="1.5" PointX="3" PointY="17" />
+        <EntityTypeShape EntityType="CapstoneModel.PersonGroup" Width="1.5" PointX="0.75" PointY="6.75" />
+        <EntityTypeShape EntityType="CapstoneModel.Picture" Width="1.5" PointX="10" PointY="0.875" />
+        <EntityTypeShape EntityType="CapstoneModel.sysdiagram" Width="1.5" PointX="0.75" PointY="0.75" />
         <AssociationConnector Association="CapstoneModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" />
         <AssociationConnector Association="CapstoneModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" />
         <AssociationConnector Association="CapstoneModel.FK_AspNetUsers_PersonGroup" />
         <AssociationConnector Association="CapstoneModel.FK_Log_AspNetUsers" />
+        <AssociationConnector Association="CapstoneModel.FK_LogObject_AspNetUsers" />
+        <AssociationConnector Association="CapstoneModel.FK_Picture_Concept" />
         <AssociationConnector Association="CapstoneModel.FK_tbl_Face_tbl_Person" />
         <AssociationConnector Association="CapstoneModel.FK_Person_PersonGroup1" />
         <AssociationConnector Association="CapstoneModel.AspNetUserRoles" />

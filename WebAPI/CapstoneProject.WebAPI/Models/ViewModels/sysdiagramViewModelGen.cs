@@ -12,16 +12,17 @@ namespace CapstoneProject.WebAPI.Models.ViewModels
     using System;
     using System.Collections.Generic;
     
-    public partial class User_PersonGroup_MappingViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<CapstoneProject.WebAPI.Models.Entities.User_PersonGroup_Mapping>
+    public partial class sysdiagramViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<CapstoneProject.WebAPI.Models.Entities.sysdiagram>
     {
     	
-    			public virtual int ID { get; set; }
-    			public virtual string UserId { get; set; }
-    			public virtual int PersonGroupId { get; set; }
-    			public virtual bool Active { get; set; }
+    			public virtual string name { get; set; }
+    			public virtual int principal_id { get; set; }
+    			public virtual int diagram_id { get; set; }
+    			public virtual Nullable<int> version { get; set; }
+    			public virtual byte[] definition { get; set; }
     	
-    	public User_PersonGroup_MappingViewModel() : base() { }
-    	public User_PersonGroup_MappingViewModel(CapstoneProject.WebAPI.Models.Entities.User_PersonGroup_Mapping entity) : base(entity) { }
+    	public sysdiagramViewModel() : base() { }
+    	public sysdiagramViewModel(CapstoneProject.WebAPI.Models.Entities.sysdiagram entity) : base(entity) { }
     
     }
 }

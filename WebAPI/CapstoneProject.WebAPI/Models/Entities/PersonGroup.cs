@@ -17,8 +17,8 @@ namespace CapstoneProject.WebAPI.Models.Entities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public PersonGroup()
         {
+            this.AspNetUsers = new HashSet<AspNetUser>();
             this.People = new HashSet<Person>();
-            this.User_PersonGroup_Mapping = new HashSet<User_PersonGroup_Mapping>();
         }
     
         public int ID { get; set; }
@@ -27,8 +27,8 @@ namespace CapstoneProject.WebAPI.Models.Entities
         public bool Active { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Person> People { get; set; }
+        public virtual ICollection<AspNetUser> AspNetUsers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<User_PersonGroup_Mapping> User_PersonGroup_Mapping { get; set; }
+        public virtual ICollection<Person> People { get; set; }
     }
 }
