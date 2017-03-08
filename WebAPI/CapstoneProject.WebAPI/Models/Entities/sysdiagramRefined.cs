@@ -12,14 +12,7 @@ namespace CapstoneProject.WebAPI.Models.Entities
     using System;
     using System.Collections.Generic;
     
-    public partial class Picture
+    public partial class sysdiagram : SkyWeb.DatVM.Data.IEntity
     {
-        public string PictureId { get; set; }
-        public Nullable<int> ConceptId { get; set; }
-        public string Description { get; set; }
-        public string ImageURL { get; set; }
-        public bool Active { get; set; }
-    
-        public virtual Concept Concept { get; set; }
     }
 }

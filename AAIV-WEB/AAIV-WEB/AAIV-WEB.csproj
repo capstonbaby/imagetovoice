@@ -398,6 +398,7 @@
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ViewModels\BigViewModel.cs" />
+    <Compile Include="Models\ViewModels\ConceptEditViewModel.cs" />
     <Compile Include="Models\ViewModels\ConceptViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>

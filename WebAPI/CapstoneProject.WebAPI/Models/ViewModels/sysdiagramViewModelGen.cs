@@ -12,17 +12,17 @@ namespace CapstoneProject.WebAPI.Models.ViewModels
     using System;
     using System.Collections.Generic;
     
-    public partial class PictureViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<CapstoneProject.WebAPI.Models.Entities.Picture>
+    public partial class sysdiagramViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<CapstoneProject.WebAPI.Models.Entities.sysdiagram>
     {
     	
-    			public virtual string PictureId { get; set; }
-    			public virtual Nullable<int> ConceptId { get; set; }
-    			public virtual string Description { get; set; }
-    			public virtual string ImageURL { get; set; }
-    			public virtual bool Active { get; set; }
+    			public virtual string name { get; set; }
+    			public virtual int principal_id { get; set; }
+    			public virtual int diagram_id { get; set; }
+    			public virtual Nullable<int> version { get; set; }
+    			public virtual byte[] definition { get; set; }
     	
-    	public PictureViewModel() : base() { }
-    	public PictureViewModel(CapstoneProject.WebAPI.Models.Entities.Picture entity) : base(entity) { }
+    	public sysdiagramViewModel() : base() { }
+    	public sysdiagramViewModel(CapstoneProject.WebAPI.Models.Entities.sysdiagram entity) : base(entity) { }
     
     }
 }

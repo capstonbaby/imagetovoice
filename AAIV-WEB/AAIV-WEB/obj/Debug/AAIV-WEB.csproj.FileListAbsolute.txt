@@ -469,3 +469,4 @@ E:\Capstone Project\Code\New folder\imagetovoice\AAIV-WEB\AAIV-WEB\obj\Debug\AAI
 E:\Capstone Project\Code\New folder\imagetovoice\AAIV-WEB\AAIV-WEB\obj\Debug\AAIV-WEB.pdb
 D:\CN9\CapstoneProject\Git\imagetovoice\AAIV-WEB\AAIV-WEB\bin\CloudinaryDotNet.dll
 D:\CN9\CapstoneProject\Git\imagetovoice\AAIV-WEB\AAIV-WEB\bin\Microsoft.ProjectOxford.Face.dll
+D:\CAPSTON\AAIV\AAIV-WEB\AAIV-WEB\bin\CloudinaryDotNet.dll

@@ -7,19 +7,20 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CapstoneProject.WebAPI.Models.Entities
+namespace CapstoneProject.WebAPI.Models.Entities.Repositories
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Picture
-    {
-        public string PictureId { get; set; }
-        public Nullable<int> ConceptId { get; set; }
-        public string Description { get; set; }
-        public string ImageURL { get; set; }
-        public bool Active { get; set; }
     
-        public virtual Concept Concept { get; set; }
+    public partial interface IsysdiagramRepository : SkyWeb.DatVM.Data.IBaseRepository<sysdiagram>
+    {
+    }
+    
+    public partial class sysdiagramRepository : SkyWeb.DatVM.Data.BaseRepository<sysdiagram>, IsysdiagramRepository
+    {
+    	public sysdiagramRepository(System.Data.Entity.DbContext dbContext) : base(dbContext)
+        {
+        }
     }
 }

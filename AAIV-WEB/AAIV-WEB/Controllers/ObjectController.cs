@@ -69,7 +69,9 @@ namespace AAIV_WEB.Controllers
 
                     var name = image.FileName;
                     var size = image.ContentLength;
-                    var path = Server.MapPath(".") + "//uploads//" + name;
+                    //var path = Server.MapPath(".") + "//uploads//" + name;
+                    string path = System.IO.Path.Combine(
+                                                  Server.MapPath("~/uploads"), name);
                     image.SaveAs(path);
                     var uploadParams = new ImageUploadParams()
                     {
@@ -89,6 +91,7 @@ namespace AAIV_WEB.Controllers
 
                     var addImage = new Picture
                     {
+                        PictureId = response1,
                         ConceptId = conceptid,
                         ImageURL = url,
                         Description = conceptDes
@@ -102,7 +105,7 @@ namespace AAIV_WEB.Controllers
                     }
                 }
             }
-            return RedirectToAction("Index", "Object");//mới có tên action ah, tên controller đâu ? RedirectToAction(tên action, tên control)
+            return RedirectToAction("Index", "Object");
         }
         public ActionResult addObject(int logId)
         {
@@ -141,6 +144,7 @@ namespace AAIV_WEB.Controllers
 
                 var addImage = new Picture
                 {
+                    PictureId = response1,
                     ConceptId = conceptid,
                     ImageURL = ImageUrl,
                     Description = conceptDes.ConceptDescription
@@ -206,6 +210,7 @@ namespace AAIV_WEB.Controllers
 
             var addImage = new Picture
             {
+                PictureId = response1,
                 ConceptId = conceptid,
                 ImageURL = imageUrl,
                 Description = conceptDes
@@ -241,7 +246,9 @@ namespace AAIV_WEB.Controllers
 
                     var name = image.FileName;
                     var size = image.ContentLength;
-                    var path = Server.MapPath(".") + "//uploads//" + name;
+                    //var path = Server.MapPath(".") + "//uploads//" + name;
+                    string path = System.IO.Path.Combine(
+                                                  Server.MapPath("~/uploads"), name);
                     image.SaveAs(path);
                     var uploadParams = new ImageUploadParams()
                     {
@@ -278,17 +285,27 @@ namespace AAIV_WEB.Controllers
         public ActionResult viewAllConcept()
         {
             var service = this.Service<IConceptService>();
-            var model = service.GetActive().ProjectTo<ConceptViewModel>(this.MapperConfig);
+            var pictureService = this.Service<IPictureService>();
+
+            var model = service.GetActive()
+                .ProjectTo<ConceptEditViewModel>(this.MapperConfig)
+                .ToList();
+
+            foreach (var concept in model)
+            {
+                var conceptPicture = pictureService.GetActive(q => q.ConceptId == concept.ConceptId).First().ImageURL;
+                concept.ConceptPicture = conceptPicture;
+            }
 
             return View(model);
         }
         public ActionResult editConcept(int conceptId)
         {
             var picService = this.Service<IPictureService>();
-            var entityPicture = picService.Get(conceptId);
+            //var entityPicture = picService.Get(conceptId);
             var conService = this.Service<IConceptService>();
             var entityConcept = conService.Get(conceptId);
-            var picture = picService.GetActive(q => q.ConceptId.Equals(conceptId)).ProjectTo<PictureViewModel>(this.MapperConfig);
+            var picture = picService.GetActive(q => q.ConceptId == conceptId).ProjectTo<PictureViewModel>(this.MapperConfig);
             //var pictures = picService.get(q => q.conceptid.equals(conceptid)).firstordefault();
 
             var model = new BigViewModel
@@ -335,7 +352,9 @@ namespace AAIV_WEB.Controllers
 
                     var name = image.FileName;
                     var size = image.ContentLength;
-                    var path = Server.MapPath(".") + "//uploads//" + name;
+                    //var path = Server.MapPath(".") + "//uploads//" + name;
+                    string path = System.IO.Path.Combine(
+                                                  Server.MapPath("~/uploads"), name);
                     image.SaveAs(path);
                     var uploadParams = new ImageUploadParams()
                     {
@@ -355,6 +374,7 @@ namespace AAIV_WEB.Controllers
 
                     var addImage = new Picture
                     {
+                        PictureId = response1,
                         ConceptId = conceptid,
                         ImageURL = url,
                         Description = conceptDes
