@@ -14,6 +14,6 @@ namespace AAIV_WEB.Models.ViewModels
         //public PictureViewModel picture { get; set; }
         public int LogId { get; set; }
         public string ImageURL { get; internal set; }
-
+        public PictureViewModel pictureId { get; set; }
     }
 }
