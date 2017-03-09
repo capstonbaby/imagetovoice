@@ -1,0 +1,95 @@
+﻿@model IEnumerable<LogViewModel>
+@{
+    ViewBag.Title = "Face Logs";
+    var i = 1;
+}
+
+<h1 class="page-header">Người chưa nhận diện được</h1>
+
+<table class="table table-hover">
+
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Hình ảnh</th>
+            <th>Tên</th>
+            <th>Ngày tạo</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var log in this.Model)
+        {
+            <tr>
+                <td>@i</td>
+                <td>
+                    <img src="@log.ImageURL" alt="No Image Available" style="max-width:100px" />
+                </td>
+                <td>@log.Name</td>
+                <td>@log.CreatedDate</td>
+                <td>
+                    <a id="add-face" class="btn btn-primary"
+                       data-toggle="modal"
+                       data-target="#myModal"
+                       data-image="@log.ImageURL"
+                       data-name="@log.Name">
+                        <i class="glyphicon glyphicon-plus"></i>
+                    </a>
+                    <a href="#" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
+                </td>
+            </tr>
+            i++;
+        }
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    @using (Html.BeginForm("NewPersonFromLog", "Face", FormMethod.Post, new { enctype = "multipart/form-data", id = "AddFaceFromLogForm" }))
+    {
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body" style="text-align:center">
+                    <img id="logImage" style="max-width:300px" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="CreateNewFromLog();" class="btn btn-primary">Thêm mới</button>
+                    <button type="button" onclick="UpdateFromLog();" class="btn btn-default">Cập nhật</button>
+                </div>
+            </div>
+            @Html.Hidden("imgUrl")
+            @Html.Hidden("name")
+            @Html.Hidden("mode")
+        </div>
+    }
+</div>
+
+@section scripts{
+    <script>
+        $(document).on("click", "#add-face", function () {
+            var logImage = $(this).data("image");
+            var name = $(this).data("name");
+            $('#logImage').attr("src", logImage);
+            $('.modal-title').html(name);
+
+            $('#imgUrl').val(logImage);
+            $('#name').val(name);
+        });
+
+        function CreateNewFromLog() {
+            $('#mode').val("new");
+            $('#AddFaceFromLogForm').submit();
+        }
+
+        function UpdateFromLog() {
+            $('#mode').val("update");
+            $('#AddFaceFromLogForm').submit();
+        }
+    </script>
+}

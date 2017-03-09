@@ -102,6 +102,7 @@
     <Property Name="PersonGroupID" Type="int" Nullable="false" />
     <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
     <Property Name="Description" Type="nvarchar" MaxLength="250" />
+    <Property Name="IsTrained" Type="bit" Nullable="false" />
     <Property Name="Active" Type="bit" Nullable="false" />
   </EntityType>
   <EntityType Name="PersonGroup">
@@ -122,16 +123,6 @@
     <Property Name="Description" Type="nvarchar" MaxLength="50" />
     <Property Name="ImageURL" Type="nvarchar(max)" Nullable="false" />
     <Property Name="Active" Type="bit" Nullable="false" />
-  </EntityType>
-  <EntityType Name="sysdiagrams">
-    <Key>
-      <PropertyRef Name="diagram_id" />
-    </Key>
-    <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
-    <Property Name="principal_id" Type="int" Nullable="false" />
-    <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="version" Type="int" />
-    <Property Name="definition" Type="varbinary(max)" />
   </EntityType>
   <Association Name="FK_AspNetUsers_PersonGroup">
     <End Role="PersonGroup" Type="Self.PersonGroup" Multiplicity="0..1" />
@@ -274,7 +265,6 @@
     <EntitySet Name="Person" EntityType="Self.Person" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="PersonGroup" EntityType="Self.PersonGroup" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Picture" EntityType="Self.Picture" Schema="dbo" store:Type="Tables" />
-    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
     <AssociationSet Name="FK_AspNetUsers_PersonGroup" Association="Self.FK_AspNetUsers_PersonGroup">
       <End Role="PersonGroup" EntitySet="PersonGroup" />
       <End Role="AspNetUsers" EntitySet="AspNetUsers" />

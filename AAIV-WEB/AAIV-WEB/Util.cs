@@ -1,4 +1,9 @@
-﻿using System;
+﻿using AAIV_WEB.Models.Entities;
+using AAIV_WEB.Models.Entities.Services;
+using Microsoft.AspNet.Identity;
+using SkyWeb.DatVM.Mvc;
+using SkyWeb.DatVM.Mvc.Autofac;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -35,6 +40,19 @@ namespace AAIV_WEB
             for (int i = 0; i < codecs.Length; i++)
                 if (codecs[i].MimeType == mimeType)
                     return codecs[i];
+
+            return null;
+        }
+
+        public static AspNetUser getCurrentUser(BaseController controller)
+        {
+            var service = controller.Service<IAspNetUserService>();
+            if (controller.User.Identity.IsAuthenticated)
+            {
+                var userId = controller.User.Identity.GetUserId();
+                var user = service.Get(userId);
+                return user;
+            }
 
             return null;
         }
