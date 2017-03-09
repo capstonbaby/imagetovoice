@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -432,7 +433,7 @@ namespace AAIV_WEB.Controllers
 
             return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
         }
-        public ActionResult deleteConcept(int conceptId)
+        public async Task<ActionResult> deleteConcept(int conceptId)
         {
             var conService = this.Service<IConceptService>();
             var entityConcept = conService.Get(conceptId);
@@ -448,13 +449,13 @@ namespace AAIV_WEB.Controllers
                     var response1 = HttpClientHelper.Get(URI1);
                     var picServiceTemp = this.Service<IPictureService>();
                     var picItem = picServiceTemp.Get(picEntity.PictureId);
-                    picServiceTemp.DeactivateAsync(picItem);
+                    await picServiceTemp.DeactivateAsync(picItem);
                 }
                 string URI = @"http://127.0.0.1:5000/clarifai/v1.0/deleteconcepts" + "?name=" + conceptId;
                 var response = HttpClientHelper.Get(URI);
                 string URI2 = @"http://127.0.0.1:5000/clarifai/v1.0/trainmodel";
                 var response2 = HttpClientHelper.Get(URI2);
-                conService.DeactivateAsync(entityConcept);
+                await conService.DeactivateAsync(entityConcept);
             }
             catch (Exception e)
             {

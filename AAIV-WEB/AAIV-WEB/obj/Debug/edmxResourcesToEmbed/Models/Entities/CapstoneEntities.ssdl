@@ -64,11 +64,10 @@
   </EntityType>
   <EntityType Name="Face">
     <Key>
-      <PropertyRef Name="ID" />
+      <PropertyRef Name="PersistedFaceId" />
     </Key>
-    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="PersonID" Type="int" Nullable="false" />
-    <Property Name="PersistedFaceId" Type="nchar" MaxLength="36" />
+    <Property Name="PersistedFaceId" Type="nvarchar" MaxLength="36" Nullable="false" />
+    <Property Name="PersonID" Type="nvarchar" MaxLength="36" Nullable="false" />
     <Property Name="ImageURL" Type="nvarchar(max)" Nullable="false" />
     <Property Name="Active" Type="bit" Nullable="false" />
   </EntityType>
@@ -95,9 +94,8 @@
   </EntityType>
   <EntityType Name="Person">
     <Key>
-      <PropertyRef Name="ID" />
+      <PropertyRef Name="PersonId" />
     </Key>
-    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="PersonId" Type="nvarchar" MaxLength="36" Nullable="false" />
     <Property Name="PersonGroupID" Type="int" Nullable="false" />
     <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
@@ -192,6 +190,18 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="FK_Face_Person">
+    <End Role="Person" Type="Self.Person" Multiplicity="1" />
+    <End Role="Face" Type="Self.Face" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Person">
+        <PropertyRef Name="PersonId" />
+      </Principal>
+      <Dependent Role="Face">
+        <PropertyRef Name="PersonID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
   <Association Name="FK_Log_AspNetUsers">
     <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1" />
     <End Role="Log" Type="Self.Log" Multiplicity="*" />
@@ -216,7 +226,7 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_Person_PersonGroup1">
+  <Association Name="FK_Person_PersonGroup">
     <End Role="PersonGroup" Type="Self.PersonGroup" Multiplicity="1" />
     <End Role="Person" Type="Self.Person" Multiplicity="*" />
     <ReferentialConstraint>
@@ -237,18 +247,6 @@
       </Principal>
       <Dependent Role="Picture">
         <PropertyRef Name="ConceptId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK_tbl_Face_tbl_Person">
-    <End Role="Person" Type="Self.Person" Multiplicity="1" />
-    <End Role="Face" Type="Self.Face" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Person">
-        <PropertyRef Name="ID" />
-      </Principal>
-      <Dependent Role="Face">
-        <PropertyRef Name="PersonID" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -285,6 +283,10 @@
       <End Role="AspNetUsers" EntitySet="AspNetUsers" />
       <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
     </AssociationSet>
+    <AssociationSet Name="FK_Face_Person" Association="Self.FK_Face_Person">
+      <End Role="Person" EntitySet="Person" />
+      <End Role="Face" EntitySet="Face" />
+    </AssociationSet>
     <AssociationSet Name="FK_Log_AspNetUsers" Association="Self.FK_Log_AspNetUsers">
       <End Role="AspNetUsers" EntitySet="AspNetUsers" />
       <End Role="Log" EntitySet="Log" />
@@ -293,17 +295,13 @@
       <End Role="AspNetUsers" EntitySet="AspNetUsers" />
       <End Role="LogObject" EntitySet="LogObject" />
     </AssociationSet>
-    <AssociationSet Name="FK_Person_PersonGroup1" Association="Self.FK_Person_PersonGroup1">
+    <AssociationSet Name="FK_Person_PersonGroup" Association="Self.FK_Person_PersonGroup">
       <End Role="PersonGroup" EntitySet="PersonGroup" />
       <End Role="Person" EntitySet="Person" />
     </AssociationSet>
     <AssociationSet Name="FK_Picture_Concept" Association="Self.FK_Picture_Concept">
       <End Role="Concept" EntitySet="Concept" />
       <End Role="Picture" EntitySet="Picture" />
-    </AssociationSet>
-    <AssociationSet Name="FK_tbl_Face_tbl_Person" Association="Self.FK_tbl_Face_tbl_Person">
-      <End Role="Person" EntitySet="Person" />
-      <End Role="Face" EntitySet="Face" />
     </AssociationSet>
   </EntityContainer>
 </Schema>

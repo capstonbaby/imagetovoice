@@ -44,3 +44,4 @@ D:\CAPSTON\AAIV\AAIV-WEB\AAIV-WEB\bin\Microsoft.Owin.Security.Twitter.xml
 D:\CAPSTON\AAIV\AAIV-WEB\AAIV-WEB\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
 D:\CAPSTON\AAIV\AAIV-WEB\AAIV-WEB\obj\Debug\AAIV-WEB.dll
 D:\CAPSTON\AAIV\AAIV-WEB\AAIV-WEB\obj\Debug\AAIV-WEB.pdb
+D:\CAPSTON\AAIV\AAIV-WEB\AAIV-WEB\obj\Debug\AAIV-WEB.csprojResolveAssemblyReference.cache

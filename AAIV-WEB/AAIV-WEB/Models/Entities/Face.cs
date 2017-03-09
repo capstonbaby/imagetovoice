@@ -12,26 +12,24 @@
 namespace AAIV_WEB.Models.Entities
 {
 
-    using System;
+using System;
     using System.Collections.Generic;
+    
+public partial class Face
+{
 
-    public partial class Face
-    {
+    public string PersistedFaceId { get; set; }
 
-        public int ID { get; set; }
+    public string PersonID { get; set; }
 
-        public int PersonID { get; set; }
+    public string ImageURL { get; set; }
 
-        public string PersistedFaceId { get; set; }
-
-        public string ImageURL { get; set; }
-
-        public bool Active { get; set; }
+    public bool Active { get; set; }
 
 
 
-        public virtual Person Person { get; set; }
+    public virtual Person Person { get; set; }
 
-    }
+}
 
 }
