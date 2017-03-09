@@ -21,6 +21,7 @@ namespace AAIV_WEB.Models.ViewModels
     			public virtual string Name { get; set; }
     			public virtual string Description { get; set; }
     			public virtual bool Active { get; set; }
+                
     	
     	public PersonViewModel() : base() { }
     	public PersonViewModel(Models.Entities.Person entity) : base(entity) { }
