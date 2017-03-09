@@ -42,6 +42,7 @@ namespace AAIV_WEB.Controllers
 
             // PErson Group
             var curUser = Util.getCurrentUser(this);
+
             if (curUser != null)
             {
                 var entity = service.GetActive(q => q.PersonGroupId == curUser.PersonGroupId).FirstOrDefault();
@@ -52,10 +53,12 @@ namespace AAIV_WEB.Controllers
                 foreach (var person in personList)
                 {
                     var img = faceService.GetActive(q => q.PersonID == person.ID).FirstOrDefault();
-                    if(img != null)
+                    if (img != null)
                     {
                         person.PersonAvatar = img.ImageURL;
                     }
+                    var imgUrl = faceService.GetActive(q => q.PersonID == person.ID).First().ImageURL;
+                    person.PersonAvatar = imgUrl;
                 }
 
                 return this.View(personList);
@@ -199,7 +202,6 @@ namespace AAIV_WEB.Controllers
             {
                 return Json(new { message = "Xóa thất bại", success = false });
             }
-
         }
 
         public ActionResult UpdatePerson(int id)
@@ -226,8 +228,6 @@ namespace AAIV_WEB.Controllers
             var userService = this.Service<IAspNetUserService>();
             var faceService = this.Service<IFaceService>();
 
-
-
             if (User.Identity.IsAuthenticated)
 
             {
@@ -243,8 +243,6 @@ namespace AAIV_WEB.Controllers
                 var personUpdateResult = faceServiceClient.UpdatePersonAsync(personGroupID, personID, person.Name, person.Description);
 
                 //Update in Database
-
-
                 updatePerson.Name = person.Name;
                 updatePerson.Description = person.Description;
                 personService.Save();
@@ -272,7 +270,6 @@ namespace AAIV_WEB.Controllers
 
                         //train
                         await faceServiceClient.TrainPersonGroupAsync(personGroupID);
-
                         //create face in db
                         var persistedFaceId = addFaceResult.PersistedFaceId.ToString();
                         var face = new Models.Entities.Face
@@ -372,5 +369,6 @@ namespace AAIV_WEB.Controllers
 
             return this.View(logList);
         }
+
     }
 }
