@@ -10,6 +10,7 @@ using System.Web.Mvc;
 
 namespace AAIV_WEB.Controllers
 {
+    
     public class HomeController : BaseController
     {
         public ActionResult Index()
@@ -17,20 +18,6 @@ namespace AAIV_WEB.Controllers
             var service = this.Service<IPersonService>();
             var model = service.GetActive().ProjectTo<PersonViewModel>(this.MapperConfig);
             return View(model);
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
         }
     }
 }

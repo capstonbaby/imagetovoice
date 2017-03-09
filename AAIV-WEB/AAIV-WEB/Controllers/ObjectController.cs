@@ -105,7 +105,7 @@ namespace AAIV_WEB.Controllers
                     }
                 }
             }
-            return RedirectToAction("Index", "Object");
+            return RedirectToAction("viewAllConcept", "Object");
         }
         public ActionResult addObject(int logId)
         {
@@ -229,7 +229,6 @@ namespace AAIV_WEB.Controllers
         }
         public ActionResult testPredict()
         {
-
             return View();
         }
         public ActionResult testConcept(IEnumerable<HttpPostedFileBase> fileUpload)
@@ -241,42 +240,59 @@ namespace AAIV_WEB.Controllers
             {
                 foreach (var image in fileUpload)
                 {
-                    byte[] imageSize = new byte[image.ContentLength];
-                    image.InputStream.Read(imageSize, 0, (int)image.ContentLength);
-
-                    var name = image.FileName;
-                    var size = image.ContentLength;
-                    //var path = Server.MapPath(".") + "//uploads//" + name;
-                    string path = System.IO.Path.Combine(
-                                                  Server.MapPath("~/uploads"), name);
-                    image.SaveAs(path);
-                    var uploadParams = new ImageUploadParams()
+                    if(image != null)
                     {
-                        File = new FileDescription(path)
-                    };
-                    var uploadResult = cloudinary.Upload(uploadParams);
-                    var url = uploadResult.Uri.AbsoluteUri;
+                        byte[] imageSize = new byte[image.ContentLength];
+                        image.InputStream.Read(imageSize, 0, (int)image.ContentLength);
 
-                    string URI = @"http://127.0.0.1:5000/clarifai/v1.0/image" + "?url=" + url;
-                    var response = HttpClientHelper.Get(URI);
-
-                    var obj = JObject.Parse(response);
-                    var value = (double)obj["outputs"][0]["data"]["concepts"][0]["value"];
-                    var id = (int)obj["outputs"][0]["data"]["concepts"][0]["id"];
-
-                    var service = this.Service<IConceptService>();
-                    var entity = service.Get(id);
-
-                    if (value > 0.6)
-                    {
-                        var model = new ConceptViewModel
+                        var name = image.FileName;
+                        var size = image.ContentLength;
+                        string path = System.IO.Path.Combine(
+                                                      Server.MapPath("~/uploads"), name);
+                        image.SaveAs(path);
+                        var uploadParams = new ImageUploadParams()
                         {
-                            ConceptId = id,
-                            ConceptName = entity.ConceptName,
-                            ConceptDescription = entity.ConceptDescription,
-                            CreateDate = entity.CreateDate
+                            File = new FileDescription(path)
                         };
-                        return View(model);
+                        var uploadResult = cloudinary.Upload(uploadParams);
+                        var url = uploadResult.Uri.AbsoluteUri;
+
+                        string URI = @"http://127.0.0.1:5000/clarifai/v1.0/image" + "?url=" + url;
+                        var response = HttpClientHelper.Get(URI);
+
+                        var obj = JObject.Parse(response);
+                        var value = (double)obj["outputs"][0]["data"]["concepts"][0]["value"];
+                        var id = (int)obj["outputs"][0]["data"]["concepts"][0]["id"];
+
+                        var service = this.Service<IConceptService>();
+                        var entity = service.Get(id);
+
+                        if (value > 0.4)
+                        {
+                            var model = new ConceptViewModel
+                            {
+                                ConceptId = id,
+                                ConceptName = entity.ConceptName,
+                                ConceptDescription = entity.ConceptDescription,
+                                CreateDate = entity.CreateDate
+                            };
+                            return View(model);
+                        }
+                        else
+                        {
+                            var model = new ConceptViewModel
+                            {
+                                ConceptId = 0,
+                                ConceptName = "Không xác định được",
+                                ConceptDescription = "",
+                                CreateDate = null,
+                            };
+                            return View(model);
+                        }
+                    }
+                    else
+                    {
+                        return RedirectToAction("testPredict", "Object");
                     }
                 }
             }
@@ -302,11 +318,9 @@ namespace AAIV_WEB.Controllers
         public ActionResult editConcept(int conceptId)
         {
             var picService = this.Service<IPictureService>();
-            //var entityPicture = picService.Get(conceptId);
             var conService = this.Service<IConceptService>();
             var entityConcept = conService.Get(conceptId);
             var picture = picService.GetActive(q => q.ConceptId == conceptId).ProjectTo<PictureViewModel>(this.MapperConfig);
-            //var pictures = picService.get(q => q.conceptid.equals(conceptid)).firstordefault();
 
             var model = new BigViewModel
             {
@@ -347,47 +361,105 @@ namespace AAIV_WEB.Controllers
             {
                 foreach (var image in fileUpload)
                 {
-                    byte[] imageSize = new byte[image.ContentLength];
-                    image.InputStream.Read(imageSize, 0, (int)image.ContentLength);
-
-                    var name = image.FileName;
-                    var size = image.ContentLength;
-                    //var path = Server.MapPath(".") + "//uploads//" + name;
-                    string path = System.IO.Path.Combine(
-                                                  Server.MapPath("~/uploads"), name);
-                    image.SaveAs(path);
-                    var uploadParams = new ImageUploadParams()
+                    if (image != null)
                     {
-                        File = new FileDescription(path)
-                    };
-                    var uploadResult = cloudinary.Upload(uploadParams);
-                    var url = uploadResult.Uri.AbsoluteUri;
+                        byte[] imageSize = new byte[image.ContentLength];
+                        image.InputStream.Read(imageSize, 0, (int)image.ContentLength);
 
-                    string URI1 = @"http://127.0.0.1:5000/clarifai/v1.0/createimage" + "?url=" + url + "&conceptid=" + conceptid;
-                    var response1 = HttpClientHelper.Get(URI1);
+                        var name = image.FileName;
+                        var size = image.ContentLength;
+                        string path = System.IO.Path.Combine(
+                                                      Server.MapPath("~/uploads"), name);
+                        image.SaveAs(path);
+                        var uploadParams = new ImageUploadParams()
+                        {
+                            File = new FileDescription(path)
+                        };
+                        var uploadResult = cloudinary.Upload(uploadParams);
+                        var url = uploadResult.Uri.AbsoluteUri;
 
-                    string URI2 = @"http://127.0.0.1:5000/clarifai/v1.0/trainmodel";
-                    var response2 = HttpClientHelper.Get(URI2);
+                        string URI1 = @"http://127.0.0.1:5000/clarifai/v1.0/createimage" + "?url=" + url + "&conceptid=" + conceptid;
+                        var response1 = HttpClientHelper.Get(URI1);
 
-                    var picService = this.Service<IPictureService>();
-                    var logObjectService = this.Service<ILogObjectService>();
+                        string URI2 = @"http://127.0.0.1:5000/clarifai/v1.0/trainmodel";
+                        var response2 = HttpClientHelper.Get(URI2);
 
-                    var addImage = new Picture
-                    {
-                        PictureId = response1,
-                        ConceptId = conceptid,
-                        ImageURL = url,
-                        Description = conceptDes
-                    };
-                    try
-                    {
-                        picService.Create(addImage);
+                        var picService = this.Service<IPictureService>();
+                        var logObjectService = this.Service<ILogObjectService>();
+
+                        var addImage = new Picture
+                        {
+                            PictureId = response1,
+                            ConceptId = conceptid,
+                            ImageURL = url,
+                            Description = conceptDes
+                        };
+                        try
+                        {
+                            picService.Create(addImage);
+                        }
+                        catch (DbEntityValidationException e)
+                        {
+                        }
                     }
-                    catch (DbEntityValidationException e)
+                    else
                     {
-                    }
+                        return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
+                    }                    
                 }
             }
+            
+            return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
+        }
+        public ActionResult updateDeleteImage(string conceptImageId, int conceptId)
+        {
+            string URI1 = @"http://127.0.0.1:5000/clarifai/v1.0/deleteimage" + "?imageId=" + conceptImageId;
+            var response1 = HttpClientHelper.Get(URI1);
+
+            string URI2 = @"http://127.0.0.1:5000/clarifai/v1.0/trainmodel";
+            var response2 = HttpClientHelper.Get(URI2);
+
+            var picService = this.Service<IPictureService>();
+            var entity = picService.Get(conceptImageId);
+
+            try
+            {
+                picService.DeactivateAsync(entity);
+            }
+            catch (DbEntityValidationException e)
+            {
+            }
+
+            return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
+        }
+        public ActionResult deleteConcept(int conceptId)
+        {
+            var conService = this.Service<IConceptService>();
+            var entityConcept = conService.Get(conceptId);
+
+            var picService = this.Service<IPictureService>();
+            var entityPic = picService.GetActive(q => q.ConceptId == conceptId).ProjectTo<PictureViewModel>(this.MapperConfig);
+
+            try
+            {
+                foreach (var picEntity in entityPic)
+                {
+                    string URI1 = @"http://127.0.0.1:5000/clarifai/v1.0/deleteimage" + "?imageId=" + picEntity.PictureId;
+                    var response1 = HttpClientHelper.Get(URI1);
+                    var picServiceTemp = this.Service<IPictureService>();
+                    var picItem = picServiceTemp.Get(picEntity.PictureId);
+                    picServiceTemp.DeactivateAsync(picItem);
+                }
+                string URI = @"http://127.0.0.1:5000/clarifai/v1.0/deleteconcepts" + "?name=" + conceptId;
+                var response = HttpClientHelper.Get(URI);
+                string URI2 = @"http://127.0.0.1:5000/clarifai/v1.0/trainmodel";
+                var response2 = HttpClientHelper.Get(URI2);
+                conService.DeactivateAsync(entityConcept);
+            }
+            catch (Exception e)
+            {
+            }
+
             return RedirectToAction("viewAllConcept", "Object");
         }
     }

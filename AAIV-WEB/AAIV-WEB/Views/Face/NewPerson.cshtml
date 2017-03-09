@@ -5,13 +5,16 @@
 
 <h1 class="page-header">Thêm người mới</h1>
 
+<style>
+    .progress {
+        background-color: #242424 !important;
+    }
+</style>
 
 <div class="panel-body">
-    <div class="col-md-6">
-
-
-        @using (Html.BeginForm("NewPerson", "Face", FormMethod.Post, new { enctype = "multipart/form-data" }))
-        {
+    @using (Html.BeginForm("NewPerson", "Face", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="col-md-6">
             <div class="form-group">
                 <label>Tên</label>
                 @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @placeholder = "Tên" })
@@ -23,14 +26,51 @@
                 @Html.TextAreaFor(m => m.Description, new { @class = "form-control", @placeholder = "Thông tin" })
                 @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
             </div>
-
+            <div class="form-group">
+                <input type="submit" value="Thêm  mới" onclick="$('.progress-striped').show();" class="btn btn-primary" />
+            </div>
+            <div class="progress progress-striped active form-group" style="display:none">
+                <div class="progress-bar progress-bar-success" role="progressbar"
+                     aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
             <div class="form-group">
                 <label>Hình ảnh</label>
-                <input type="file" name="file" id="file" style="width: 100%;" multiple/>
+                <input type="file" name="file" id="file" style="width: 100%;" multiple />
             </div>
-            
-            <input type="submit" value="Thêm  mới" class="btn btn-primary"/>
-        }
-    </div>
+
+        </div>
+    }
+
 </div>
 
+@section scripts{
+    <script src="/signalr/hubs"></script>
+    <script>
+        $(document).ready(function () {
+            var progressNotifier = $.connection.progressHub;
+
+            // client-side sendMessage function that will be called from the server-side
+            progressNotifier.client.sendMessage = function (message, percent) {
+                // update progress
+                UpdateProgress(message, percent);
+                //alert(message);
+            };
+
+            // establish the connection to the server and start server-side operation
+            $.connection.hub.start().done(function () {
+                // call the method CallLongOperation defined in the Hub
+                progressNotifier.server.getCountAndMessage();
+            });
+        });
+
+        // Update the progress bar
+        function UpdateProgress(message, percent) {
+            var progressBar = $(".progress-bar");
+            progressBar.html(message);
+            progressBar.attr("style", "width:" + percent + "%");
+        }
+    </script>
+}

@@ -70,12 +70,12 @@ namespace CapstoneProject.WebAPI.Controllers
             }));
         }
 
-        public async Task<JsonResult> CreateLog(LogViewModel model)
+        public async Task<JsonResult> CreateLog(LogViewModel model, string userId)
         {
             var service = this.Service<ILogService>();
 
             model.CreatedDate = DateTime.Now;
-            model.UserID = "36a65953-8d12-46cd-9500-fc33e9123aaf";
+            model.UserID = userId;
 
             model.Active = true;
 
