@@ -17,27 +17,95 @@ namespace CapstoneProject.WebAPI.Controllers
 {
     public class DataController : BaseController
     {
-        public async Task<JsonResult> CreatePerson(PersonViewModel model, int logId)
+        public async Task<JsonResult> CreatePerson(PersonViewModel model)
         {
             var service = this.Service<IPersonService>();
-            var logService = this.Service<ILogService>();
             var faceService = this.Service<IFaceService>();
 
-            //TODO: ADD PERSON GROUP ID AFTER IMPLEMENT AUTHORIZATION
-            model.PersonGroupID = 2;
-            model.Active = true;
             try
             {
+                model.Active = true;
                 await service.CreatePersonAsync(model);
 
-                var log = logService.Get(logId);
-                await logService.DeactivateAsync(log);
-
-                return Json(new { message = "Create Person Successfully" });
+                return Json(new
+                {
+                    success = true,
+                    message = "Create Person Successfully"
+                });
             }
             catch (Exception ex)
             {
-                return Json(new { message = "Create Person Failed", error = ex });
+                return Json(new
+                {
+                    success = true,
+                    message = "Create Person Failed",
+                    error = ex.Message
+                });
+            }
+        }
+
+        public async Task<JsonResult> AddPersonFace(FaceViewModel face)
+        {
+            try
+            {
+                var service = this.Service<IFaceService>();
+
+                var entity = face.ToEntity();
+                await service.CreateAsync(entity);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Add face successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Add face failed",
+                    error = ex.Message
+                });
+            }
+        }
+
+        public async Task<JsonResult> UpdatePerson(PersonViewModel model)
+        {
+            try
+            {
+                var service = this.Service<IPersonService>();
+
+                var entity = service.Get(q => q.PersonId == model.PersonId).FirstOrDefault();
+                if(entity != null)
+                {
+                    entity.Name = model.Name;
+                    entity.Description = model.Description;
+
+                    await service.UpdateAsync(entity);
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Update person successfully"
+                    });
+                }
+
+                return Json(new
+                {
+                    success = false,
+                    message = "Update Person Failed",
+                    error = "Person not found"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Update Person Failed",
+                    error = ex.Message
+                });
             }
         }
 
@@ -70,12 +138,12 @@ namespace CapstoneProject.WebAPI.Controllers
             }));
         }
 
-        public async Task<JsonResult> CreateLog(LogViewModel model)
+        public async Task<JsonResult> CreateLog(LogViewModel model, string userId)
         {
             var service = this.Service<ILogService>();
 
             model.CreatedDate = DateTime.Now;
-            model.UserID = "36a65953-8d12-46cd-9500-fc33e9123aaf";
+            model.UserID = userId;
 
             model.Active = true;
 
@@ -130,12 +198,12 @@ namespace CapstoneProject.WebAPI.Controllers
 
         //Object
 
-        public async Task<JsonResult> CreateLogObject(LogObjectViewModel model)
+        public async Task<JsonResult> CreateLogObject(LogObjectViewModel model, string userId)
         {
             var service = this.Service<ILogObjectService>();
 
             model.CreatedDate = DateTime.Now;
-            model.UserID = "36a65953-8d12-46cd-9500-fc33e9123aaf";
+            model.UserID = userId;
 
             model.Active = true;
 
@@ -161,7 +229,7 @@ namespace CapstoneProject.WebAPI.Controllers
             }
         }
 
-        public string getDescriptionConcept(string conceptid)
+        public string getDescriptionConcept(int conceptid)
         {
             var service = this.Service<IConceptService>();
             var model = service.GetActive(q => q.ConceptId.Equals(conceptid)).First();
@@ -169,6 +237,6 @@ namespace CapstoneProject.WebAPI.Controllers
             return model.ConceptDescription;
         }
 
-        
+
     }
 }

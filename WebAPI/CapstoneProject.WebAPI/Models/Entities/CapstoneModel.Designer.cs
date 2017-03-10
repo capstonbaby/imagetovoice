@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'D:\CN9\CapstoneProject\Git\imagetovoice\WebAPI\CapstoneProject.WebAPI\Models\Entities\CapstoneModel.edmx'. 
+﻿// T4 code generation is enabled for model 'D:\CAPSTON\AAIV\WebAPI\CapstoneProject.WebAPI\Models\Entities\CapstoneModel.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.

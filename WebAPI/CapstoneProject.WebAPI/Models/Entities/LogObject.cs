@@ -19,5 +19,7 @@ namespace CapstoneProject.WebAPI.Models.Entities
         public string UserID { get; set; }
         public string ImageURL { get; set; }
         public bool Active { get; set; }
+    
+        public virtual AspNetUser AspNetUser { get; set; }
     }
 }

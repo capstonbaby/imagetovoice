@@ -7,6 +7,7 @@ namespace AAIV_WEB.Models.ViewModels
 {
     public class PersonEditViewModel : PersonViewModel
     {
-        public string PersonAvatars { get; set; }
+        public string PersonAvatar { get; set; }
+        public List<FaceViewModel> FaceList { get; set; }
     }
 }

@@ -61,7 +61,7 @@
           <Key>
             <PropertyRef Name="ConceptId" />
           </Key>
-          <Property Name="ConceptId" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ConceptId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="ConceptName" Type="nvarchar" MaxLength="100" />
           <Property Name="ConceptDescription" Type="nvarchar" MaxLength="100" />
           <Property Name="CreateDate" Type="datetime" />
@@ -122,11 +122,21 @@
           <Key>
             <PropertyRef Name="PictureId" />
           </Key>
-          <Property Name="PictureId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ConceptId" Type="varchar" MaxLength="50" />
+          <Property Name="PictureId" Type="varchar" MaxLength="32" Nullable="false" />
+          <Property Name="ConceptId" Type="int" />
           <Property Name="Description" Type="nvarchar" MaxLength="50" />
           <Property Name="ImageURL" Type="nvarchar(max)" Nullable="false" />
           <Property Name="Active" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
         </EntityType>
         <Association Name="FK_AspNetUsers_PersonGroup">
           <End Role="PersonGroup" Type="Self.PersonGroup" Multiplicity="0..1" />
@@ -208,6 +218,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_LogObject_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1" />
+          <End Role="LogObject" Type="Self.LogObject" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LogObject">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Person_PersonGroup1">
           <End Role="PersonGroup" Type="Self.PersonGroup" Multiplicity="1" />
           <End Role="Person" Type="Self.Person" Multiplicity="*" />
@@ -217,6 +239,18 @@
             </Principal>
             <Dependent Role="Person">
               <PropertyRef Name="PersonGroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Picture_Concept">
+          <End Role="Concept" Type="Self.Concept" Multiplicity="0..1" />
+          <End Role="Picture" Type="Self.Picture" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Concept">
+              <PropertyRef Name="ConceptId" />
+            </Principal>
+            <Dependent Role="Picture">
+              <PropertyRef Name="ConceptId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -245,6 +279,7 @@
           <EntitySet Name="Person" EntityType="Self.Person" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PersonGroup" EntityType="Self.PersonGroup" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Picture" EntityType="Self.Picture" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_AspNetUsers_PersonGroup" Association="Self.FK_AspNetUsers_PersonGroup">
             <End Role="PersonGroup" EntitySet="PersonGroup" />
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
@@ -269,9 +304,17 @@
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="Log" EntitySet="Log" />
           </AssociationSet>
+          <AssociationSet Name="FK_LogObject_AspNetUsers" Association="Self.FK_LogObject_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="LogObject" EntitySet="LogObject" />
+          </AssociationSet>
           <AssociationSet Name="FK_Person_PersonGroup1" Association="Self.FK_Person_PersonGroup1">
             <End Role="PersonGroup" EntitySet="PersonGroup" />
             <End Role="Person" EntitySet="Person" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Picture_Concept" Association="Self.FK_Picture_Concept">
+            <End Role="Concept" EntitySet="Concept" />
+            <End Role="Picture" EntitySet="Picture" />
           </AssociationSet>
           <AssociationSet Name="FK_tbl_Face_tbl_Person" Association="Self.FK_tbl_Face_tbl_Person">
             <End Role="Person" EntitySet="Person" />
@@ -294,6 +337,7 @@
           <EntitySet Name="People" EntityType="CapstoneModel.Person" />
           <EntitySet Name="PersonGroups" EntityType="CapstoneModel.PersonGroup" />
           <EntitySet Name="Pictures" EntityType="CapstoneModel.Picture" />
+          <EntitySet Name="sysdiagrams" EntityType="CapstoneModel.sysdiagram" />
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="CapstoneModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaim" EntitySet="AspNetUserClaims" />
@@ -309,6 +353,14 @@
           <AssociationSet Name="FK_Log_AspNetUsers" Association="CapstoneModel.FK_Log_AspNetUsers">
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
             <End Role="Log" EntitySet="Logs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LogObject_AspNetUsers" Association="CapstoneModel.FK_LogObject_AspNetUsers">
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+            <End Role="LogObject" EntitySet="LogObjects" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Picture_Concept" Association="CapstoneModel.FK_Picture_Concept">
+            <End Role="Concept" EntitySet="Concepts" />
+            <End Role="Picture" EntitySet="Pictures" />
           </AssociationSet>
           <AssociationSet Name="FK_tbl_Face_tbl_Person" Association="CapstoneModel.FK_tbl_Face_tbl_Person">
             <End Role="Person" EntitySet="People" />
@@ -373,17 +425,19 @@
           <NavigationProperty Name="AspNetUserLogins" Relationship="CapstoneModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUser" ToRole="AspNetUserLogin" />
           <NavigationProperty Name="PersonGroup" Relationship="CapstoneModel.FK_AspNetUsers_PersonGroup" FromRole="AspNetUser" ToRole="PersonGroup" />
           <NavigationProperty Name="Logs" Relationship="CapstoneModel.FK_Log_AspNetUsers" FromRole="AspNetUser" ToRole="Log" />
+          <NavigationProperty Name="LogObjects" Relationship="CapstoneModel.FK_LogObject_AspNetUsers" FromRole="AspNetUser" ToRole="LogObject" />
           <NavigationProperty Name="AspNetRoles" Relationship="CapstoneModel.AspNetUserRoles" FromRole="AspNetUser" ToRole="AspNetRole" />
         </EntityType>
         <EntityType Name="Concept">
           <Key>
             <PropertyRef Name="ConceptId" />
           </Key>
-          <Property Name="ConceptId" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ConceptId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="ConceptName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="ConceptDescription" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="CreateDate" Type="DateTime" Precision="3" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Pictures" Relationship="CapstoneModel.FK_Picture_Concept" FromRole="Concept" ToRole="Picture" />
         </EntityType>
         <EntityType Name="Face">
           <Key>
@@ -417,6 +471,7 @@
           <Property Name="UserID" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="AspNetUser" Relationship="CapstoneModel.FK_LogObject_AspNetUsers" FromRole="LogObject" ToRole="AspNetUser" />
         </EntityType>
         <EntityType Name="Person">
           <Key>
@@ -446,11 +501,22 @@
           <Key>
             <PropertyRef Name="PictureId" />
           </Key>
-          <Property Name="PictureId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ConceptId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PictureId" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="false" />
+          <Property Name="ConceptId" Type="Int32" />
           <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Concept" Relationship="CapstoneModel.FK_Picture_Concept" FromRole="Picture" ToRole="Concept" />
+        </EntityType>
+        <EntityType Name="sysdiagram">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Type="CapstoneModel.AspNetUser" Role="AspNetUser" Multiplicity="1">
@@ -501,6 +567,30 @@
             </Principal>
             <Dependent Role="Log">
               <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LogObject_AspNetUsers">
+          <End Type="CapstoneModel.AspNetUser" Role="AspNetUser" Multiplicity="1" />
+          <End Type="CapstoneModel.LogObject" Role="LogObject" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LogObject">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Picture_Concept">
+          <End Type="CapstoneModel.Concept" Role="Concept" Multiplicity="0..1" />
+          <End Type="CapstoneModel.Picture" Role="Picture" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Concept">
+              <PropertyRef Name="ConceptId" />
+            </Principal>
+            <Dependent Role="Picture">
+              <PropertyRef Name="ConceptId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -659,6 +749,17 @@
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="ConceptId" ColumnName="ConceptId" />
                 <ScalarProperty Name="PictureId" ColumnName="PictureId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="CapstoneModel.sysdiagram">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="definition" ColumnName="definition" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

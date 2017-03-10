@@ -103,5 +103,83 @@ namespace CapstoneProject.WebAPI.Controllers
                 });
             }
         }
+
+        public async Task<JsonResult> Register(RegisterViewModel model)
+        {
+            var userService = this.Service<IAspNetUserService>();
+
+            if (ModelState.IsValid)
+            {
+                if (!model.Password.Equals(model.ConfirmPassword))
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Register Failled",
+                        error = "Confirm Password miss matched"
+                    });
+                }
+                try
+                {
+                    var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                    var result = await UserManager.CreateAsync(user, model.Password);
+                    if (result.Succeeded)
+                    {
+                        try
+                        {
+                            var userEntity = userService.Get(user.Id);
+                            if (userEntity != null)
+                            {
+                                userEntity.PersonGroupId = 1;
+                                await userService.UpdateAsync(userEntity);
+                                return Json(new
+                                {
+                                    success = true,
+                                    message = "Register Successfully"
+                                });
+                            }
+
+                        }
+                        //add person group failled
+                        catch (Exception ex)
+                        {
+                            await UserManager.DeleteAsync(user);
+                            return Json(new
+                            {
+                                success = false,
+                                message = "Register Failled",
+                                error = ex.Message
+                            });
+                        }
+                    }
+                    //create user result not success
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Register Failled",
+                        error = result.Errors.FirstOrDefault()
+                    });
+                }
+                // Create User Failled
+                catch (Exception ex)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Register Failled",
+                        error = ex.Message
+                    });
+                }
+                
+            }
+
+            // If we got this far, something failed, redisplay form
+            return Json(new
+            {
+                success = false,
+                message = "Register Failled",
+                error = "Model state is invalid"
+            });
+        }
     }
 }
