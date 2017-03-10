@@ -195,6 +195,8 @@ namespace AAIV_WEB.Controllers
                     await faceService.DeactivateAsync(item);
                 }
 
+                //Train Person
+                await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupName);
 
                 return Json(new { message = "Xóa thành công", success = true });
             }
@@ -270,6 +272,7 @@ namespace AAIV_WEB.Controllers
 
                         //train
                         await faceServiceClient.TrainPersonGroupAsync(personGroupID);
+
                         //create face in db
                         var persistedFaceId = addFaceResult.PersistedFaceId.ToString();
                         var face = new Models.Entities.Face
@@ -283,9 +286,8 @@ namespace AAIV_WEB.Controllers
 
                     }
                 }
-
-
-                return RedirectToAction("Index", "Face");
+                
+                return RedirectToAction("UpdatePerson", "Face", new { id = person.ID});
             }
             else
             {
@@ -356,7 +358,7 @@ namespace AAIV_WEB.Controllers
                 }
             }
 
-            return RedirectToAction("Index", "Face");
+            return RedirectToAction("UpdatePerson", "Face", new { id = person.ID });
         }
 
         public ActionResult ShowLogs()
