@@ -13,6 +13,15 @@
     }
 </style>
 <h2>Cập nhật đồ vật</h2>
+<div class="error">
+    @{
+        var message = TempData["message"] as string;
+        if (message != null)
+        {
+            <span class="label label-danger">@message</span>
+        }
+    }
+</div>
 <div class="panel-body">
     <div class="row">
         <div class="col-md-6">
@@ -23,10 +32,10 @@
                     @Html.HiddenFor(q => q.ConceptId)
                 </div>
                 <div class="form-group">
-                    <label>Tên đồ vật: <input type="text" name="conceptName" value="@Model.ConceptName" /></label>
+                    <label>Tên đồ vật: <input type="text" name="conceptName" value="@Model.ConceptName" required placeholder="Nhập tên đồ vật!"/></label>
                 </div>
                 <div class="form-group">
-                    <label>Mô tả: <input type="text" name="conceptDes" value="@Model.ConceptDescription" /></label>
+                    <label>Mô tả: <input type="text" name="conceptDes" value="@Model.ConceptDescription" placeholder="Nhập mô tả đồ vật!"/></label>
                 </div>
                 <div class="form-group">
                     <label>Ngày tạo: @Model.CreateDate</label>
@@ -45,15 +54,20 @@
             @foreach (var item in this.Model.PictureList)
             {
                 <div class="col-lg-3 col-md-4 col-xs-6 thumb">
-                    <a class="thumbnail" id="person-face" data-toggle="modal" data-target="#myModal" data-image="@item.ImageURL" data-id="@item.PictureId">
+                    <a class="thumbnail person-face" data-toggle="modal" data-target="#myModal" data-image="@item.ImageURL" data-id="@item.PictureId">
                         <img class="img-responsive" src="@item.ImageURL" alt="">
                     </a>
+                    <input type="checkbox" class="select-image" data-id="@item.PictureId"/>
                 </div>
             }
+            <button type="button" onclick="DeleteImageBySelect();" class="btn btn-danger">Delete</button>
         </div>
     </div>
 </div>
-
+@if (TempData["notice"] != null)
+{
+    <p>@TempData["notice"]</p>
+}
 @using (Html.BeginForm("updateDeleteImage", "Object", FormMethod.Post, new { enctype = "multipart/form-data", id = "EditImageObjectForm" }))
 {
     <!-- Modal -->
@@ -113,14 +127,41 @@
 
 @section scripts{
     <script>
-        $(document).on("click", "#person-face", function () {
+        var conceptId = "@Model.ConceptId";
+        function PostDataRedirect(data, dataName, location) {
+            var form = document.createElement("form");
+
+            form.method = "POST";
+            form.action = location;
+
+            if (data.constructor === Array && dataName.constructor === Array) {
+                for (var i = 0; i < data.length; i++) {
+                    var element = document.createElement("input");
+                    element.type = "hidden";
+                    element.value = data[i];
+                    element.name = dataName[i];
+                    form.appendChild(element);
+                }
+            } else {
+                var element1 = document.createElement("input");
+                element1.type = "hidden";
+                element1.value = data;
+                element1.name = dataName;
+                form.appendChild(element1);
+            }
+
+            document.body.appendChild(form);
+
+            form.submit();
+        }
+        $(document).on("click", ".person-face", function () {
             var image = $(this).data("image");
             var pictureId = $(this).data("id");
 
             $(".modal-body #image-modal").attr("src", image);
             $(".modal-body #conceptImageId").val(pictureId);
         });
-        
+
         function DeleteImage() {
             swal({
                 title: 'Bạn có chắc chắn xóa?',
@@ -137,6 +178,48 @@
                 $("#EditImageObjectForm").submit();
             })
 
-        }
+        };
+        function DeleteImageBySelect() {
+            var picIdList = "";
+            $(".select-image").each(function () {
+                var item = $(this);
+                if (item.is(':checked')) {
+                    picIdList += item.attr('data-id') + ",";
+                }
+                
+
+            })
+            if (picIdList === "")
+            {
+                swal({
+                    title: 'Ban chua lua chon bat ky hinh nao?',
+                    text: "",
+                    type: 'warning',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'ok',
+                    cancelButtonText: 'Không'
+
+                });
+                return
+            }
+            ///
+            swal({
+                title: 'Bạn có chắc chắn xóa?',
+                text: "",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Có',
+                cancelButtonText: 'Không'
+
+            }).then(function () {
+                //PostDataRedirect([ un, pw ], ["un", "pw"], "login.php");
+                PostDataRedirect([picIdList,conceptId], ["picIdList", "conceptId"], '@Url.Action("deleteImageBySelect","Object")')
+            })
+
+        };
     </script>
 }

@@ -11,8 +11,10 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+
 
 namespace AAIV_WEB.Controllers
 {
@@ -21,7 +23,6 @@ namespace AAIV_WEB.Controllers
         public ActionResult Index()
         {
             var service = this.Service<ILogObjectService>();
-
             var model = service.GetActive().ProjectTo<LogObjectViewModel>(this.MapperConfig);
 
             return View(model);
@@ -33,12 +34,16 @@ namespace AAIV_WEB.Controllers
 
             return View(conceptList);
         }
-        public ActionResult createNewObject(string conceptName, string conceptDes, IEnumerable<HttpPostedFileBase> fileUpload)
+        public async Task<ActionResult> createNewObject(string conceptName, string conceptDes, IEnumerable<HttpPostedFileBase> fileUpload)
         {
-            Account account = new Account("trains", "445514799582782", "NIIYkOkkMtT_2uAtf2R3WWuEvLk");
-            Cloudinary cloudinary = new Cloudinary(account);
 
-            var conceptService = this.Service<IConceptService>();
+            // Validate data input
+            if (string.IsNullOrEmpty(conceptName))
+            {
+                TempData["message"] = "Tên đồ vật không được bỏ trống!";
+                return RedirectToAction("createObject", "Object");
+            }
+            //            
             var addConcept = new Concept
             {
                 ConceptName = conceptName,
@@ -46,64 +51,81 @@ namespace AAIV_WEB.Controllers
                 CreateDate = DateTime.Now,
                 Active = true
             };
+            var conceptService = this.Service<IConceptService>();
             try
             {
-                conceptService.Create(addConcept);
-            }
-            catch (DbEntityValidationException e)
-            {
-            }
-
-            var concepts = conceptService.Get(q => q.ConceptName.Equals(conceptName)).FirstOrDefault();
-            int conceptid = concepts.ConceptId;
-
-            string URI = @"http://127.0.0.1:5000/clarifai/v1.0/createconcept" + "?id=" + conceptid;
-            var response = HttpClientHelper.Get(URI);
-
-            if (fileUpload != null)
-            {
-                foreach (var image in fileUpload)
+                if (conceptService != null)
                 {
-                    byte[] imageSize = new byte[image.ContentLength];
-                    image.InputStream.Read(imageSize, 0, (int)image.ContentLength);
+                    // nope tra ve void thi biet the nao da duoc tao hay la chua
+                    await conceptService.CreateAsync(addConcept);
+                }
+                else
+                {
+                    TempData["message"] = "Service không hoạt động!";
+                    return RedirectToAction("createObject", "Object");
+                }
+                var concepts = conceptService.Get(q => q.ConceptName.Equals(conceptName)).FirstOrDefault();
+                int conceptid = concepts.ConceptId;
 
-                    var name = image.FileName;
-                    var size = image.ContentLength;
-                    //var path = Server.MapPath(".") + "//uploads//" + name;
-                    string path = System.IO.Path.Combine(
-                                                  Server.MapPath("~/uploads"), name);
-                    image.SaveAs(path);
-                    var uploadParams = new ImageUploadParams()
+                string createConceptURI = Constant.CREATE_CONCEPT_API + conceptid;
+                var createConceptResponse = HttpClientHelper.Get(createConceptURI);
+                if (createConceptResponse != null)
+                {
+                    var list_image = getImageURL(fileUpload);
+                    if (list_image != null)
                     {
-                        File = new FileDescription(path)
-                    };
-                    var uploadResult = cloudinary.Upload(uploadParams);
-                    var url = uploadResult.Uri.AbsoluteUri;
+                        foreach (var image_url in list_image)
+                        {
+                            string createImgURI = Constant.Get_Create_IMG_API_URL(image_url, conceptid);
+                            var createImgResponse = HttpClientHelper.Get(createImgURI);
+                            string trainURI = Constant.TRAIN_API;
+                            var trainResponse = HttpClientHelper.Get(trainURI);
 
-                    string URI1 = @"http://127.0.0.1:5000/clarifai/v1.0/createimage" + "?url=" + url + "&conceptid=" + conceptid;
-                    var response1 = HttpClientHelper.Get(URI1);
-
-                    string URI2 = @"http://127.0.0.1:5000/clarifai/v1.0/trainmodel";
-                    var response2 = HttpClientHelper.Get(URI2);
-
-                    var picService = this.Service<IPictureService>();
-                    var logObjectService = this.Service<ILogObjectService>();
-
-                    var addImage = new Picture
-                    {
-                        PictureId = response1,
-                        ConceptId = conceptid,
-                        ImageURL = url,
-                        Description = conceptDes
-                    };
-                    try
-                    {
-                        picService.Create(addImage);
+                            if (createImgResponse != null && trainResponse != null)
+                            {
+                                var addImage = new Picture
+                                {
+                                    PictureId = createImgResponse,
+                                    ConceptId = conceptid,
+                                    ImageURL = image_url,
+                                    Description = conceptDes
+                                };
+                                var picService = this.Service<IPictureService>();
+                                var logObjectService = this.Service<ILogObjectService>();
+                                if (picService != null)
+                                {
+                                    // nope tra ve void thi biet the nao da duoc tao hay la chua
+                                    await picService.CreateAsync(addImage);
+                                }
+                                else
+                                {
+                                    TempData["message"] = "Service không hoạt động!";
+                                    return RedirectToAction("createObject", "Object");
+                                }
+                            }
+                            else
+                            {
+                                TempData["message"] = "Tạo mới thất bại! Vui lòng thử lại!";
+                                return RedirectToAction("createObject", "Object");
+                            }
+                        }
                     }
-                    catch (DbEntityValidationException e)
+                    else
                     {
+                        TempData["message"] = "Vui lòng chọn hình ảnh!";
+                        return RedirectToAction("createObject", "Object");
                     }
                 }
+                else
+                {
+                    TempData["message"] = "Tạo concept thất bại! Vui lòng thử lại!";
+                    return RedirectToAction("createObject", "Object");
+                }
+            }
+            catch (Exception e)
+            {
+                TempData["message"] = "Tạo mới thất bại! Vui lòng thử lại!";
+                return RedirectToAction("createObject", "Object");
             }
             return RedirectToAction("viewAllConcept", "Object");
         }
@@ -111,54 +133,73 @@ namespace AAIV_WEB.Controllers
         {
             var service = this.Service<ILogObjectService>();
             var entity = service.Get(logId);
-
             var conceptService = this.Service<IConceptService>();
             var concepts = conceptService.GetActive().ProjectTo<ConceptViewModel>(this.MapperConfig);
-
-            var model = new BigViewModel
+            if(entity != null)
             {
-                ImageURL = entity.ImageURL,
-                LogObjectViewModel = new LogObjectViewModel(entity),
-                ConceptList = concepts,
-                LogId = logId
-            };
-            return View(model);
+                var model = new BigViewModel
+                {
+                    ImageURL = entity.ImageURL,
+                    LogObjectViewModel = new LogObjectViewModel(entity),
+                    ConceptList = concepts,
+                    LogId = logId
+                };
+                return View(model);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Object");
+            }
         }
-        public ActionResult addImageConcept(string ImageUrl, int? ConceptId, int logId)
+        public async Task<ActionResult> addImageConcept(string ImageUrl, int? ConceptId, int logId)
         {
             if (ConceptId != null)
             {
                 int conceptid = ConceptId.Value;
+                string createImgURI = Constant.Get_Create_IMG_API_URL(ImageUrl, conceptid);
+                var createImgResponse = HttpClientHelper.Get(createImgURI);
+                string trainURI = Constant.TRAIN_API;
+                var trainResponse = HttpClientHelper.Get(trainURI);
 
-                string URI1 = @"http://127.0.0.1:5000/clarifai/v1.0/createimage" + "?url=" + ImageUrl + "&conceptid=" + conceptid;
-                var response1 = HttpClientHelper.Get(URI1);
-
-                string URI2 = @"http://127.0.0.1:5000/clarifai/v1.0/trainmodel";
-                var response2 = HttpClientHelper.Get(URI2);
-
-                var picService = this.Service<IPictureService>();
-                var logObjectService = this.Service<ILogObjectService>();
-                var entity = logObjectService.Get(logId);
-                var conceptService = this.Service<IConceptService>();
-                var conceptDes = conceptService.Get(q => q.ConceptId.Equals(conceptid)).FirstOrDefault();
-
-                var addImage = new Picture
+                if (createImgResponse != null && trainResponse != null)
                 {
-                    PictureId = response1,
-                    ConceptId = conceptid,
-                    ImageURL = ImageUrl,
-                    Description = conceptDes.ConceptDescription
-                };
-
-                try
-                {
-                    picService.Create(addImage);
-                    logObjectService.Deactivate(entity);
+                    var conceptService = this.Service<IConceptService>();
+                    if (conceptService != null)
+                    {
+                        var conceptDes = conceptService.Get(q => q.ConceptId.Equals(conceptid)).FirstOrDefault();
+                        var addImage = new Picture
+                        {
+                            PictureId = createImgResponse,
+                            ConceptId = conceptid,
+                            ImageURL = ImageUrl,
+                            Description = conceptDes.ConceptDescription
+                        };
+                        var picService = this.Service<IPictureService>();
+                        var logObjectService = this.Service<ILogObjectService>();
+                        if (picService != null && logObjectService != null)
+                        {
+                            var entity = logObjectService.Get(logId);
+                            await picService.CreateAsync(addImage);
+                            await logObjectService.DeactivateAsync(entity);
+                        }
+                        else
+                        {
+                            TempData["message"] = "Service không hoạt động!";
+                            return RedirectToAction("addObject", "Object");
+                        }
+                        return RedirectToAction("Index", "Object");
+                    }
+                    else
+                    {
+                        TempData["message"] = "Service không hoạt động!";
+                        return RedirectToAction("addObject", "Object");
+                    }
                 }
-                catch (DbEntityValidationException e)
+                else
                 {
+                    TempData["message"] = "Tạo mới thất bại! Vui lòng thử lại!";
+                    return RedirectToAction("addObject", "Object");
                 }
-                return RedirectToAction("Index", "Object");
             }
             return RedirectToAction("addNewConcept", "Object", new { imgUrl = ImageUrl, logId = logId });
 
@@ -174,9 +215,15 @@ namespace AAIV_WEB.Controllers
             };
             return View(model);
         }
-        public ActionResult addImageNewConcept(string conceptName, string conceptDes, string imageUrl, int logId)
+        public async Task<ActionResult> addImageNewConcept(string conceptName, string conceptDes, string imageUrl, int logId)
         {
-            var conceptService = this.Service<IConceptService>();
+            // Validate data input
+            if (string.IsNullOrEmpty(conceptName))
+            {
+                TempData["message"] = "Tên đồ vật không được bỏ trống!";
+                return RedirectToAction("addNewConcept", "Object", new { imgUrl = imageUrl, logId = logId });
+            }
+            //    
             var addConcept = new Concept
             {
                 ConceptName = conceptName,
@@ -184,47 +231,60 @@ namespace AAIV_WEB.Controllers
                 CreateDate = DateTime.Now,
                 Active = false
             };
-            try
+            var conceptService = this.Service<IConceptService>();
+            if (conceptService != null)
             {
-                conceptService.Create(addConcept);
+                await conceptService.CreateAsync(addConcept);
+                var concepts = conceptService.Get(q => q.ConceptName.Equals(conceptName)).FirstOrDefault();
+
+                string createConceptURI = Constant.CREATE_CONCEPT_API + concepts.ConceptId;
+                var createConceptResponse = HttpClientHelper.Get(createConceptURI);
+                if (createConceptResponse != null)
+                {
+                    string createImgURI = Constant.Get_Create_IMG_API_URL(imageUrl, concepts.ConceptId);
+                    var createImgResponse = HttpClientHelper.Get(createImgURI);
+                    string trainURI = Constant.TRAIN_API;
+                    var trainResponse = HttpClientHelper.Get(trainURI);
+                    if (createImgResponse != null && trainResponse != null)
+                    {
+                        var addImage = new Picture
+                        {
+                            PictureId = createImgResponse,
+                            ConceptId = concepts.ConceptId,
+                            ImageURL = imageUrl,
+                            Description = conceptDes
+                        };
+                        var picService = this.Service<IPictureService>();
+                        var logObjectService = this.Service<ILogObjectService>();
+                        if (picService != null && logObjectService != null)
+                        {
+                            var entity = logObjectService.Get(logId);
+                            await picService.CreateAsync(addImage);
+                            await logObjectService.DeactivateAsync(entity);
+                        }
+                        else
+                        {
+                            TempData["message"] = "Service không hoạt động!";
+                            return RedirectToAction("addNewConcept", "Object", new { imgUrl = imageUrl, logId = logId });
+                        }
+                    }
+                    else
+                    {
+                        TempData["message"] = "Tạo mới thất bại! Vui lòng thử lại!";
+                        return RedirectToAction("addNewConcept", "Object", new { imgUrl = imageUrl, logId = logId });
+                    }
+                }
+                else
+                {
+                    TempData["message"] = "Tạo concept thất bại! Vui lòng thử lại!";
+                    return RedirectToAction("addNewConcept", "Object", new { imgUrl = imageUrl, logId = logId });
+                }
             }
-            catch (DbEntityValidationException e)
+            else
             {
+                TempData["message"] = "Service không hoạt động!";
+                return RedirectToAction("addNewConcept", "Object", new { imgUrl = imageUrl, logId = logId });
             }
-
-            var concepts = conceptService.Get(q => q.ConceptName.Equals(conceptName)).FirstOrDefault();
-            int conceptid = concepts.ConceptId;
-
-            string URI = @"http://127.0.0.1:5000/clarifai/v1.0/createconcept" + "?id=" + conceptid;
-            var response = HttpClientHelper.Get(URI);
-
-            string URI1 = @"http://127.0.0.1:5000/clarifai/v1.0/createimage" + "?url=" + imageUrl + "&conceptid=" + conceptid;
-            var response1 = HttpClientHelper.Get(URI1);
-
-            string URI2 = @"http://127.0.0.1:5000/clarifai/v1.0/trainmodel";
-            var response2 = HttpClientHelper.Get(URI2);
-
-            var picService = this.Service<IPictureService>();
-            var logObjectService = this.Service<ILogObjectService>();
-            var entity = logObjectService.Get(logId);
-
-            var addImage = new Picture
-            {
-                PictureId = response1,
-                ConceptId = conceptid,
-                ImageURL = imageUrl,
-                Description = conceptDes
-            };
-
-            try
-            {
-                picService.Create(addImage);
-                logObjectService.Deactivate(entity);
-            }
-            catch (DbEntityValidationException e)
-            {
-            }
-
             return RedirectToAction("Index", "Object");
         }
         public ActionResult testPredict()
@@ -236,65 +296,63 @@ namespace AAIV_WEB.Controllers
             Account account = new Account("trains", "445514799582782", "NIIYkOkkMtT_2uAtf2R3WWuEvLk");
             Cloudinary cloudinary = new Cloudinary(account);
 
-            if (fileUpload != null)
+            var list_image = getImageURL(fileUpload);
+            if (list_image != null)
             {
-                foreach (var image in fileUpload)
+                foreach (var image_Url in list_image)
                 {
-                    if(image != null)
+                    string detectURI = Constant.DETECT_API + image_Url;
+                    var detectResponse = HttpClientHelper.Get(detectURI);
+                    if (detectResponse != null)
                     {
-                        byte[] imageSize = new byte[image.ContentLength];
-                        image.InputStream.Read(imageSize, 0, (int)image.ContentLength);
-
-                        var name = image.FileName;
-                        var size = image.ContentLength;
-                        string path = System.IO.Path.Combine(
-                                                      Server.MapPath("~/uploads"), name);
-                        image.SaveAs(path);
-                        var uploadParams = new ImageUploadParams()
-                        {
-                            File = new FileDescription(path)
-                        };
-                        var uploadResult = cloudinary.Upload(uploadParams);
-                        var url = uploadResult.Uri.AbsoluteUri;
-
-                        string URI = @"http://127.0.0.1:5000/clarifai/v1.0/image" + "?url=" + url;
-                        var response = HttpClientHelper.Get(URI);
-
-                        var obj = JObject.Parse(response);
+                        var obj = JObject.Parse(detectResponse);
                         var value = (double)obj["outputs"][0]["data"]["concepts"][0]["value"];
                         var id = (int)obj["outputs"][0]["data"]["concepts"][0]["id"];
 
                         var service = this.Service<IConceptService>();
-                        var entity = service.Get(id);
-
-                        if (value > 0.4)
+                        if (service != null)
                         {
-                            var model = new ConceptViewModel
+                            var entity = service.Get(id);
+                            if (value > 0.4)
                             {
-                                ConceptId = id,
-                                ConceptName = entity.ConceptName,
-                                ConceptDescription = entity.ConceptDescription,
-                                CreateDate = entity.CreateDate
-                            };
-                            return View(model);
+                                var model = new ConceptViewModel
+                                {
+                                    ConceptId = id,
+                                    ConceptName = entity.ConceptName,
+                                    ConceptDescription = entity.ConceptDescription,
+                                    CreateDate = entity.CreateDate
+                                };
+                                return View(model);
+                            }
+                            else
+                            {
+                                var model = new ConceptViewModel
+                                {
+                                    ConceptId = 0,
+                                    ConceptName = "Không xác định được",
+                                    ConceptDescription = "",
+                                    CreateDate = null,
+                                };
+                                return View(model);
+                            }
                         }
                         else
                         {
-                            var model = new ConceptViewModel
-                            {
-                                ConceptId = 0,
-                                ConceptName = "Không xác định được",
-                                ConceptDescription = "",
-                                CreateDate = null,
-                            };
-                            return View(model);
+                            TempData["message"] = "Service không hoạt động!";
+                            return RedirectToAction("testPredict", "Object");
                         }
                     }
                     else
                     {
+                        TempData["message"] = "Không nhận dạng được vật thể!";
                         return RedirectToAction("testPredict", "Object");
                     }
                 }
+            }
+            else
+            {
+                TempData["message"] = "Vui lòng chọn hình ảnh!";
+                return RedirectToAction("testPredict", "Object");
             }
             return View();
         }
@@ -321,23 +379,32 @@ namespace AAIV_WEB.Controllers
             var conService = this.Service<IConceptService>();
             var entityConcept = conService.Get(conceptId);
             var picture = picService.GetActive(q => q.ConceptId == conceptId).ProjectTo<PictureViewModel>(this.MapperConfig);
-
-            var model = new BigViewModel
+            if (entityConcept != null)
             {
-                ConceptId = conceptId,
-                ConceptName = entityConcept.ConceptName,
-                ConceptDescription = entityConcept.ConceptDescription,
-                PictureList = picture,
-                CreateDate = entityConcept.CreateDate
-            };
-            return View(model);
+                var model = new BigViewModel
+                {
+                    ConceptId = conceptId,
+                    ConceptName = entityConcept.ConceptName,
+                    ConceptDescription = entityConcept.ConceptDescription,
+                    PictureList = picture,
+                    CreateDate = entityConcept.CreateDate
+                };
+                return View(model);
+            }
+            else
+            {
+                return RedirectToAction("viewAllConcept", "Object");
+            }
         }
-        public ActionResult updateNewConcept(int conceptId, string conceptName, string conceptDes, IEnumerable<HttpPostedFileBase> fileUpload)
+        public async Task<ActionResult> updateNewConcept(int conceptId, string conceptName, string conceptDes, IEnumerable<HttpPostedFileBase> fileUpload)
         {
-            Account account = new Account("trains", "445514799582782", "NIIYkOkkMtT_2uAtf2R3WWuEvLk");
-            Cloudinary cloudinary = new Cloudinary(account);
-
-            var conceptService = this.Service<IConceptService>();
+            // Validate data input
+            if (string.IsNullOrEmpty(conceptName))
+            {
+                TempData["message"] = "Tên đồ vật không được bỏ trống!";
+                return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
+            }
+            //  
             var updateConcept = new Concept
             {
                 ConceptId = conceptId,
@@ -346,19 +413,136 @@ namespace AAIV_WEB.Controllers
                 CreateDate = DateTime.Now,
                 Active = true
             };
-            try
+            var conceptService = this.Service<IConceptService>();
+            if (conceptService != null)
             {
-                conceptService.Update(updateConcept);
+                await conceptService.UpdateAsync(updateConcept);
+                var concepts = conceptService.Get(q => q.ConceptName.Equals(conceptName)).FirstOrDefault();
+                int conceptid = concepts.ConceptId;
+                var list_image = getImageURL(fileUpload);
+                if (list_image != null)
+                {
+                    foreach (var image_Url in list_image)
+                    {
+                        string URI1 = Constant.Get_Create_IMG_API_URL(image_Url, conceptid);
+                        var createImgResponse = HttpClientHelper.Get(URI1);
+                        string URI2 = Constant.TRAIN_API;
+                        var trainResponse = HttpClientHelper.Get(URI2);
+                        if (createImgResponse != null && trainResponse != null)
+                        {
+                            var addImage = new Picture
+                            {
+                                PictureId = createImgResponse,
+                                ConceptId = conceptid,
+                                ImageURL = image_Url,
+                                Description = conceptDes
+                            };
+                            var picService = this.Service<IPictureService>();
+                            var logObjectService = this.Service<ILogObjectService>();
+                            if (picService != null)
+                            {
+                                await picService.CreateAsync(addImage);
+                            }
+                            else
+                            {
+                                TempData["message"] = "Service không hoạt động!";
+                                return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
+                            }
+                        }
+                        else
+                        {
+                            TempData["message"] = "Service không hoạt động!";
+                            return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
+                        }
+                    }
+                }
             }
-            catch (DbEntityValidationException e)
+            else
             {
+                TempData["message"] = "Service không hoạt động!";
+                return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
             }
-
-            var concepts = conceptService.Get(q => q.ConceptName.Equals(conceptName)).FirstOrDefault();
-            int conceptid = concepts.ConceptId;
-
+            return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
+        }
+        public async Task<ActionResult> updateDeleteImage(string conceptImageId, int conceptId)
+        {
+            string delImgURI = Constant.DEL_IMG_API + conceptImageId;
+            var delImgResponse = HttpClientHelper.Get(delImgURI);
+            string trainURI = Constant.TRAIN_API;
+            var trainResponse = HttpClientHelper.Get(trainURI);
+            if (delImgResponse.Equals("OK") && trainResponse != null)
+            {
+                var picService = this.Service<IPictureService>();
+                if (picService != null)
+                {
+                    var entity = picService.Get(conceptImageId);
+                    await picService.DeactivateAsync(entity);
+                }
+                else
+                {
+                    TempData["message"] = "Service không hoạt động!";
+                    return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
+                }
+            }
+            else
+            {
+                TempData["message"] = "Ảnh chưa được xóa! Vui lòng thử lại";
+                return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
+            }
+            return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
+        }
+        public async Task<ActionResult> deleteConcept(int conceptId)
+        {
+            var conService = this.Service<IConceptService>();
+            var picService = this.Service<IPictureService>();
+            if (conService != null && picService != null)
+            {
+                var entityConcept = conService.Get(conceptId);
+                var entityPic = picService.GetActive(q => q.ConceptId == conceptId).ProjectTo<PictureViewModel>(this.MapperConfig);
+                foreach (var picEntity in entityPic)
+                {
+                    string delImgURI = Constant.DEL_IMG_API + picEntity.PictureId;
+                    var delImgResponse = HttpClientHelper.Get(delImgURI);
+                    if (delImgResponse != null)
+                    {
+                        //var picServiceTemp = this.Service<IPictureService>();
+                        var picItem = picService.Get(picEntity.PictureId);
+                        await picService.DeactivateAsync(picItem);
+                    }
+                    else
+                    {
+                        TempData["message"] = "Ảnh chưa được xóa! Vui lòng thử lại!";
+                        return RedirectToAction("viewAllConcept", "Object");
+                    }
+                }
+                string delConceptURI = Constant.DEL_CONCEPT_API + conceptId;
+                var delConceptPesponse = HttpClientHelper.Get(delConceptURI);
+                string trainURI = Constant.TRAIN_API;
+                var trainResponse = HttpClientHelper.Get(trainURI);
+                if (delConceptPesponse != null && trainResponse != null)
+                {
+                    await conService.DeactivateAsync(entityConcept);
+                }
+                else
+                {
+                    TempData["message"] = "Concept chưa được xóa! Vui lòng thử lại!";
+                    return RedirectToAction("viewAllConcept", "Object");
+                }
+            }
+            else
+            {
+                TempData["message"] = "Service không hoạt động!";
+                return RedirectToAction("viewAllConcept", "Object");
+            }
+            return RedirectToAction("viewAllConcept", "Object");
+        }
+        public List<string> getImageURL(IEnumerable<HttpPostedFileBase> fileUpload)
+        {
+            Account account = new Account("trains", "445514799582782", "NIIYkOkkMtT_2uAtf2R3WWuEvLk");
+            Cloudinary cloudinary = new Cloudinary(account);
             if (fileUpload != null)
             {
+                List<string> listPicUrl = new List<string>();
                 foreach (var image in fileUpload)
                 {
                     if (image != null)
@@ -368,8 +552,7 @@ namespace AAIV_WEB.Controllers
 
                         var name = image.FileName;
                         var size = image.ContentLength;
-                        string path = System.IO.Path.Combine(
-                                                      Server.MapPath("~/uploads"), name);
+                        string path = System.IO.Path.Combine(Server.MapPath("~/uploads"), name);
                         image.SaveAs(path);
                         var uploadParams = new ImageUploadParams()
                         {
@@ -377,90 +560,59 @@ namespace AAIV_WEB.Controllers
                         };
                         var uploadResult = cloudinary.Upload(uploadParams);
                         var url = uploadResult.Uri.AbsoluteUri;
-
-                        string URI1 = @"http://127.0.0.1:5000/clarifai/v1.0/createimage" + "?url=" + url + "&conceptid=" + conceptid;
-                        var response1 = HttpClientHelper.Get(URI1);
-
-                        string URI2 = @"http://127.0.0.1:5000/clarifai/v1.0/trainmodel";
-                        var response2 = HttpClientHelper.Get(URI2);
-
-                        var picService = this.Service<IPictureService>();
-                        var logObjectService = this.Service<ILogObjectService>();
-
-                        var addImage = new Picture
-                        {
-                            PictureId = response1,
-                            ConceptId = conceptid,
-                            ImageURL = url,
-                            Description = conceptDes
-                        };
-                        try
-                        {
-                            picService.Create(addImage);
-                        }
-                        catch (DbEntityValidationException e)
-                        {
-                        }
+                        listPicUrl.Add(url);
+                    }
+                }
+                return listPicUrl;
+            }
+            return null;
+        }
+        public async Task<ActionResult> deleteImageBySelect(string picIdList, int conceptId)
+        {
+            var picIdArray = picIdList.Split(',');
+            var picService = this.Service<IPictureService>();
+            foreach (var picId in picIdArray)
+            {
+                string delImgURI = Constant.DEL_IMG_API + picId;
+                var delImgResponse = HttpClientHelper.Get(delImgURI);
+                string trainURI = Constant.TRAIN_API;
+                var trainResponse = HttpClientHelper.Get(trainURI);
+                if (delImgResponse.Equals("OK") && trainResponse != null)
+                {
+                    if (picService != null)
+                    {
+                        var entity = picService.Get(picId);
+                        await picService.DeactivateAsync(entity);
                     }
                     else
                     {
+                        TempData["message"] = "Service không hoạt động!";
                         return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
-                    }                    
+                    }
                 }
-            }
-            
-            return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
-        }
-        public ActionResult updateDeleteImage(string conceptImageId, int conceptId)
-        {
-            string URI1 = @"http://127.0.0.1:5000/clarifai/v1.0/deleteimage" + "?imageId=" + conceptImageId;
-            var response1 = HttpClientHelper.Get(URI1);
-
-            string URI2 = @"http://127.0.0.1:5000/clarifai/v1.0/trainmodel";
-            var response2 = HttpClientHelper.Get(URI2);
-
-            var picService = this.Service<IPictureService>();
-            var entity = picService.Get(conceptImageId);
-
-            try
-            {
-                picService.DeactivateAsync(entity);
-            }
-            catch (DbEntityValidationException e)
-            {
-            }
-
-            return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
-        }
-        public ActionResult deleteConcept(int conceptId)
-        {
-            var conService = this.Service<IConceptService>();
-            var entityConcept = conService.Get(conceptId);
-
-            var picService = this.Service<IPictureService>();
-            var entityPic = picService.GetActive(q => q.ConceptId == conceptId).ProjectTo<PictureViewModel>(this.MapperConfig);
-
-            try
-            {
-                foreach (var picEntity in entityPic)
+                else
                 {
-                    string URI1 = @"http://127.0.0.1:5000/clarifai/v1.0/deleteimage" + "?imageId=" + picEntity.PictureId;
-                    var response1 = HttpClientHelper.Get(URI1);
-                    var picServiceTemp = this.Service<IPictureService>();
-                    var picItem = picServiceTemp.Get(picEntity.PictureId);
-                    picServiceTemp.DeactivateAsync(picItem);
+                    TempData["message"] = "Ảnh chưa được xóa! Vui lòng thử lại!";
+                    return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
                 }
-                string URI = @"http://127.0.0.1:5000/clarifai/v1.0/deleteconcepts" + "?name=" + conceptId;
-                var response = HttpClientHelper.Get(URI);
-                string URI2 = @"http://127.0.0.1:5000/clarifai/v1.0/trainmodel";
-                var response2 = HttpClientHelper.Get(URI2);
-                conService.DeactivateAsync(entityConcept);
             }
-            catch (Exception e)
+            return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
+        }
+        public async Task<ActionResult> deleteLog(int logId)
+        {
+            var logObjectService = this.Service<ILogObjectService>();
+            if (logObjectService != null)
             {
+                var entity = logObjectService.Get(logId);
+                await logObjectService.DeactivateAsync(entity);
             }
-
-            return RedirectToAction("viewAllConcept", "Object");
+            else
+            {
+                TempData["message"] = "Service không hoạt động!";
+                return RedirectToAction("Index", "Object");
+            }
+            TempData["message"] = "Xóa log thành công!";
+            return RedirectToAction("Index", "Object");
         }
     }
 }
