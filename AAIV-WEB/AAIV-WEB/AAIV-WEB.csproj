@@ -427,6 +427,7 @@
     <Compile Include="RequireRequestValueAttribute.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="Utils\Constant.cs" />
     <Compile Include="Utils\HttpClientHelper.cs" />
   </ItemGroup>
   <ItemGroup>

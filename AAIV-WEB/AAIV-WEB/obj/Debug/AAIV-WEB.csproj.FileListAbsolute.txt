@@ -44,4 +44,3 @@ E:\Capstone Project\Code\New folder\imagetovoice\AAIV-WEB\AAIV-WEB\bin\Microsoft
 E:\Capstone Project\Code\New folder\imagetovoice\AAIV-WEB\AAIV-WEB\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
 E:\Capstone Project\Code\New folder\imagetovoice\AAIV-WEB\AAIV-WEB\obj\Debug\AAIV-WEB.dll
 E:\Capstone Project\Code\New folder\imagetovoice\AAIV-WEB\AAIV-WEB\obj\Debug\AAIV-WEB.pdb
-E:\Capstone Project\Code\New folder\imagetovoice\AAIV-WEB\AAIV-WEB\obj\Debug\AAIV-WEB.csprojResolveAssemblyReference.cache
