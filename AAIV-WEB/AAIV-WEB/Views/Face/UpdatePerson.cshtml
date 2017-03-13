@@ -10,7 +10,6 @@
         @using (Html.BeginForm("UpdatePerson", "Face", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
 
-            @Html.HiddenFor(q => q.ID)
             @Html.HiddenFor(q => q.PersonId)
             @Html.HiddenFor(q => q.PersonGroupID)
             @Html.HiddenFor(q => q.Active)
@@ -59,11 +58,11 @@
                     <h4 class="modal-title">Cập nhật hình ảnh</h4>
                 </div>
                 <div class="modal-body">
+
                     <img id="image-modal" src="" style="max-width:400px" />
                     <input type="file" name="fileModal" id="fileModal" style="width: 100%;" />
                     @Html.Hidden("persistedFaceId")
                     @Html.Hidden("mode")
-                    @Html.HiddenFor(q => q.ID)
                     @Html.HiddenFor(q => q.PersonId)
                     @Html.HiddenFor(q => q.PersonGroupID)
                 </div>

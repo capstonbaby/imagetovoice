@@ -12,12 +12,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
 namespace AAIV_WEB.Controllers
 {
+    [Authorize]
     public class FaceController : BaseController
     {
         private static string API_KEY = "3fafcdb48bdc4ef6b20d61524bfac93c";
@@ -40,7 +42,8 @@ namespace AAIV_WEB.Controllers
 
             // PErson Group
             var curUser = Util.getCurrentUser(this);
-            if(curUser != null)
+
+            if (curUser != null)
             {
                 var entity = service.GetActive(q => q.PersonGroupId == curUser.PersonGroupId).FirstOrDefault();
                 var personList = personService.GetActive(q => q.PersonGroupID == entity.PersonGroupId)
@@ -49,8 +52,11 @@ namespace AAIV_WEB.Controllers
 
                 foreach (var person in personList)
                 {
-                    var imgUrl = faceService.GetActive(q => q.PersonID == person.ID).First().ImageURL;
-                    person.PersonAvatar = imgUrl;
+                    var img = faceService.GetActive(q => q.PersonID == person.PersonId).FirstOrDefault();
+                    if (img != null)
+                    {
+                        person.PersonAvatar = img.ImageURL;
+                    }
                 }
 
                 return this.View(personList);
@@ -73,6 +79,8 @@ namespace AAIV_WEB.Controllers
             var personGroupService = this.Service<IPersonGroupService>();
             var userService = this.Service<IAspNetUserService>();
             var faceService = this.Service<IFaceService>();
+            var progressHub = new ProgressHub();
+            progressHub.SendMessage("20%", 20);
 
             if (User.Identity.IsAuthenticated)
             {
@@ -84,6 +92,7 @@ namespace AAIV_WEB.Controllers
 
                     //create in Microsoft
                     var personCreateResult = await faceServiceClient.CreatePersonAsync(personGroup.PersonGroupName, person.Name, person.Description);
+                    progressHub.SendMessage("33%", 33);
 
                     //create in database
                     var newPerson = new Person
@@ -92,10 +101,11 @@ namespace AAIV_WEB.Controllers
                         Description = person.Description,
                         PersonGroupID = personGroup.ID,
                         Active = true,
-                        PersonId = personCreateResult.PersonId.ToString()
+                        PersonId = personCreateResult.PersonId.ToString(),
+                        IsTrained = true,
                     };
                     await personService.CreateAsync(newPerson);
-
+                    progressHub.SendMessage("50%", 50);
 
                     if (file != null)
                     {
@@ -117,25 +127,29 @@ namespace AAIV_WEB.Controllers
                             //create face in Microsoft
                             var addFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroup.PersonGroupName, personCreateResult.PersonId, uploadResult);
 
+
                             //create face in db
                             var persistedFaceId = addFaceResult.PersistedFaceId.ToString();
                             var face = new Models.Entities.Face
                             {
                                 ImageURL = uploadResult,
                                 PersistedFaceId = persistedFaceId,
-                                PersonID = newPerson.ID,
+                                PersonID = newPerson.PersonId,
                                 Active = true
                             };
                             await faceService.CreateAsync(face);
 
                         }
+                        progressHub.SendMessage("70%", 70);
+                        await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupName);
+                        progressHub.SendMessage("Complete !", 100);
+                        Thread.Sleep(1000);
                     }
                     // after successfully uploading redirect the user
                     return RedirectToAction("Index", "Face");
                 }
                 catch (Exception ex)
                 {
-
                     throw;
                 }
             }
@@ -145,7 +159,13 @@ namespace AAIV_WEB.Controllers
             }
         }
 
-        public async Task<JsonResult> DeletePerson(int id)
+        [HttpPost]
+        public ActionResult NewPersonFromLog(string imgUrl, string name, string mode)
+        {
+            return this.View();
+        }
+
+        public async Task<JsonResult> DeletePerson(string id)
         {
             var personService = this.Service<IPersonService>();
             var personGroupService = this.Service<IPersonGroupService>();
@@ -167,8 +187,7 @@ namespace AAIV_WEB.Controllers
 
                 await personService.DeactivateAsync(deletePerson);
 
-                var faces = faceService.GetActive(q => q.PersonID == deletePerson.ID).ToList();
-                foreach (var item in faces)
+                foreach (var item in deletePerson.Faces)
                 {
                     await faceService.DeactivateAsync(item);
                 }
@@ -180,10 +199,9 @@ namespace AAIV_WEB.Controllers
             {
                 return Json(new { message = "Xóa thất bại", success = false });
             }
-            
         }
 
-        public ActionResult UpdatePerson(int id)
+        public ActionResult UpdatePerson(string id)
         {
             var personService = this.Service<IPersonService>();
             var personGroupService = this.Service<IPersonGroupService>();
@@ -191,7 +209,7 @@ namespace AAIV_WEB.Controllers
             var faceService = this.Service<IFaceService>();
 
             var person = personService.Get(id);
-            var faceList = faceService.GetActive(q => q.PersonID == id)
+            var faceList = faceService.GetActive(q => q.PersonID.Equals(person.PersonId))
                             .ProjectTo<FaceViewModel>(this.MapperConfig);
             var personViewModel = new PersonViewModel(person);
             var model = this.Mapper.Map<PersonEditViewModel>(personViewModel);
@@ -206,9 +224,7 @@ namespace AAIV_WEB.Controllers
             var personGroupService = this.Service<IPersonGroupService>();
             var userService = this.Service<IAspNetUserService>();
             var faceService = this.Service<IFaceService>();
-           
 
-            
             if (User.Identity.IsAuthenticated)
 
             {
@@ -218,20 +234,18 @@ namespace AAIV_WEB.Controllers
 
                 //Update in Microsoft
 
-                var updatePerson = personService.Get(person.ID);
+                var updatePerson = personService.Get(person.PersonId);
                 Guid personID = new Guid(updatePerson.PersonId);
 
-                var personUpdateResult = faceServiceClient.UpdatePersonAsync(personGroupID,personID,person.Name,person.Description);
+                var personUpdateResult = faceServiceClient.UpdatePersonAsync(personGroupID, personID, person.Name, person.Description);
 
                 //Update in Database
-                
-                
                 updatePerson.Name = person.Name;
                 updatePerson.Description = person.Description;
                 personService.Save();
 
                 //Upload imageS
-                if (file != null)
+                if (file.Count() > 0 && file.FirstOrDefault() != null)
                 {
                     foreach (var imageFile in file)
                     {
@@ -251,13 +265,15 @@ namespace AAIV_WEB.Controllers
                         //create face in Microsoft
                         var addFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupID, personID, uploadResult);
 
+                        //train
+                        await faceServiceClient.TrainPersonGroupAsync(personGroupID);
                         //create face in db
                         var persistedFaceId = addFaceResult.PersistedFaceId.ToString();
                         var face = new Models.Entities.Face
                         {
                             ImageURL = uploadResult,
                             PersistedFaceId = persistedFaceId,
-                            PersonID = person.ID,
+                            PersonID = person.PersonId,
                             Active = true
                         };
                         await faceService.CreateAsync(face);
@@ -266,7 +282,7 @@ namespace AAIV_WEB.Controllers
                 }
 
 
-                    return RedirectToAction("Index", "Face");
+                return RedirectToAction("Index", "Face");
             }
             else
             {
@@ -287,55 +303,70 @@ namespace AAIV_WEB.Controllers
             var user = userService.Get(userId);
             var personGroupID = user.PersonGroup.PersonGroupName;
 
-                //Delete in Microsoft
-                Guid personID = new Guid(person.PersonId);
-                Guid persistedFaceID = new Guid(persistedFaceId);
+            //Delete in Microsoft
+            Guid personID = new Guid(person.PersonId);
+            Guid persistedFaceID = new Guid(persistedFaceId);
 
-                await faceServiceClient.DeletePersonFaceAsync(personGroupID, personID, persistedFaceID);
+            await faceServiceClient.DeletePersonFaceAsync(personGroupID, personID, persistedFaceID);
 
-                //Delete in Database
-                var deleteFace = faceService.GetActive(q => q.PersistedFaceId == persistedFaceId).FirstOrDefault();
-                await faceService.DeactivateAsync(deleteFace);
+            //Delete in Database
+            var deleteFace = faceService.GetActive(q => q.PersistedFaceId == persistedFaceId).FirstOrDefault();
+            await faceService.DeactivateAsync(deleteFace);
 
-                if (mode == "UpdateFace")
+            if (mode == "UpdateFace")
+            {
+                //Upload imageS
+                if (fileModal != null)
                 {
-                    //Upload imageS
-                    if (fileModal != null)
+
                     {
+                        string pic = System.IO.Path.GetFileName(fileModal.FileName);
+                        string path = System.IO.Path.Combine(
+                                               Server.MapPath("~/images"), pic);
+                        // file is uploaded
+                        fileModal.SaveAs(path);
 
+                        var uploadParams = new ImageUploadParams()
                         {
-                            string pic = System.IO.Path.GetFileName(fileModal.FileName);
-                            string path = System.IO.Path.Combine(
-                                                   Server.MapPath("~/images"), pic);
-                            // file is uploaded
-                            fileModal.SaveAs(path);
+                            File = new FileDescription(path)
+                        };
 
-                            var uploadParams = new ImageUploadParams()
-                            {
-                                File = new FileDescription(path)
-                            };
+                        var uploadResult = cloudinary.Upload(uploadParams).Uri.ToString();
 
-                            var uploadResult = cloudinary.Upload(uploadParams).Uri.ToString();
+                        //create face in Microsoft
+                        var addFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupID, personID, uploadResult);
 
-                            //create face in Microsoft
-                            var addFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupID, personID, uploadResult);
+                        //create face in db
+                        var newPersistedFaceId = addFaceResult.PersistedFaceId.ToString();
+                        var face = new Models.Entities.Face
+                        {
+                            ImageURL = uploadResult,
+                            PersistedFaceId = newPersistedFaceId,
+                            PersonID = person.PersonId,
+                            Active = true
+                        };
+                        await faceService.CreateAsync(face);
 
-                            //create face in db
-                            var newPersistedFaceId = addFaceResult.PersistedFaceId.ToString();
-                            var face = new Models.Entities.Face
-                            {
-                                ImageURL = uploadResult,
-                                PersistedFaceId = newPersistedFaceId,
-                                PersonID = person.ID,
-                                Active = true
-                            };
-                            await faceService.CreateAsync(face);
-
-                        }
+                        
+                        
                     }
                 }
-
-            return RedirectToAction("Index", "Face");
+            }
+            //train
+            await faceServiceClient.TrainPersonGroupAsync(personGroupID);
+            return RedirectToAction("UpdatePerson", "Face", new {id = person.PersonId});
         }
+
+        public ActionResult ShowLogs()
+        {
+            var curUser = Util.getCurrentUser(this);
+            var logService = this.Service<ILogService>();
+
+            var logList = logService.GetActive(q => q.UserID.Equals(curUser.Id))
+                        .ProjectTo<LogViewModel>(this.MapperConfig);
+
+            return this.View(logList);
+        }
+
     }
 }

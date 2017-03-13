@@ -17,6 +17,7 @@
             <th>Ảnh đại diện</th>
             <th>Tên</th>
             <th>Thông tin</th>
+            <th>Status</th>
             <th></th>
         </tr>
     </thead>
@@ -27,16 +28,23 @@
             <tr>
                 <td> @i</td>
                 <td>
-                    <img src="@item.PersonAvatar" style="max-width:100px" />
+                    <img src="@item.PersonAvatar" style="max-width:100px" alt="No image available" />
                 </td>
                 <td> @item.Name</td>
                 <td> @item.Description</td>
                 <td>
-                    
-                    <a href="@Url.Action("UpdatePerson","Face",new { id = item.ID})" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
-                    @*<a href="@Url.Action("DeletePerson","Face",new { id = item.ID})" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></a>*@
-                   <a onclick="DeletePerson(@item.ID);" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
-
+                    @if (item.IsTrained)
+                    {
+                        <span class="label label-success">Trained</span>
+                    }
+                    else
+                    {
+                        <span class="label label-danger">Not Trained</span>
+                    }
+                </td>
+                <td>
+                    <a href="@Url.Action("UpdatePerson","Face",new { id = item.PersonId})" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
+                    <a onclick="DeletePerson(@item.PersonId);" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
                 </td>
             </tr>
 
@@ -63,7 +71,8 @@
                 $.ajax({
                     url: "@Url.Action("DeletePerson", "Face")",
                     type: 'POST',
-                    data: {id : i},
+                    data: { id: i },
+
                     success: function (data) {
                         if (data.success) {
                             swal({
@@ -91,7 +100,6 @@
                     }
                 });
             })
-           
         }
     </script>
 
