@@ -13,13 +13,22 @@
     }
 </style>
 <h2>Kiểm tra đồ vật</h2>
+<div class="error">
+    @{
+        var message = TempData["message"] as string;
+        if (message != null)
+        {
+            <span class="label label-danger">@message</span>
+        }
+    }
+</div>
 @using (Html.BeginForm("testConcept", "Object", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <fieldset>
         <table>
             <tr>
                 <td>
-                    Thêm hình: <input type="file" name="fileUpload" id="fileUpload" />
+                    Thêm hình: <input type="file" name="fileUpload" id="fileUpload" required />
                     <div id="image-holder"></div>
                 </td>
             </tr>

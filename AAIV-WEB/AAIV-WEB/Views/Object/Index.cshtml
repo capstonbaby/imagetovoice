@@ -1,21 +1,61 @@
 ﻿@model IEnumerable<LogObjectViewModel>
 @{
     ViewBag.Title = "Index";
+    var i = 1;
 }
 
 <h2>Danh sách Log</h2>
-<a href="@Url.Action("createObject", "Object")" class="btn btn-success">Tạo mới đồ vật</a>
-<a href="@Url.Action("testPredict", "Object")" class="btn btn-success">Kiểm tra đồ vật</a>
+<div class="error">
+    @{
+        var message = TempData["message"] as string;
+        if (message != null)
+        {
+            <span class="label label-danger">@message</span>
+        }
+    }
+</div>
+<a href="@Url.Action("createObject", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-plus-sign"></i> Tạo mới đồ vật</a>
+<a href="@Url.Action("testPredict", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-question-sign"></i> Kiểm tra đồ vật</a>
 <br /><br />
 <table class="table table-striped">
+@using (Html.BeginForm("deleteLog", "Object", FormMethod.Post, new { enctype = "multipart/form-data", id = "deleteLogForm" }))
+{
     <tbody>
-        @foreach(var items in this.Model)
+        @foreach (var items in this.Model)
         {
             <tr>
+                <td>@i</td>
+                <input type="hidden" value="@items.ID" name="logId" />
                 <td><img src="@items.ImageURL" style="with:100px; height:100px;"/></td>
                 <td>@items.CreatedDate</td>
-                <td><a href="@Url.Action("addObject", new { logId = items.ID })" class="btn btn-success">Thêm đồ vật</a></td>
+                <td>
+                    <a href="@Url.Action("addObject", new { logId = items.ID })" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i></a>
+                    <button type="button" onclick="DeleteLog();" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>
+                </td>                
             </tr>
+            i++;
         }
     </tbody>
+}
 </table>
+@section scripts{
+    <script>
+
+        function DeleteLog() {
+            swal({
+                title: 'Bạn có chắc chắn xóa?',
+                text: "",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Có',
+                cancelButtonText: 'Không'
+
+            }).then(function () {
+                $("#deleteLogForm").submit();
+            })
+
+        }
+    </script>
+}

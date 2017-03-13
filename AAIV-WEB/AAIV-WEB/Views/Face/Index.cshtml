@@ -41,10 +41,17 @@
                     {
                         <span class="label label-danger">Not Trained</span>
                     }
+
+
+                    
+                    @*<a href="@Url.Action("UpdatePerson","Face",new { id = item.ID})" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>*@
+                    @*<a href="@Url.Action("DeletePerson","Face",new { id = item.ID})" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></a>*@
+                   @*<a onclick="DeletePerson(@item.ID);" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></a>*@
+
                 </td>
                 <td>
                     <a href="@Url.Action("UpdatePerson","Face",new { id = item.PersonId})" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
-                    <a onclick="DeletePerson(@item.PersonId);" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
+                    <a onclick="DeletePerson('@item.PersonId');" class="btn btn-danger"> <i class="glyphicon glyphicon-trash"> </i> </a>
                 </td>
             </tr>
 

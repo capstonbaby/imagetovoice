@@ -59,12 +59,14 @@
                 </div>
                 <div class="modal-body">
 
-                    <img id="image-modal" src="" style="max-width:400px" />
+                    <img id="image-modal" src="" style="max-width:400px; text-align:center" />
                     <input type="file" name="fileModal" id="fileModal" style="width: 100%;" />
                     @Html.Hidden("persistedFaceId")
                     @Html.Hidden("mode")
                     @Html.HiddenFor(q => q.PersonId)
                     @Html.HiddenFor(q => q.PersonGroupID)
+                    
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" onclick="UpdateFace();" class="btn btn-success">Update</button>
@@ -125,5 +127,7 @@
             })
             
         }
+
+       
     </script>
 }

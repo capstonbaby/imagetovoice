@@ -13,6 +13,15 @@
     }
 </style>
 <h2>Tạo mới đồ vật</h2>
+<div class="error">
+    @{ 
+        var message = TempData["message"] as string;
+        if(message != null)
+        {
+            <span class="label label-danger">@message</span>
+        }
+     }
+</div>
 @using (Html.BeginForm("createNewObject", "Object", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <fieldset>       
@@ -20,19 +29,19 @@
             <tr>
                 <td>
                     Tên đồ vật:<br>
-                    <input type="text" name="conceptName">
+                    <input type="text" name="conceptName" required placeholder="Nhập tên đồ vật!">
                     
                 </td>
             </tr>
             <tr>
                 <td>
                     Mô tả:<br>
-                    <input type="text" name="conceptDes">
+                    <input type="text" name="conceptDes" placeholder="Nhập mô tả đồ vật">
                 </td>
             </tr>
             <tr>
                 <td>
-                    Thêm hình: <input type="file" name="fileUpload" id="fileUpload" multiple="multiple"/>
+                    Thêm hình: <input type="file" name="fileUpload" id="fileUpload" multiple="multiple" required/>
                     <div id="image-holder"></div>
                 </td>
             </tr>
