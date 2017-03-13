@@ -293,9 +293,6 @@ namespace AAIV_WEB.Controllers
         }
         public ActionResult testConcept(IEnumerable<HttpPostedFileBase> fileUpload)
         {
-            Account account = new Account("trains", "445514799582782", "NIIYkOkkMtT_2uAtf2R3WWuEvLk");
-            Cloudinary cloudinary = new Cloudinary(account);
-
             var list_image = getImageURL(fileUpload);
             if (list_image != null)
             {
@@ -424,10 +421,10 @@ namespace AAIV_WEB.Controllers
                 {
                     foreach (var image_Url in list_image)
                     {
-                        string URI1 = Constant.Get_Create_IMG_API_URL(image_Url, conceptid);
-                        var createImgResponse = HttpClientHelper.Get(URI1);
-                        string URI2 = Constant.TRAIN_API;
-                        var trainResponse = HttpClientHelper.Get(URI2);
+                        string createImgURI = Constant.Get_Create_IMG_API_URL(image_Url, conceptid);
+                        var createImgResponse = HttpClientHelper.Get(createImgURI);
+                        string trainURI = Constant.TRAIN_API;
+                        var trainResponse = HttpClientHelper.Get(trainURI);
                         if (createImgResponse != null && trainResponse != null)
                         {
                             var addImage = new Picture
@@ -438,7 +435,6 @@ namespace AAIV_WEB.Controllers
                                 Description = conceptDes
                             };
                             var picService = this.Service<IPictureService>();
-                            var logObjectService = this.Service<ILogObjectService>();
                             if (picService != null)
                             {
                                 await picService.CreateAsync(addImage);
@@ -451,7 +447,7 @@ namespace AAIV_WEB.Controllers
                         }
                         else
                         {
-                            TempData["message"] = "Service không hoạt động!";
+                            TempData["message"] = "Tạo hình ảnh thất bại! Vui lòng thử lại!";
                             return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
                         }
                     }
@@ -505,7 +501,6 @@ namespace AAIV_WEB.Controllers
                     var delImgResponse = HttpClientHelper.Get(delImgURI);
                     if (delImgResponse != null)
                     {
-                        //var picServiceTemp = this.Service<IPictureService>();
                         var picItem = picService.Get(picEntity.PictureId);
                         await picService.DeactivateAsync(picItem);
                     }
@@ -601,18 +596,17 @@ namespace AAIV_WEB.Controllers
         public async Task<ActionResult> deleteLog(int logId)
         {
             var logObjectService = this.Service<ILogObjectService>();
+            var entity = logObjectService.Get(logId);
             if (logObjectService != null)
             {
-                var entity = logObjectService.Get(logId);
                 await logObjectService.DeactivateAsync(entity);
+                return RedirectToAction("Index", "Object");
             }
             else
             {
-                TempData["message"] = "Service không hoạt động!";
+                TempData["message"] = "Xóa log thất bại! Vui lòng thử lại!";
                 return RedirectToAction("Index", "Object");
-            }
-            TempData["message"] = "Xóa log thành công!";
-            return RedirectToAction("Index", "Object");
-        }
+            }            
+        }        
     }
 }
