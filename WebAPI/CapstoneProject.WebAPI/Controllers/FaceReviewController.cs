@@ -120,6 +120,43 @@ namespace CapstoneProject.WebAPI.Controllers
             return response;
         }
 
+        [Route("updateperson")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> UpdatePerson(FormDataCollection formDataCollection)
+        {
+            string personGroupId = formDataCollection["personGroupId"];
+            string personId = formDataCollection["personId"];
+            string personName = formDataCollection["personName"];
+            string userData = formDataCollection["userData"];
+
+            var method = new HttpMethod("PATCH");
+            var client = new HttpClient();
+            var queryString = HttpUtility.ParseQueryString(string.Empty);
+
+            // Request headers
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
+
+            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId + "/persons/" + personId;
+            HttpResponseMessage response;
+
+            string body = @"{'name':'" + personName + "','userData':'" + userData + "'}";
+
+            // Request body
+            byte[] byteData = Encoding.UTF8.GetBytes(body);
+
+            using (var content = new ByteArrayContent(byteData))
+            {
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                var request = new HttpRequestMessage(method, uri)
+                {
+                    Content = content,
+                };
+                response = await client.SendAsync(request);
+            }
+
+            return response;
+        }
+
         [Route("getpersonbyid")]
         [HttpPost]
         public async Task<HttpResponseMessage> GetPersonById(FormDataCollection formDataCollection)
@@ -205,7 +242,7 @@ namespace CapstoneProject.WebAPI.Controllers
             // Request headers
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
 
-            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/"+personGroupId+"/train?" + queryString;
+            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId + "/train?" + queryString;
 
             HttpResponseMessage response;
 

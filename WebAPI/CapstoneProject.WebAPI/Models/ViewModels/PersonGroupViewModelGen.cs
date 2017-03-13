@@ -15,7 +15,7 @@ namespace CapstoneProject.WebAPI.Models.ViewModels
     public partial class PersonGroupViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<CapstoneProject.WebAPI.Models.Entities.PersonGroup>
     {
     	
-    			public virtual int ID { get; set; }
+    			public virtual string PersonGroupId { get; set; }
     			public virtual string PersonGroupName { get; set; }
     			public virtual string Description { get; set; }
     			public virtual bool Active { get; set; }

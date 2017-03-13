@@ -15,9 +15,8 @@ namespace CapstoneProject.WebAPI.Models.ViewModels
     public partial class FaceViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<CapstoneProject.WebAPI.Models.Entities.Face>
     {
     	
-    			public virtual int ID { get; set; }
-    			public virtual int PersonID { get; set; }
     			public virtual string PersistedFaceId { get; set; }
+    			public virtual string PersonID { get; set; }
     			public virtual string ImageURL { get; set; }
     			public virtual bool Active { get; set; }
     	

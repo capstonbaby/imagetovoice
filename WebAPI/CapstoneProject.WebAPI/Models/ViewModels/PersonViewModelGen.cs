@@ -15,11 +15,11 @@ namespace CapstoneProject.WebAPI.Models.ViewModels
     public partial class PersonViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<CapstoneProject.WebAPI.Models.Entities.Person>
     {
     	
-    			public virtual int ID { get; set; }
     			public virtual string PersonId { get; set; }
-    			public virtual int PersonGroupID { get; set; }
+    			public virtual string PersonGroupId { get; set; }
     			public virtual string Name { get; set; }
     			public virtual string Description { get; set; }
+    			public virtual bool IsTrained { get; set; }
     			public virtual bool Active { get; set; }
     	
     	public PersonViewModel() : base() { }
