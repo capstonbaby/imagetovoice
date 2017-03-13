@@ -26,6 +26,13 @@ namespace AAIV_WEB
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
+
+            bundles.Add(new ScriptBundle("~/bundles/dropzonescripts").Include(
+                     "~/Content/dropzone/dropzone.min.js"));
+
+            bundles.Add(new StyleBundle("~/Content/dropzonescss").Include(
+                     "~/Content/dropzone/css/basic.css",
+                     "~/Content/dropzone/css/dropzone.css"));
         }
     }
 }

@@ -19,8 +19,6 @@ namespace AAIV_WEB.Models.ViewModels
     {
 
 
-        public virtual int ID { get; set; }
-
         public virtual string PersonId { get; set; }
 
         public virtual int PersonGroupID { get; set; }
@@ -38,6 +36,5 @@ namespace AAIV_WEB.Models.ViewModels
         public PersonViewModel(Models.Entities.Person entity) : base(entity) { }
 
     }
-
 
 }

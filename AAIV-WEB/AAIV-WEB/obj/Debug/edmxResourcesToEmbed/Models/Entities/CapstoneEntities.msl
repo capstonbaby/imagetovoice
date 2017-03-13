@@ -63,9 +63,8 @@
         <MappingFragment StoreEntitySet="Face">
           <ScalarProperty Name="Active" ColumnName="Active" />
           <ScalarProperty Name="ImageURL" ColumnName="ImageURL" />
-          <ScalarProperty Name="PersistedFaceId" ColumnName="PersistedFaceId" />
           <ScalarProperty Name="PersonID" ColumnName="PersonID" />
-          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="PersistedFaceId" ColumnName="PersistedFaceId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -101,7 +100,6 @@
           <ScalarProperty Name="Name" ColumnName="Name" />
           <ScalarProperty Name="PersonGroupID" ColumnName="PersonGroupID" />
           <ScalarProperty Name="PersonId" ColumnName="PersonId" />
-          <ScalarProperty Name="ID" ColumnName="ID" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

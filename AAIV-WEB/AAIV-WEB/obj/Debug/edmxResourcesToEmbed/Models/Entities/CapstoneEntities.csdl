@@ -36,11 +36,11 @@
       <End Role="Concept" EntitySet="Concepts" />
       <End Role="Picture" EntitySet="Pictures" />
     </AssociationSet>
-    <AssociationSet Name="FK_tbl_Face_tbl_Person" Association="CapstoneModel.FK_tbl_Face_tbl_Person">
+    <AssociationSet Name="FK_Face_Person" Association="CapstoneModel.FK_Face_Person">
       <End Role="Person" EntitySet="People" />
       <End Role="Face" EntitySet="Faces" />
     </AssociationSet>
-    <AssociationSet Name="FK_Person_PersonGroup1" Association="CapstoneModel.FK_Person_PersonGroup1">
+    <AssociationSet Name="FK_Person_PersonGroup" Association="CapstoneModel.FK_Person_PersonGroup">
       <End Role="PersonGroup" EntitySet="PersonGroups" />
       <End Role="Person" EntitySet="People" />
     </AssociationSet>
@@ -115,14 +115,13 @@
   </EntityType>
   <EntityType Name="Face">
     <Key>
-      <PropertyRef Name="ID" />
+      <PropertyRef Name="PersistedFaceId" />
     </Key>
-    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="PersonID" Type="Int32" Nullable="false" />
-    <Property Name="PersistedFaceId" Type="String" MaxLength="36" FixedLength="true" Unicode="true" />
+    <Property Name="PersistedFaceId" Type="String" Nullable="false" MaxLength="36" FixedLength="false" Unicode="true" />
+    <Property Name="PersonID" Type="String" Nullable="false" MaxLength="36" FixedLength="false" Unicode="true" />
     <Property Name="ImageURL" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="Active" Type="Boolean" Nullable="false" />
-    <NavigationProperty Name="Person" Relationship="CapstoneModel.FK_tbl_Face_tbl_Person" FromRole="Face" ToRole="Person" />
+    <NavigationProperty Name="Person" Relationship="CapstoneModel.FK_Face_Person" FromRole="Face" ToRole="Person" />
   </EntityType>
   <EntityType Name="Log">
     <Key>
@@ -149,17 +148,16 @@
   </EntityType>
   <EntityType Name="Person">
     <Key>
-      <PropertyRef Name="ID" />
+      <PropertyRef Name="PersonId" />
     </Key>
-    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
     <Property Name="PersonId" Type="String" Nullable="false" MaxLength="36" FixedLength="false" Unicode="true" />
     <Property Name="PersonGroupID" Type="Int32" Nullable="false" />
     <Property Name="Name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
     <Property Name="Description" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
     <Property Name="IsTrained" Type="Boolean" Nullable="false" />
     <Property Name="Active" Type="Boolean" Nullable="false" />
-    <NavigationProperty Name="Faces" Relationship="CapstoneModel.FK_tbl_Face_tbl_Person" FromRole="Person" ToRole="Face" />
-    <NavigationProperty Name="PersonGroup" Relationship="CapstoneModel.FK_Person_PersonGroup1" FromRole="Person" ToRole="PersonGroup" />
+    <NavigationProperty Name="Faces" Relationship="CapstoneModel.FK_Face_Person" FromRole="Person" ToRole="Face" />
+    <NavigationProperty Name="PersonGroup" Relationship="CapstoneModel.FK_Person_PersonGroup" FromRole="Person" ToRole="PersonGroup" />
   </EntityType>
   <EntityType Name="PersonGroup">
     <Key>
@@ -170,7 +168,7 @@
     <Property Name="Description" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
     <Property Name="Active" Type="Boolean" Nullable="false" />
     <NavigationProperty Name="AspNetUsers" Relationship="CapstoneModel.FK_AspNetUsers_PersonGroup" FromRole="PersonGroup" ToRole="AspNetUser" />
-    <NavigationProperty Name="People" Relationship="CapstoneModel.FK_Person_PersonGroup1" FromRole="PersonGroup" ToRole="Person" />
+    <NavigationProperty Name="People" Relationship="CapstoneModel.FK_Person_PersonGroup" FromRole="PersonGroup" ToRole="Person" />
   </EntityType>
   <EntityType Name="Picture">
     <Key>
@@ -259,19 +257,19 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_tbl_Face_tbl_Person">
+  <Association Name="FK_Face_Person">
     <End Type="CapstoneModel.Person" Role="Person" Multiplicity="1" />
     <End Type="CapstoneModel.Face" Role="Face" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="Person">
-        <PropertyRef Name="ID" />
+        <PropertyRef Name="PersonId" />
       </Principal>
       <Dependent Role="Face">
         <PropertyRef Name="PersonID" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_Person_PersonGroup1">
+  <Association Name="FK_Person_PersonGroup">
     <End Type="CapstoneModel.PersonGroup" Role="PersonGroup" Multiplicity="1" />
     <End Type="CapstoneModel.Person" Role="Person" Multiplicity="*" />
     <ReferentialConstraint>

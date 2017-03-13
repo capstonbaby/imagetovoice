@@ -1,4 +1,4 @@
-﻿@model PersonViewModel
+﻿@model PersonEditViewModel
 @{
     ViewBag.Title = "NewPerson";
 }
@@ -8,6 +8,10 @@
 <style>
     .progress {
         background-color: #242424 !important;
+    }
+
+    .dz-max-files-reached {
+        background-color: red;
     }
 </style>
 
@@ -35,7 +39,17 @@
                 </div>
             </div>
         </div>
+
         <div class="col-md-6">
+            @if (Model.LogImage != null)
+            {
+                <div class="form-group">
+                    @Html.HiddenFor(q => q.LogImage)
+                    @Html.HiddenFor(q => q.LogID)
+                    <img src="@Model.LogImage" style="max-width: 150px"/>
+                </div>
+                
+            }
             <div class="form-group">
                 <label>Hình ảnh</label>
                 <input type="file" name="file" id="file" style="width: 100%;" multiple />
@@ -45,6 +59,22 @@
 
         </div>
     }
+
+    @*Dropzone
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Hình ảnh</label>
+
+            <form action="@Url.Action("Uploader", "Face")" method="post" enctype="multipart/form-data" class="dropzone" id="dropzoneForm">
+                <div class="jumbotron">
+                    <div class="fallback">
+                        <input name="file" type="file" multiple />
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>*@
 
 </div>
 
@@ -76,29 +106,36 @@
         }
 
 
-        $(function loadImage () {
-            // Multiple images preview in browser
-           var imagesPreview = function (input, placeToInsertImagePreview) {
+        //File Upload response from the server
+        //Dropzone.options.dropzoneForm = {
+        //    init: function () {
+        //        this.on("maxfilesexceeded", function (data) {
+        //            var res = eval('(' + data.xhr.responseText + ')');
 
-                if (input.files) {
-                  var filesAmount = input.files.length;
+        //        });
+        //        this.on("addedfile", function (file) {
 
-                   for (i = 0; i < filesAmount; i++) {
-                        var reader = new FileReader();
+        //            // Create the remove button
+        //            var removeButton = Dropzone.createElement("<button>Remove file</button>");
 
-                     reader.onload = function (event) {
-                          $($.parseHTML('<img>')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
-                        }
+        //            // Capture the Dropzone instance as closure.
+        //            var _this = this;
 
-                       reader.readAsDataURL(input.files[i]);
-                   }
-                }
+        //            // Listen to the click event
+        //            removeButton.addEventListener("click", function (e) {
+        //                // Make sure the button click doesn't submit the form:
+        //                e.preventDefault();
+        //                e.stopPropagation();
+        //                // Remove the file preview.
+        //                _this.removeFile(file);
+        //                // If you want to the delete the file on the server as well,
+        //                // you can do the AJAX request here.
+        //            });
 
-           };
-
-           $('#file').on('change', function () {
-              imagesPreview(this, 'div.gallery');
-           });
-       });
+        //            // Add the button to the file preview element.
+        //            file.previewElement.appendChild(removeButton);
+        //        });
+        //    }
+        //};
     </script>
 }

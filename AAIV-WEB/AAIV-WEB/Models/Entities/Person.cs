@@ -27,8 +27,6 @@ public partial class Person
     }
 
 
-    public int ID { get; set; }
-
     public string PersonId { get; set; }
 
     public int PersonGroupID { get; set; }
