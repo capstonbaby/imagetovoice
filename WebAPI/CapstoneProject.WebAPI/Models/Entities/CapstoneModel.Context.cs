@@ -36,6 +36,5 @@ namespace CapstoneProject.WebAPI.Models.Entities
         public virtual DbSet<Person> People { get; set; }
         public virtual DbSet<PersonGroup> PersonGroups { get; set; }
         public virtual DbSet<Picture> Pictures { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
     }
 }

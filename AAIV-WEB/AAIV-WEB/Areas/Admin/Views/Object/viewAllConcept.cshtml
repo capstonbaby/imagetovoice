@@ -1,0 +1,74 @@
+﻿@model IEnumerable<ConceptEditViewModel>
+@{
+    ViewBag.Title = "viewAllConcept";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var i = 1;
+}
+
+<h2>Danh sách đồ vật</h2>
+<div class="error">
+    @{
+        var message = TempData["message"] as string;
+        if (message != null)
+        {
+            <span class="label label-danger">@message</span>
+        }
+    }
+</div>
+<a href="@Url.Action("createObject", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-plus-sign"></i> Tạo mới đồ vật</a>
+<a href="@Url.Action("testPredict", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-question-sign"></i> Kiểm tra đồ vật</a>
+<br /><br />
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <td>No.</td>
+            <td>Image</td>
+            <td>Tên</td>
+            <td>Chú thích</td>
+            <td></td>
+        </tr>
+    </thead>
+@using (Html.BeginForm("deleteConcept", "Object", FormMethod.Post, new { enctype = "multipart/form-data", id = "deleteConceptForm" }))
+{
+    <tbody>
+        @foreach (var items in this.Model)
+        {
+            <tr>
+                <td>@i</td>
+                <input type="hidden" value="@items.ConceptId" name="conceptId"/>
+                <td><img src="@items.ConceptPicture" style="max-width: 100px"/></td>
+                <td>@items.ConceptName</td>
+                <td>@items.ConceptDescription</td>
+                <td>
+                    <a href="@Url.Action("editConcept", new { conceptID = items.ConceptId })" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
+                    <button type="button" onclick="DeleteImage();" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>                   
+                </td>
+            </tr>
+            i++;
+        }
+    </tbody>
+}
+</table>
+@section scripts{
+    <script>
+
+        function DeleteImage() {
+            swal({
+                title: 'Bạn có chắc chắn xóa?',
+                text: "",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Có',
+                cancelButtonText: 'Không'
+
+            }).then(function () {
+                $("#deleteConceptForm").submit();
+            })
+
+        }
+    </script>
+}
+
+

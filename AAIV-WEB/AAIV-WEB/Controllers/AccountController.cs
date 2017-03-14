@@ -9,12 +9,22 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using AAIV_WEB.Models;
+using Microsoft.ProjectOxford.Face;
+using SkyWeb.DatVM.Mvc;
+using AAIV_WEB.Models.Entities.Services;
+using AAIV_WEB.Models.Entities;
+using Microsoft.AspNet.Identity.EntityFramework;
+using System.Web.Configuration;
 
 namespace AAIV_WEB.Controllers
 {
     [Authorize]
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
+        private static string API_KEY = "3fafcdb48bdc4ef6b20d61524bfac93c";
+
+        private readonly FaceServiceClient faceServiceClient = new FaceServiceClient(API_KEY);
+
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
@@ -22,7 +32,7 @@ namespace AAIV_WEB.Controllers
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -34,9 +44,9 @@ namespace AAIV_WEB.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -58,6 +68,13 @@ namespace AAIV_WEB.Controllers
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
+            if (System.Web.HttpContext.Current.User.IsInRole("Admin"))
+            {
+                return RedirectToAction("viewAllConcept", "Object", new { area = "Admin" });
+            } else if (System.Web.HttpContext.Current.User.IsInRole("User"))
+            {
+                return RedirectToAction("Index", "Face", new { area = "User" });
+            }
             return View();
         }
 
@@ -72,14 +89,13 @@ namespace AAIV_WEB.Controllers
             {
                 return View(model);
             }
-
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
             var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                    return RedirectToAction("viewAllConcept", "Object", new { area = "Admin"});
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
@@ -120,7 +136,7 @@ namespace AAIV_WEB.Controllers
             // If a user enters incorrect codes for a specified amount of time then the user account 
             // will be locked out for a specified amount of time. 
             // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -153,17 +169,40 @@ namespace AAIV_WEB.Controllers
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
+                //set role for user. Default is USER
+                UserManager.AddToRole(user.Id, "User");
+
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    try
+                    {
+                        //create person group with personGroupId = user id
+                        //create person group in DB
+                        var personGroupService = this.Service<IPersonGroupService>();
+                        await personGroupService.CreateAsync(new PersonGroup
+                        {
+                            PersonGroupId = user.Id,
+                            PersonGroupName = user.UserName,
+                            Description = "",
+                            Active = true
+                        });
+                        //create person group in Microsoft
+                        await faceServiceClient.CreatePersonGroupAsync(user.Id, user.UserName, "");
 
-                    return RedirectToAction("Index", "Home");
+                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+
+                        // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
+                        // Send an email with this link
+                        // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                        // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                        // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+
+                        return RedirectToAction("Index", "Face", new { area = "User" });
+                    }
+                    catch (Exception ex)
+                    {
+                        return View(model);
+                    }
                 }
                 AddErrors(result);
             }

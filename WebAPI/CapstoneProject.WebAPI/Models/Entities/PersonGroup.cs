@@ -17,17 +17,14 @@ namespace CapstoneProject.WebAPI.Models.Entities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public PersonGroup()
         {
-            this.AspNetUsers = new HashSet<AspNetUser>();
             this.People = new HashSet<Person>();
         }
     
-        public int ID { get; set; }
+        public string PersonGroupId { get; set; }
         public string PersonGroupName { get; set; }
         public string Description { get; set; }
         public bool Active { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AspNetUser> AspNetUsers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Person> People { get; set; }
     }

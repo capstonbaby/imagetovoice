@@ -43,8 +43,6 @@ public partial class AspNetUserViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<
 	
 		public virtual string UserName { get; set; }
 	
-		public virtual Nullable<int> PersonGroupId { get; set; }
-	
 
 	public AspNetUserViewModel() : base() { }
 	public AspNetUserViewModel(Models.Entities.AspNetUser entity) : base(entity) { }

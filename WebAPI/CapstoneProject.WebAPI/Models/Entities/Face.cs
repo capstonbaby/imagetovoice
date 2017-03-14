@@ -14,9 +14,8 @@ namespace CapstoneProject.WebAPI.Models.Entities
     
     public partial class Face
     {
-        public int ID { get; set; }
-        public int PersonID { get; set; }
         public string PersistedFaceId { get; set; }
+        public string PersonID { get; set; }
         public string ImageURL { get; set; }
         public bool Active { get; set; }
     

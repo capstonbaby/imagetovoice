@@ -2,6 +2,7 @@
 using CapstoneProject.WebAPI.Models.Entities;
 using CapstoneProject.WebAPI.Models.Entities.Services;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.ProjectOxford.Face;
 using SkyWeb.DatVM.Mvc;
 using SkyWeb.DatVM.Mvc.Autofac;
 using System;
@@ -15,6 +16,10 @@ namespace CapstoneProject.WebAPI.Controllers
 {
     public class AccountController : BaseController
     {
+        private static string API_KEY = "3fafcdb48bdc4ef6b20d61524bfac93c";
+
+        private readonly FaceServiceClient faceServiceClient = new FaceServiceClient(API_KEY);
+
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
@@ -58,14 +63,14 @@ namespace CapstoneProject.WebAPI.Controllers
             {
                 var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, true, shouldLockout: false);
                 var userService = this.Service<IAspNetUserService>();
-
+                var personGroupService = this.Service<IPersonGroupService>();
 
                 switch (result)
                 {
                     case SignInStatus.Success:
                         {
                             var user = userService.Get(q => q.Email.Equals(model.Email)).FirstOrDefault();
-
+                            var personGroup = personGroupService.Get(user.Id);
                             return Json(new
                             {
                                 success = true,
@@ -73,7 +78,7 @@ namespace CapstoneProject.WebAPI.Controllers
                                 data = new
                                 {
                                     username = user.UserName,
-                                    personGroupId = user.PersonGroup.PersonGroupName,
+                                    personGroupId = personGroup.PersonGroupId,
                                     userId = user.Id
                                 },
                             });
@@ -83,14 +88,14 @@ namespace CapstoneProject.WebAPI.Controllers
                             return Json(new
                             {
                                 success = false,
-                                message = "Login Failled",
+                                message = "Login Failed",
                             });
                         }
                     default:
                         return Json(new
                         {
                             success = false,
-                            message = "Login Falled",
+                            message = "Login Failed",
                         });
                 }
             }
@@ -100,6 +105,7 @@ namespace CapstoneProject.WebAPI.Controllers
                 {
                     success = false,
                     message = "Login Falled",
+                    error = ex.Message
                 });
             }
         }
@@ -107,6 +113,7 @@ namespace CapstoneProject.WebAPI.Controllers
         public async Task<JsonResult> Register(RegisterViewModel model)
         {
             var userService = this.Service<IAspNetUserService>();
+            var personGroupService = this.Service<IPersonGroupService>();
 
             if (ModelState.IsValid)
             {
@@ -130,8 +137,18 @@ namespace CapstoneProject.WebAPI.Controllers
                             var userEntity = userService.Get(user.Id);
                             if (userEntity != null)
                             {
-                                userEntity.PersonGroupId = 1;
-                                await userService.UpdateAsync(userEntity);
+
+                                //create person group in MCS
+                                await faceServiceClient.CreatePersonGroupAsync(user.Id, user.UserName, null);
+
+                                //create person group in Db
+                                await personGroupService.CreateAsync(new PersonGroup
+                                {
+                                    PersonGroupId = user.Id,
+                                    PersonGroupName = user.UserName,
+                                    Active = true,
+                                });
+
                                 return Json(new
                                 {
                                     success = true,

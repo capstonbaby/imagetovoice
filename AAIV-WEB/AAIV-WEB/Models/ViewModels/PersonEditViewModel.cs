@@ -9,5 +9,10 @@ namespace AAIV_WEB.Models.ViewModels
     {
         public string PersonAvatar { get; set; }
         public List<FaceViewModel> FaceList { get; set; }
+        public string LogImage { get; set; }
+
+        //Log
+        public int LogID { get; set; }
+
     }
 }
