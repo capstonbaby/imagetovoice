@@ -28,26 +28,27 @@
             <td></td>
         </tr>
     </thead>
-@using (Html.BeginForm("deleteConcept", "Object", FormMethod.Post, new { enctype = "multipart/form-data", id = "deleteConceptForm" }))
-{
-    <tbody>
-        @foreach (var items in this.Model)
-        {
-            <tr>
-                <td>@i</td>
-                <input type="hidden" value="@items.ConceptId" name="conceptId"/>
-                <td><img src="@items.ConceptPicture" style="max-width: 100px"/></td>
-                <td>@items.ConceptName</td>
-                <td>@items.ConceptDescription</td>
-                <td>
-                    <a href="@Url.Action("editConcept", new { conceptID = items.ConceptId })" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
-                    <button type="button" onclick="DeleteImage();" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>                   
-                </td>
-            </tr>
-            i++;
-        }
-    </tbody>
-}
+    @using (Html.BeginForm("deleteConcept", "Object", FormMethod.Post, new { enctype = "multipart/form-data", id = "deleteConceptForm" }))
+    {
+        <tbody>
+            @foreach (var items in this.Model)
+            {
+                <tr>
+                    <td>@i</td>
+                    <input type="hidden" value="@items.ConceptId" name="conceptId" />
+                    <td><img src="@items.ConceptPicture" style="max-width: 100px" /></td>
+                    <td>@items.ConceptName</td>
+                    <td>@items.ConceptDescription</td>
+                    <td>
+                        <a href="@Url.Action("editConcept", new { conceptID = items.ConceptId })" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
+                        <a href="@Url.Action("deleteConcept", "Object", new {conceptID = items.ConceptId})" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
+                        @*<button type="button" onclick="DeleteImage();" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>*@
+                    </td>
+                </tr>
+                i++;
+            }
+        </tbody>
+    }
 </table>
 @section scripts{
     <script>
@@ -64,8 +65,10 @@
                 cancelButtonText: 'Không'
 
             }).then(function () {
+                //return true;
                 $("#deleteConceptForm").submit();
             })
+            //return false;
 
         }
     </script>

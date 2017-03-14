@@ -24,7 +24,9 @@ namespace AAIV_WEB.Controllers
         {
             var service = this.Service<ILogObjectService>();
             var model = service.GetActive().ProjectTo<LogObjectViewModel>(this.MapperConfig);
-
+            var conceptService = this.Service<IConceptService>();
+            var conceptList = conceptService.GetActive().ProjectTo<ConceptViewModel>(this.MapperConfig);
+            ViewBag.conceptList = conceptList;
             return View(model);
         }
         public ActionResult createObject()
@@ -180,14 +182,15 @@ namespace AAIV_WEB.Controllers
                         {
                             var entity = logObjectService.Get(logId);
                             await picService.CreateAsync(addImage);
-                            await logObjectService.DeactivateAsync(entity);
+                            await logObjectService.DeactivateAsync(entity);                            
                         }
                         else
                         {
                             TempData["message"] = "Service không hoạt động!";
                             return RedirectToAction("addObject", "Object");
                         }
-                        return RedirectToAction("Index", "Object");
+                        //return RedirectToAction("Index", "Object");
+                        return Json(new { message = "Cập nhật thành công", success = true });
                     }
                     else
                     {
@@ -201,14 +204,17 @@ namespace AAIV_WEB.Controllers
                     return RedirectToAction("addObject", "Object");
                 }
             }
-            return RedirectToAction("addNewConcept", "Object", new { imgUrl = ImageUrl, logId = logId });
+            //return RedirectToAction("addNewConcept", "Object", new { imgUrl = ImageUrl, logId = logId });
+            return Json(new { message = "Cập nhật thất bại", success = false });
 
         }
-        public ActionResult addNewConcept(string imgUrl, int logId)
+        public ActionResult addNewConcept(int logId)
         {
+            var logservice = this.Service<ILogObjectService>();
+            var logentity = logservice.Get(logId);
             var model = new BigViewModel
             {
-                ImageURL = imgUrl,
+                ImageURL = logentity.ImageURL,
                 LogObjectViewModel = null,
                 ConceptList = null,
                 LogId = logId
@@ -357,15 +363,15 @@ namespace AAIV_WEB.Controllers
         {
             var service = this.Service<IConceptService>();
             var pictureService = this.Service<IPictureService>();
-
+            var conceptPicture = "";
             var model = service.GetActive()
                 .ProjectTo<ConceptEditViewModel>(this.MapperConfig)
                 .ToList();
 
             foreach (var concept in model)
             {
-                var conceptPicture = pictureService.GetActive(q => q.ConceptId == concept.ConceptId).First().ImageURL;
-                concept.ConceptPicture = conceptPicture;
+                    conceptPicture = pictureService.GetActive(q => q.ConceptId == concept.ConceptId).First().ImageURL;
+                    concept.ConceptPicture = conceptPicture;
             }
 
             return View(model);
@@ -466,7 +472,7 @@ namespace AAIV_WEB.Controllers
             var delImgResponse = HttpClientHelper.Get(delImgURI);
             string trainURI = Constant.TRAIN_API;
             var trainResponse = HttpClientHelper.Get(trainURI);
-            if (delImgResponse.Equals("OK") && trainResponse != null)
+            if (delImgResponse != null && trainResponse != null)
             {
                 var picService = this.Service<IPictureService>();
                 if (picService != null)
@@ -495,7 +501,7 @@ namespace AAIV_WEB.Controllers
             {
                 var entityConcept = conService.Get(conceptId);
                 var entityPic = picService.GetActive(q => q.ConceptId == conceptId).ProjectTo<PictureViewModel>(this.MapperConfig);
-                foreach (var picEntity in entityPic)
+                foreach (var picEntity in entityPic.ToList())
                 {
                     string delImgURI = Constant.DEL_IMG_API + picEntity.PictureId;
                     var delImgResponse = HttpClientHelper.Get(delImgURI);
@@ -503,13 +509,13 @@ namespace AAIV_WEB.Controllers
                     {
                         var picItem = picService.Get(picEntity.PictureId);
                         await picService.DeactivateAsync(picItem);
-                    }
+                }
                     else
                     {
-                        TempData["message"] = "Ảnh chưa được xóa! Vui lòng thử lại!";
-                        return RedirectToAction("viewAllConcept", "Object");
-                    }
+                    TempData["message"] = "Ảnh chưa được xóa! Vui lòng thử lại!";
+                    return RedirectToAction("viewAllConcept", "Object");
                 }
+            }
                 string delConceptURI = Constant.DEL_CONCEPT_API + conceptId;
                 var delConceptPesponse = HttpClientHelper.Get(delConceptURI);
                 string trainURI = Constant.TRAIN_API;
@@ -517,19 +523,21 @@ namespace AAIV_WEB.Controllers
                 if (delConceptPesponse != null && trainResponse != null)
                 {
                     await conService.DeactivateAsync(entityConcept);
-                }
-                else
-                {
-                    TempData["message"] = "Concept chưa được xóa! Vui lòng thử lại!";
-                    return RedirectToAction("viewAllConcept", "Object");
-                }
             }
+            else
+            {
+                TempData["message"] = "Concept chưa được xóa! Vui lòng thử lại!";
+                return RedirectToAction("viewAllConcept", "Object");
+            }
+        }
             else
             {
                 TempData["message"] = "Service không hoạt động!";
                 return RedirectToAction("viewAllConcept", "Object");
+                //return Json(new { message = "Xóa Thất Bại", success = false });
             }
             return RedirectToAction("viewAllConcept", "Object");
+            //return Json(new { message = "Xóa Thành Công", success = true });
         }
         public List<string> getImageURL(IEnumerable<HttpPostedFileBase> fileUpload)
         {
@@ -572,7 +580,7 @@ namespace AAIV_WEB.Controllers
                 var delImgResponse = HttpClientHelper.Get(delImgURI);
                 string trainURI = Constant.TRAIN_API;
                 var trainResponse = HttpClientHelper.Get(trainURI);
-                if (delImgResponse.Equals("OK") && trainResponse != null)
+                if (delImgResponse != null && trainResponse != null)
                 {
                     if (picService != null)
                     {
@@ -587,26 +595,26 @@ namespace AAIV_WEB.Controllers
                 }
                 else
                 {
-                    TempData["message"] = "Ảnh chưa được xóa! Vui lòng thử lại!";
+                    
                     return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
                 }
             }
             return RedirectToAction("editConcept", "Object", new { conceptId = conceptId });
         }
-        public async Task<ActionResult> deleteLog(int logId)
+        public async Task<JsonResult> deleteLog(int logId)
         {
             var logObjectService = this.Service<ILogObjectService>();
             var entity = logObjectService.Get(logId);
             if (logObjectService != null)
             {
                 await logObjectService.DeactivateAsync(entity);
-                return RedirectToAction("Index", "Object");
+                return Json(new { success = true, message = "Xoa thanh cong" });
             }
             else
             {
                 TempData["message"] = "Xóa log thất bại! Vui lòng thử lại!";
-                return RedirectToAction("Index", "Object");
-            }            
+                return Json(new { success = false, message = "Xóa log thất bại! Vui lòng thử lại!" });
+            }
         }        
     }
 }
