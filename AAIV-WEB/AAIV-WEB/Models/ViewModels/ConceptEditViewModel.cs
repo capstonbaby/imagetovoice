@@ -1,9 +1,10 @@
-﻿using System;
+﻿using AAIV_WEB.Models.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace AAIV_WEB.Models.ViewModels
+namespace AAIV_WEB.Areas.Admin.Models.ViewModels
 {
     public class ConceptEditViewModel : ConceptViewModel
     {

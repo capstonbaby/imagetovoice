@@ -19,7 +19,7 @@ public partial class PersonGroupViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel
 {
 	
 	
-		public virtual int ID { get; set; }
+		public virtual string PersonGroupId { get; set; }
 	
 		public virtual string PersonGroupName { get; set; }
 	

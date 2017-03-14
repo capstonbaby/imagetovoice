@@ -45,8 +45,7 @@ namespace AAIV_WEB.Controllers
 
             if (curUser != null)
             {
-                var entity = service.GetActive(q => q.PersonGroupId == curUser.PersonGroupId).FirstOrDefault();
-                var personList = personService.GetActive(q => q.PersonGroupID == entity.PersonGroupId)
+                var personList = personService.GetActive(q => q.PersonGroupId == curUser.Id)
                     .ProjectTo<PersonEditViewModel>(this.MapperConfig)
                     .ToList();
 
@@ -69,7 +68,7 @@ namespace AAIV_WEB.Controllers
         public ActionResult NewPerson()
         {
             PersonEditViewModel model = (PersonEditViewModel)TempData["personEditViewModel"];
-            if(model == null)
+            if (model == null)
             {
                 model = new PersonEditViewModel();
             }
@@ -91,12 +90,11 @@ namespace AAIV_WEB.Controllers
             {
                 try
                 {
-                    var userId = User.Identity.GetUserId();
-                    var user = userService.Get(userId);
-                    var personGroup = user.PersonGroup;
+                    var user = Util.getCurrentUser(this);
+                    var personGroup = personGroupService.Get(user.Id);
 
                     //create in Microsoft
-                    var personCreateResult = await faceServiceClient.CreatePersonAsync(personGroup.PersonGroupName, person.Name, person.Description);
+                    var personCreateResult = await faceServiceClient.CreatePersonAsync(personGroup.PersonGroupId, person.Name, person.Description);
                     progressHub.SendMessage("33%", 33);
 
                     //create in database
@@ -104,7 +102,7 @@ namespace AAIV_WEB.Controllers
                     {
                         Name = person.Name,
                         Description = person.Description,
-                        PersonGroupID = personGroup.ID,
+                        PersonGroupId = personGroup.PersonGroupId,
                         Active = true,
                         PersonId = personCreateResult.PersonId.ToString(),
                         IsTrained = true,
@@ -113,12 +111,11 @@ namespace AAIV_WEB.Controllers
                     progressHub.SendMessage("50%", 50);
 
                     //Solve Log image file to MCS + db
-
                     if (person.LogImage != null)
                     {
                         //create face in Microsoft
                         var addFaceResult = await faceServiceClient.AddPersonFaceAsync
-                                                (personGroup.PersonGroupName, personCreateResult.PersonId, person.LogImage);
+                                                (personGroup.PersonGroupId, personCreateResult.PersonId, person.LogImage);
 
                         //create face in db
                         var persistedFaceId = addFaceResult.PersistedFaceId.ToString();
@@ -135,7 +132,7 @@ namespace AAIV_WEB.Controllers
                         //Deactive log in db
                         await logService.DeactivateAsync(logService.Get(person.LogID));
 
-                        
+
                     }
 
                     //Upload new chosen iamge files
@@ -157,7 +154,7 @@ namespace AAIV_WEB.Controllers
                             var uploadResult = cloudinary.Upload(uploadParams).Uri.ToString();
 
                             //create face in Microsoft
-                            var addFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroup.PersonGroupName, personCreateResult.PersonId, uploadResult);
+                            var addFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroup.PersonGroupId, personCreateResult.PersonId, uploadResult);
 
 
                             //create face in db
@@ -172,12 +169,12 @@ namespace AAIV_WEB.Controllers
                             await faceService.CreateAsync(face);
 
                         }
-                        
+
                     }
                     //Set Progress bar
                     progressHub.SendMessage("70%", 70);
                     //Train
-                    await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupName);
+                    await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupId);
                     progressHub.SendMessage("Complete !", 100);
                     Thread.Sleep(1000);
 
@@ -190,7 +187,7 @@ namespace AAIV_WEB.Controllers
                     {
                         return RedirectToAction("Index", "Face");
                     }
-                    
+
                 }
                 catch (Exception ex)
                 {
@@ -205,7 +202,7 @@ namespace AAIV_WEB.Controllers
 
         public ActionResult Uploader()
         {
-             bool isSavedSuccessfully = true;
+            bool isSavedSuccessfully = true;
             string fName = "";
             foreach (string fileName in Request.Files)
             {
@@ -214,7 +211,7 @@ namespace AAIV_WEB.Controllers
                 fName = file.FileName;
                 if (file != null && file.ContentLength > 0)
                 {
-                   
+
                     var fileName1 = Path.GetFileName(file.FileName);
 
                     string pathString = System.IO.Path.Combine(Server.MapPath("~/images"), fileName1);
@@ -248,10 +245,10 @@ namespace AAIV_WEB.Controllers
             TempData["personEditViewModel"] = model;
 
             return RedirectToAction("NewPerson", "Face");
-           
-           
+
+
         }
-        
+
 
         public async Task<JsonResult> DeletePerson(string id)
         {
@@ -262,14 +259,13 @@ namespace AAIV_WEB.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                var userId = User.Identity.GetUserId();
-                var user = userService.Get(userId);
-                var personGroup = user.PersonGroup;
+                var user = Util.getCurrentUser(this);
+                var personGroup = personGroupService.Get(user.Id);
 
                 var deletePerson = personService.Get(id);
                 //Delete in Microsoft
                 Guid personID = new Guid(deletePerson.PersonId);
-                await faceServiceClient.DeletePersonAsync(personGroup.PersonGroupName, personID);
+                await faceServiceClient.DeletePersonAsync(personGroup.PersonGroupId, personID);
 
                 //Delete in Database
 
@@ -281,7 +277,7 @@ namespace AAIV_WEB.Controllers
                 }
 
                 //Train Person
-                await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupName);
+                await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupId);
 
                 return Json(new { message = "Xóa thành công", success = true });
             }
@@ -319,9 +315,8 @@ namespace AAIV_WEB.Controllers
             if (User.Identity.IsAuthenticated)
 
             {
-                var userId = User.Identity.GetUserId();
-                var user = userService.Get(userId);
-                var personGroupID = user.PersonGroup.PersonGroupName;
+                var user = Util.getCurrentUser(this);
+                var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
 
                 //Update in Microsoft
 
@@ -372,8 +367,8 @@ namespace AAIV_WEB.Controllers
 
                     }
                 }
-                
-                return RedirectToAction("UpdatePerson", "Face", new { id = person.PersonId});
+
+                return RedirectToAction("UpdatePerson", "Face", new { id = person.PersonId });
             }
             else
             {
@@ -390,9 +385,8 @@ namespace AAIV_WEB.Controllers
             var userService = this.Service<IAspNetUserService>();
             var faceService = this.Service<IFaceService>();
 
-            var userId = User.Identity.GetUserId();
-            var user = userService.Get(userId);
-            var personGroupID = user.PersonGroup.PersonGroupName;
+            var user = Util.getCurrentUser(this);
+            var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
 
             //Delete in Microsoft
             Guid personID = new Guid(person.PersonId);
@@ -438,15 +432,15 @@ namespace AAIV_WEB.Controllers
                         };
                         await faceService.CreateAsync(face);
 
-                        
-                        
+
+
                     }
                 }
             }
 
             //train
             await faceServiceClient.TrainPersonGroupAsync(personGroupID);
-            return RedirectToAction("UpdatePerson", "Face", new {id = person.PersonId});
+            return RedirectToAction("UpdatePerson", "Face", new { id = person.PersonId });
         }
 
         public ActionResult ShowLogs()
@@ -489,9 +483,8 @@ namespace AAIV_WEB.Controllers
             var faceService = this.Service<IFaceService>();
             var logService = this.Service<ILogService>();
 
-            var userId = User.Identity.GetUserId();
-            var user = userService.Get(userId);
-            var personGroupID = user.PersonGroup.PersonGroupName;
+            var user = Util.getCurrentUser(this);
+            var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
 
             var log = logService.Get(logID);
 
@@ -504,7 +497,7 @@ namespace AAIV_WEB.Controllers
             var newPersistedFaceId = addFaceResult.PersistedFaceId.ToString();
             var face = new Models.Entities.Face
             {
-                ImageURL = log.ImageURL ,
+                ImageURL = log.ImageURL,
                 PersistedFaceId = newPersistedFaceId,
                 PersonID = personID,
                 Active = true

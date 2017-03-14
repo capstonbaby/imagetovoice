@@ -1,0 +1,41 @@
+﻿@model BigViewModel
+@{
+    ViewBag.Title = "addNewConcept";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Tạo mới đồ vật</h2>
+<div class="error">
+    @{
+        var message = TempData["message"] as string;
+        if (message != null)
+        {
+            <span class="label label-danger">@message</span>
+        }
+    }
+</div>
+<div>
+    @using (Html.BeginForm("addImageNewConcept", "Object", FormMethod.Post))
+    {
+        <table style="width: auto;">
+            <tr>
+                <td style="width:250px;">
+                    Tên đồ vật:<br>
+                    <input type="text" name="conceptName" required placeholder="Nhập tên đồ vật!">
+                </td>
+                <td style="width:250px;" rowspan="2">
+                    <img src="@this.Model.ImageURL" style="max-width: 300px" />
+                    @Html.HiddenFor(q => q.ImageURL)
+                    @Html.HiddenFor(q => q.LogId)
+                </td>
+            </tr>
+            <tr>
+                <td style="width:250px;">
+                    Mô tả:<br>
+                    <input type="text" name="conceptDes" placeholder="Nhập mô tả đồ vật!">
+                </td>
+            </tr>
+        </table>
+        <input type="submit" value="Tạo" class="btn btn-success"/>
+    }
+</div>

@@ -50,7 +50,6 @@
     <Property Name="LockoutEnabled" Type="bit" Nullable="false" />
     <Property Name="AccessFailedCount" Type="int" Nullable="false" />
     <Property Name="UserName" Type="nvarchar" MaxLength="256" Nullable="false" />
-    <Property Name="PersonGroupId" Type="int" />
   </EntityType>
   <EntityType Name="Concept">
     <Key>
@@ -97,7 +96,7 @@
       <PropertyRef Name="PersonId" />
     </Key>
     <Property Name="PersonId" Type="nvarchar" MaxLength="36" Nullable="false" />
-    <Property Name="PersonGroupID" Type="int" Nullable="false" />
+    <Property Name="PersonGroupId" Type="nvarchar" MaxLength="128" Nullable="false" />
     <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
     <Property Name="Description" Type="nvarchar" MaxLength="250" />
     <Property Name="IsTrained" Type="bit" Nullable="false" />
@@ -105,10 +104,10 @@
   </EntityType>
   <EntityType Name="PersonGroup">
     <Key>
-      <PropertyRef Name="ID" />
+      <PropertyRef Name="PersonGroupId" />
     </Key>
-    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="PersonGroupName" Type="nvarchar" MaxLength="128" Nullable="false" />
+    <Property Name="PersonGroupId" Type="nvarchar" MaxLength="128" Nullable="false" />
+    <Property Name="PersonGroupName" Type="nvarchar" MaxLength="128" />
     <Property Name="Description" Type="nvarchar" MaxLength="250" />
     <Property Name="Active" Type="bit" Nullable="false" />
   </EntityType>
@@ -122,18 +121,16 @@
     <Property Name="ImageURL" Type="nvarchar(max)" Nullable="false" />
     <Property Name="Active" Type="bit" Nullable="false" />
   </EntityType>
-  <Association Name="FK_AspNetUsers_PersonGroup">
-    <End Role="PersonGroup" Type="Self.PersonGroup" Multiplicity="0..1" />
-    <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="PersonGroup">
-        <PropertyRef Name="ID" />
-      </Principal>
-      <Dependent Role="AspNetUsers">
-        <PropertyRef Name="PersonGroupId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
+  <EntityType Name="sysdiagrams">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+    <Property Name="principal_id" Type="int" Nullable="false" />
+    <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="version" Type="int" />
+    <Property Name="definition" Type="varbinary(max)" />
+  </EntityType>
   <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
     <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
       <OnDelete Action="Cascade" />
@@ -231,10 +228,10 @@
     <End Role="Person" Type="Self.Person" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="PersonGroup">
-        <PropertyRef Name="ID" />
+        <PropertyRef Name="PersonGroupId" />
       </Principal>
       <Dependent Role="Person">
-        <PropertyRef Name="PersonGroupID" />
+        <PropertyRef Name="PersonGroupId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -263,10 +260,7 @@
     <EntitySet Name="Person" EntityType="Self.Person" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="PersonGroup" EntityType="Self.PersonGroup" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Picture" EntityType="Self.Picture" Schema="dbo" store:Type="Tables" />
-    <AssociationSet Name="FK_AspNetUsers_PersonGroup" Association="Self.FK_AspNetUsers_PersonGroup">
-      <End Role="PersonGroup" EntitySet="PersonGroup" />
-      <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-    </AssociationSet>
+    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
     <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
       <End Role="AspNetUsers" EntitySet="AspNetUsers" />
       <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />

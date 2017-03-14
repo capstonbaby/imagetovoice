@@ -205,12 +205,15 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
+    <Compile Include="Areas\Admin\Controllers\ObjectController.cs" />
+    <Compile Include="Areas\Admin\Models\ConceptEditViewModel.cs" />
+    <Compile Include="Areas\User\Controllers\FaceController.cs" />
+    <Compile Include="Areas\User\UserAreaRegistration.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\FaceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ObjectClarifaiController.cs" />
-    <Compile Include="Controllers\ObjectController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -341,6 +344,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Entities\Repositories\sysdiagramRepositoryGen.cs">
+      <DependentUpon>Repositories.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Entities\Services\AspNetRoleServiceGen.cs">
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
@@ -379,6 +385,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Entities\Services\sysdiagramServiceGen.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\sysdiagram.cs">
+      <DependentUpon>CapstoneEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\sysdiagramRefined.cs">
+      <DependentUpon>EntityRefinery.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\AspNetRoleViewModelGen.cs">
@@ -394,7 +409,6 @@
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ViewModels\BigViewModel.cs" />
-    <Compile Include="Models\ViewModels\ConceptEditViewModel.cs" />
     <Compile Include="Models\ViewModels\ConceptViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
@@ -417,6 +431,9 @@
     <Compile Include="Models\ViewModels\PictureViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ViewModels\sysdiagramViewModelGen.cs">
+      <DependentUpon>ViewModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ViewModels\ViewModel.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -431,6 +448,17 @@
     <Compile Include="Utils\HttpClientHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\Admin\Views\Object\addNewConcept.cshtml" />
+    <Content Include="Areas\Admin\Views\Object\addObject.cshtml" />
+    <Content Include="Areas\Admin\Views\Object\createObject.cshtml" />
+    <Content Include="Areas\Admin\Views\Object\editConcept.cshtml" />
+    <Content Include="Areas\Admin\Views\Object\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Object\testConcept.cshtml" />
+    <Content Include="Areas\Admin\Views\Object\testPredict.cshtml" />
+    <Content Include="Areas\Admin\Views\Object\viewAllConcept.cshtml" />
+    <Content Include="Areas\Admin\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Admin\Views\web.config" />
+    <Content Include="Areas\Admin\Views\_ViewStart.cshtml" />
     <Content Include="bin\AAIV-WEB.dll" />
     <Content Include="bin\AAIV-WEB.pdb" />
     <Content Include="bin\Antlr3.Runtime.dll" />
@@ -836,13 +864,6 @@
     </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <EntityDeploy Include="Models\Entities\CapstoneEntities.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>CapstoneEntities.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <Content Include="Models\Entities\CapstoneEntities.edmx.diagram">
-      <DependentUpon>CapstoneEntities.edmx</DependentUpon>
-    </Content>
     <Content Include="Content\vendor\bootstrap-social\bootstrap-social.less" />
     <Content Include="Content\vendor\bootstrap-social\bootstrap-social.scss" />
     <Content Include="Content\vendor\bootstrap\fonts\glyphicons-halflings-regular.eot" />
@@ -889,6 +910,13 @@
     <Content Include="Content\vendor\font-awesome\scss\_spinning.scss" />
     <Content Include="Content\vendor\font-awesome\scss\_stacked.scss" />
     <Content Include="Content\vendor\font-awesome\scss\_variables.scss" />
+    <Content Include="Areas\User\Views\web.config" />
+    <Content Include="Areas\User\Views\Face\Index.cshtml" />
+    <Content Include="Areas\User\Views\Face\NewPerson.cshtml" />
+    <Content Include="Areas\User\Views\Face\ShowLogs.cshtml" />
+    <Content Include="Areas\User\Views\Face\UpdatePerson.cshtml" />
+    <Content Include="Areas\User\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\User\Views\Shared\_Layout.cshtml" />
     <None Include="bin\AAIV-WEB.dll.config" />
     <Content Include="bin\roslyn\Microsoft.CSharp.Core.targets" />
     <Content Include="bin\roslyn\Microsoft.VisualBasic.Core.targets" />
@@ -919,6 +947,13 @@
     <Content Include="Content\bootstrapselect\README.md" />
     <Content Include="Content\bootstrapselect\sass\bootstrap-select.scss" />
     <Content Include="Content\bootstrapselect\sass\variables.scss" />
+    <EntityDeploy Include="Models\Entities\CapstoneEntities.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>CapstoneEntities.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\Entities\CapstoneEntities.edmx.diagram">
+      <DependentUpon>CapstoneEntities.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -969,21 +1004,10 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Account\Login_old.cshtml" />
     <Content Include="Views\Account\Register_old.cshtml" />
-    <Content Include="Views\Face\Index.cshtml" />
-    <Content Include="Views\Face\NewPerson.cshtml" />
-    <Content Include="Views\Face\UpdatePerson.cshtml" />
-    <Content Include="Views\Object\addNewConcept.cshtml" />
-    <Content Include="Views\Object\addObject.cshtml" />
-    <Content Include="Views\Object\createObject.cshtml" />
-    <Content Include="Views\Object\editConcept.cshtml" />
-    <Content Include="Views\Object\Index.cshtml" />
-    <Content Include="Views\Object\testConcept.cshtml" />
-    <Content Include="Views\Object\testPredict.cshtml" />
-    <Content Include="Views\Object\viewAllConcept.cshtml" />
-    <Content Include="Views\Face\ShowLogs.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Areas\User\Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
