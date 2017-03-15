@@ -29,6 +29,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                 .ProjectTo<AspNetUserEditViewModel>(this.MapperConfig)
                 .ToList();
             return View(userlist);
+
         }
         [HttpPost]
         public async Task<ActionResult> DeactivateAccounts(AspNetUserEditViewModel model)

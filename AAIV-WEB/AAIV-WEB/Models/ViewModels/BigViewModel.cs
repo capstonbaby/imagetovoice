@@ -11,7 +11,7 @@ namespace AAIV_WEB.Models.ViewModels
         public LogObjectViewModel LogObjectViewModel { get; set; }
         public IEnumerable<ConceptViewModel> ConceptList { get; set; }
         public IEnumerable<PictureViewModel> PictureList { get; set; }
-        //public PictureViewModel picture { get; set; }
+        public IEnumerable<LogObjectViewModel> LogList { get; set; }
         public int LogId { get; set; }
         public string ImageURL { get; internal set; }
         public PictureViewModel pictureId { get; set; }

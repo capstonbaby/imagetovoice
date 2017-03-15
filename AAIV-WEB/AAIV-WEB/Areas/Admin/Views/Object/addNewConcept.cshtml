@@ -5,37 +5,85 @@
 }
 
 <h2>Tạo mới đồ vật</h2>
-<div class="error">
-    @{
-        var message = TempData["message"] as string;
-        if (message != null)
-        {
-            <span class="label label-danger">@message</span>
-        }
-    }
-</div>
-<div>
+<div class="panel-body">
     @using (Html.BeginForm("addImageNewConcept", "Object", FormMethod.Post))
     {
-        <table style="width: auto;">
-            <tr>
-                <td style="width:250px;">
-                    Tên đồ vật:<br>
-                    <input type="text" name="conceptName" required placeholder="Nhập tên đồ vật!">
-                </td>
-                <td style="width:250px;" rowspan="2">
-                    <img src="@this.Model.ImageURL" style="max-width: 300px" />
-                    @Html.HiddenFor(q => q.ImageURL)
-                    @Html.HiddenFor(q => q.LogId)
-                </td>
-            </tr>
-            <tr>
-                <td style="width:250px;">
-                    Mô tả:<br>
-                    <input type="text" name="conceptDes" placeholder="Nhập mô tả đồ vật!">
-                </td>
-            </tr>
-        </table>
-        <input type="submit" value="Tạo" class="btn btn-success"/>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Tên Đồ Vật</label>
+                <input type="text" name="conceptName" id="conceptName" class="form-control" placeholder="Nhập tên đồ vật!">
+            </div>
+
+            <div class="form-group">
+                <label>Mô Tả Đồ Vật</label>
+                <textarea name="conceptDes" id="conceptDes" class="form-control" rows="4" cols="50" placeholder="Nhập mô tả đồ vật!"></textarea>
+            </div>
+            <div class="form-group">
+                @*<input type="submit" value="Tạo Mới" class="btn btn-success" />*@
+                <button type="button" onclick="AddConcept(@this.Model.LogId)" class="btn btn-success">Tạo Mới</button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            @if (Model.ImageURL != null)
+            {
+                @Html.HiddenFor(q => q.ImageURL)
+                @Html.HiddenFor(q => q.LogId)
+                <div class="form-group">
+                    <img src="@Model.ImageURL" style="max-width: 150px" />
+                </div>
+
+            }
+        </div>
     }
 </div>
+@section scripts{
+    <script>
+        function AddConcept(id) {
+            swal({
+                title: 'Bạn có chắc chắn tạo mới?',
+                text: "",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Có',
+                cancelButtonText: 'Không'
+
+            }).then(function () {
+                var name = document.getElementById("conceptName").value;
+                var des = document.getElementById("conceptDes").value;
+                $.ajax({
+                    method: 'POST',
+                    url: "@Url.Action("addImageNewConcept", "Object")",
+                    data:
+                        {
+                            logId : id,
+                            conceptName: name,
+                            conceptDes: des
+                        },
+                    success: function(result){
+                        if (result.success) {
+                            swal({
+                                text: result.message,
+                                type: 'success',
+                            }).then(function () {
+                                Window.location.href = "@Url.Action("Index", "Object")";
+                            });
+                        } else {
+                            swal({
+                                text: result.message,
+                                type: 'error',
+                            });
+                        }
+                    },
+                    error: function(error){
+                        swal({
+                            text: "Đã có lỗi xảy ra!",
+                            type: 'error',
+                        });
+                    }
+                });
+            })
+        }
+    </script>
+}
