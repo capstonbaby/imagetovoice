@@ -6,18 +6,15 @@
     var i = 1;
 }
 
-<h1 class="page-header">Danh sách</h1>
+<h1 class="page-header">Danh sách <a href="@Url.Action("NewPerson","Face")" class="btn btn-success pull-right"><i class="glyphicon glyphicon-plus"></i>Thêm mới</a></h1>
 
-<a href="@Url.Action("NewPerson","Face")" class="btn btn-success pull-right"><i class="glyphicon glyphicon-plus"></i>Thêm mới</a>
-
-<table class="table table-hover">
+<table id="myTable" class="table table-hover" cellspacing="0" width="100%">
     <thead>
         <tr>
             <th>No</th>
             <th>Ảnh đại diện</th>
             <th>Tên</th>
             <th>Thông tin</th>
-            <th>Status</th>
             <th></th>
         </tr>
     </thead>
@@ -33,23 +30,6 @@
                 <td> @item.Name</td>
                 <td> @item.Description</td>
                 <td>
-                    @if (item.IsTrained)
-                    {
-                        <span class="label label-success">Trained</span>
-                    }
-                    else
-                    {
-                        <span class="label label-danger">Not Trained</span>
-                    }
-
-
-                    
-                    @*<a href="@Url.Action("UpdatePerson","Face",new { id = item.ID})" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>*@
-                    @*<a href="@Url.Action("DeletePerson","Face",new { id = item.ID})" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></a>*@
-                   @*<a onclick="DeletePerson(@item.ID);" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></a>*@
-
-                </td>
-                <td>
                     <a href="@Url.Action("UpdatePerson","Face",new { id = item.PersonId})" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
                     <a onclick="DeletePerson('@item.PersonId');" class="btn btn-danger"> <i class="glyphicon glyphicon-trash"> </i> </a>
                 </td>
@@ -63,6 +43,11 @@
 
 @section scripts{
     <script>
+
+        $(function () {
+            $('#myTable').DataTable();
+        });
+
         function DeletePerson(i) {
             swal({
                 title: 'Bạn có chắc chắn xóa?',

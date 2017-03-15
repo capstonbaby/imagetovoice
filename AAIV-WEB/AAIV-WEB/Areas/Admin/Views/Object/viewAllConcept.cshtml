@@ -1,11 +1,11 @@
 ﻿@model IEnumerable<ConceptEditViewModel>
 @{
-    ViewBag.Title = "viewAllConcept";
+    ViewBag.Title = "Đồ vật";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var i = 1;
 }
 
-<h2>Danh sách đồ vật</h2>
+<h1 class="page-header">Danh sách đồ vật</h1>
 <div class="error">
     @{
         var message = TempData["message"] as string;
@@ -15,39 +15,40 @@
         }
     }
 </div>
-<a href="@Url.Action("createObject", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-plus-sign"></i> Tạo mới đồ vật</a>
-<a href="@Url.Action("testPredict", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-question-sign"></i> Kiểm tra đồ vật</a>
-<br /><br />
+<div class="pull-right">
+    <a href="@Url.Action("createObject", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-plus-sign"></i> Tạo mới đồ vật</a>
+    <a href="@Url.Action("testPredict", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-question-sign"></i> Kiểm tra đồ vật</a>
+</div>
 <table class="table table-striped">
     <thead>
         <tr>
-            <td>No.</td>
-            <td>Image</td>
-            <td>Tên</td>
-            <td>Chú thích</td>
-            <td></td>
+            <th>No.</th>
+            <th>Image</th>
+            <th>Tên</th>
+            <th>Chú thích</th>
+            <th></th>
         </tr>
     </thead>
-@using (Html.BeginForm("deleteConcept", "Object", FormMethod.Post, new { enctype = "multipart/form-data", id = "deleteConceptForm" }))
-{
-    <tbody>
-        @foreach (var items in this.Model)
-        {
-            <tr>
-                <td>@i</td>
-                <input type="hidden" value="@items.ConceptId" name="conceptId"/>
-                <td><img src="@items.ConceptPicture" style="max-width: 100px"/></td>
-                <td>@items.ConceptName</td>
-                <td>@items.ConceptDescription</td>
-                <td>
-                    <a href="@Url.Action("editConcept", new { conceptID = items.ConceptId })" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
-                    <button type="button" onclick="DeleteImage();" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>                   
-                </td>
-            </tr>
-            i++;
-        }
-    </tbody>
-}
+    @using (Html.BeginForm("deleteConcept", "Object", FormMethod.Post, new { enctype = "multipart/form-data", id = "deleteConceptForm" }))
+    {
+        <tbody>
+            @foreach (var items in this.Model)
+            {
+                <tr>
+                    <td>@i</td>
+                    <input type="hidden" value="@items.ConceptId" name="conceptId" />
+                    <td><img src="@items.ConceptPicture" style="max-width: 100px" /></td>
+                    <td>@items.ConceptName</td>
+                    <td>@items.ConceptDescription</td>
+                    <td>
+                        <a href="@Url.Action("editConcept", new { conceptID = items.ConceptId })" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
+                        <button type="button" onclick="DeleteImage();" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>
+                    </td>
+                </tr>
+                i++;
+            }
+        </tbody>
+    }
 </table>
 @section scripts{
     <script>

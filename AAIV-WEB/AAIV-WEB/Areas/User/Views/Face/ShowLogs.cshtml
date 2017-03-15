@@ -7,7 +7,7 @@
 
 <h1 class="page-header">Người chưa nhận diện được</h1>
 
-<table class="table table-hover">
+<table id="myTable" class="table table-hover" cellspacing="0" width="100%">
 
     <thead>
         <tr>
@@ -98,6 +98,11 @@
 
 @section scripts{
     <script>
+
+        $(function () {
+            $('#myTable').DataTable();
+        });
+
         $(document).on("click", "#add-face", function () {
             var logImage = $(this).data("image");
             var name = $(this).data("name");

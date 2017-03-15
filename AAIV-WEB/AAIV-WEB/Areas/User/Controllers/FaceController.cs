@@ -103,7 +103,6 @@ namespace AAIV_WEB.Areas.User.Controllers
                         PersonGroupId = personGroup.PersonGroupId,
                         Active = true,
                         PersonId = personCreateResult.PersonId.ToString(),
-                        IsTrained = true,
                     };
                     await personService.CreateAsync(newPerson);
                     progressHub.SendMessage("50%", 50);
@@ -257,27 +256,35 @@ namespace AAIV_WEB.Areas.User.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                var user = Util.getCurrentUser(this);
-                var personGroup = personGroupService.Get(user.Id);
-
-                var deletePerson = personService.Get(id);
-                //Delete in Microsoft
-                Guid personID = new Guid(deletePerson.PersonId);
-                await faceServiceClient.DeletePersonAsync(personGroup.PersonGroupId, personID);
-
-                //Delete in Database
-
-                await personService.DeactivateAsync(deletePerson);
-
-                foreach (var item in deletePerson.Faces)
+                try
                 {
-                    await faceService.DeactivateAsync(item);
+                    var user = Util.getCurrentUser(this);
+                    var personGroup = personGroupService.Get(user.Id);
+
+                    var deletePerson = personService.Get(id);
+                    //Delete in Microsoft
+                    Guid personID = new Guid(deletePerson.PersonId);
+                    await faceServiceClient.DeletePersonAsync(personGroup.PersonGroupId, personID);
+
+                    //Delete in Database
+
+                    await personService.DeactivateAsync(deletePerson);
+
+                    foreach (var item in deletePerson.Faces)
+                    {
+                        await faceService.DeactivateAsync(item);
+                    }
+
+                    //Train Person
+                    await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupId);
+
+                    return Json(new { message = "Xóa thành công", success = true });
                 }
+                catch (Exception ex)
+                {
 
-                //Train Person
-                await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupId);
-
-                return Json(new { message = "Xóa thành công", success = true });
+                    throw;
+                }
             }
             else
             {
