@@ -310,15 +310,14 @@ namespace AAIV_WEB.Areas.User.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> UpdatePerson(PersonViewModel person, IEnumerable<HttpPostedFileBase> file)
+
+        public async Task<JsonResult> UpdatePersonInfo(PersonViewModel person)
         {
             var personService = this.Service<IPersonService>();
             var personGroupService = this.Service<IPersonGroupService>();
             var userService = this.Service<IAspNetUserService>();
-            var faceService = this.Service<IFaceService>();
 
-            if (User.Identity.IsAuthenticated)
-
+            try
             {
                 var user = Util.getCurrentUser(this);
                 var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
@@ -328,12 +327,49 @@ namespace AAIV_WEB.Areas.User.Controllers
                 var updatePerson = personService.Get(person.PersonId);
                 Guid personID = new Guid(updatePerson.PersonId);
 
-                var personUpdateResult = faceServiceClient.UpdatePersonAsync(personGroupID, personID, person.Name, person.Description);
+                await faceServiceClient.UpdatePersonAsync(personGroupID, personID, person.Name, person.Description);
+
+                //train
+                await faceServiceClient.TrainPersonGroupAsync(personGroupID);
 
                 //Update in Database
                 updatePerson.Name = person.Name;
                 updatePerson.Description = person.Description;
                 personService.Save();
+
+
+                return Json(new { message = "Cập nhật thành công", success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { message = "Cập nhật thất bại", success = false });
+            }
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> AddPersonFace(PersonViewModel person, IEnumerable<HttpPostedFileBase> file)
+        {
+            var personService = this.Service<IPersonService>();
+            var personGroupService = this.Service<IPersonGroupService>();
+            var userService = this.Service<IAspNetUserService>();
+            var faceService = this.Service<IFaceService>();
+
+            try
+            {
+                var user = Util.getCurrentUser(this);
+                var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
+
+                //Update in Microsoft
+
+                var updatePerson = personService.Get(person.PersonId);
+                Guid personID = new Guid(updatePerson.PersonId);
+
+                //var personUpdateResult = faceServiceClient.UpdatePersonAsync(personGroupID, personID, person.Name, person.Description);
+
+                //Update in Database
+                //updatePerson.Name = person.Name;
+                //updatePerson.Description = person.Description;
+                //personService.Save();
 
                 //Upload imageS
                 if (file.Count() > 0 && file.FirstOrDefault() != null)
@@ -369,15 +405,14 @@ namespace AAIV_WEB.Areas.User.Controllers
                             Active = true
                         };
                         await faceService.CreateAsync(face);
-
                     }
+                    //return Json(new { message = "Cập nhật thành công", success = true });
                 }
-
-                return RedirectToAction("UpdatePerson", "Face", new { id = person.PersonId });
+                return Json(new { message = "Cập nhật thành công", success = true });
             }
-            else
+            catch (Exception ex)
             {
-                return RedirectToAction("Login", "Account");
+                return Json(new { message = "Cập nhật thất bại", success = false });
             }
 
         }
