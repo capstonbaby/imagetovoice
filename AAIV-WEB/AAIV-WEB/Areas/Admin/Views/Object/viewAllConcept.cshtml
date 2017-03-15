@@ -28,31 +28,31 @@
             <td></td>
         </tr>
     </thead>
-@using (Html.BeginForm("deleteConcept", "Object", FormMethod.Post, new { enctype = "multipart/form-data", id = "deleteConceptForm" }))
-{
-    <tbody>
-        @foreach (var items in this.Model)
-        {
-            <tr>
-                <td>@i</td>
-                <input type="hidden" value="@items.ConceptId" name="conceptId"/>
-                <td><img src="@items.ConceptPicture" style="max-width: 100px"/></td>
-                <td>@items.ConceptName</td>
-                <td>@items.ConceptDescription</td>
-                <td>
-                    <a href="@Url.Action("editConcept", new { conceptID = items.ConceptId })" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
-                    <button type="button" onclick="DeleteImage();" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>                   
-                </td>
-            </tr>
-            i++;
-        }
-    </tbody>
-}
+    @*@using (Html.BeginForm("deleteConcept", "Object", FormMethod.Post, new { enctype = "multipart/form-data", id = "deleteConceptForm" }))
+    {*@
+        <tbody>
+            @foreach (var items in this.Model)
+            {
+                <tr>
+                    <td>@i</td>
+                    <input type="hidden" value="@items.ConceptId" name="conceptId" />
+                    <td><img src="@items.ConceptPicture" style="max-width: 100px" /></td>
+                    <td>@items.ConceptName</td>
+                    <td>@items.ConceptDescription</td>
+                    <td>
+                        <a href="@Url.Action("editConcept", new { conceptID = items.ConceptId })" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
+                        @*<button type="button" onclick="DeleteConcept(@items.ConceptId);" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>*@
+                    </td>
+                </tr>
+                i++;
+            }
+        </tbody>
+    @*}*@
 </table>
 @section scripts{
     <script>
 
-        function DeleteImage() {
+        function DeleteConcept(conceptId) {
             swal({
                 title: 'Bạn có chắc chắn xóa?',
                 text: "",
@@ -64,7 +64,32 @@
                 cancelButtonText: 'Không'
 
             }).then(function () {
-                $("#deleteConceptForm").submit();
+                $.ajax({
+                    method: 'POST',
+                    url: "@Url.Action("deleteConcept", "Object")",
+                    data: { conceptId: conceptId },
+                    success: function (result) {
+                        if (result.success) {
+                            swal({
+                                text: result.message,
+                                type: 'success',
+                            }).then(function () {
+                                location.reload();
+                            });
+                        } else {
+                            swal({
+                                text: result.message,
+                                type: 'error',
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        swal({
+                            text: "Đã có lỗi xảy ra!",
+                            type: 'error',
+                        });
+                    }
+                });
             })
 
         }
