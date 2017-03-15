@@ -11,17 +11,19 @@
         
         
         
-        <EntityTypeShape EntityType="CapstoneModel.AspNetRole" Width="1.5" PointX="8.7682746130825358" PointY="18.935450696822" />
-        <EntityTypeShape EntityType="CapstoneModel.AspNetUserClaim" Width="1.5" PointX="2.6388959896931872" PointY="8.9989726883354475" />
-        <EntityTypeShape EntityType="CapstoneModel.AspNetUserLogin" Width="1.5" PointX="1.18364898729308" PointY="6.3070594101711457" />
-        <EntityTypeShape EntityType="CapstoneModel.AspNetUser" Width="1.5" PointX="8.7973009929048374" PointY="20.598546544368634" />
-        <EntityTypeShape EntityType="CapstoneModel.Concept" Width="1.5" PointX="0.69635010356844873" PointY="26.545585301958763" />
-        <EntityTypeShape EntityType="CapstoneModel.Face" Width="1.5" PointX="7.0643876619005512" PointY="30.875156148744352" />
-        <EntityTypeShape EntityType="CapstoneModel.Log" Width="1.5" PointX="11.322909000945701" PointY="3.1540233954573158" />
-        <EntityTypeShape EntityType="CapstoneModel.LogObject" Width="1.5" PointX="2.9422132889471078" PointY="19.888384113036274" />
-        <EntityTypeShape EntityType="CapstoneModel.Person" Width="1.5" PointX="11.125003046880011" PointY="20.984202469226066" />
-        <EntityTypeShape EntityType="CapstoneModel.PersonGroup" Width="1.5" PointX="1.3546657289167241" PointY="13.757409966437802" />
-        <EntityTypeShape EntityType="CapstoneModel.Picture" Width="1.5" PointX="8.7647921167150109" PointY="24.121170919444957" />
+        
+        <EntityTypeShape EntityType="CapstoneModel.AspNetRole" Width="1.5" PointX="7.6922176571992313" PointY="18.686404147505016" />
+        <EntityTypeShape EntityType="CapstoneModel.AspNetUserClaim" Width="1.5" PointX="0.57025019851059189" PointY="28.20891348841084" />
+        <EntityTypeShape EntityType="CapstoneModel.AspNetUserLogin" Width="1.5" PointX="0.914121749305223" PointY="16.607456349119293" />
+        <EntityTypeShape EntityType="CapstoneModel.AspNetUser" Width="1.5" PointX="6.5045738716165413" PointY="8.12220639368622" />
+        <EntityTypeShape EntityType="CapstoneModel.Concept" Width="1.5" PointX="10.804444865698201" PointY="6.6374633939179883" />
+        <EntityTypeShape EntityType="CapstoneModel.Face" Width="1.5" PointX="10.677438921610563" PointY="28.775527401257087" />
+        <EntityTypeShape EntityType="CapstoneModel.Log" Width="1.5" PointX="7.9075246266590078" PointY="1.9513666787889632" />
+        <EntityTypeShape EntityType="CapstoneModel.LogObject" Width="1.5" PointX="2.879169217720241" PointY="22.609414886035683" />
+        <EntityTypeShape EntityType="CapstoneModel.Person" Width="1.5" PointX="4.3161690851283119" PointY="26.62402918684484" />
+        <EntityTypeShape EntityType="CapstoneModel.PersonGroup" Width="1.5" PointX="6.9149906984134528" PointY="18.367080324500371" />
+        <EntityTypeShape EntityType="CapstoneModel.Picture" Width="1.5" PointX="3.7567327375322268" PointY="0.95574532493750808" />
+        <EntityTypeShape EntityType="CapstoneModel.sysdiagram" Width="1.5" PointX="5.1257809908714993" PointY="2.0415395209759191" />
         <AssociationConnector Association="CapstoneModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" />
         <AssociationConnector Association="CapstoneModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" />
         <AssociationConnector Association="CapstoneModel.FK_Log_AspNetUsers" />
@@ -30,6 +32,24 @@
         <AssociationConnector Association="CapstoneModel.FK_Face_Person" />
         <AssociationConnector Association="CapstoneModel.FK_Person_PersonGroup" />
         <AssociationConnector Association="CapstoneModel.AspNetUserRoles" />
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         

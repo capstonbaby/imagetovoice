@@ -70,7 +70,7 @@ namespace AAIV_WEB.Controllers
             ViewBag.ReturnUrl = returnUrl;
             if (System.Web.HttpContext.Current.User.IsInRole("Admin"))
             {
-                return RedirectToAction("viewAllConcept", "Object", new { area = "Admin" });
+                return RedirectToAction("Index", "User", new { area = "Admin" });
             } else if (System.Web.HttpContext.Current.User.IsInRole("User"))
             {
                 return RedirectToAction("Index", "Face", new { area = "User" });
@@ -95,7 +95,18 @@ namespace AAIV_WEB.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToAction("viewAllConcept", "Object", new { area = "Admin"});
+                    {
+                        var service = this.Service<IAspNetUserService>();
+                        var user = service.Get(q => q.Email.Equals(model.Email)).FirstOrDefault();
+                        if (user.Active)
+                        {
+                            return RedirectToAction("Index", "User", new { area = "Admin" });
+                        }else
+                        {
+                            ModelState.AddModelError("", "Tài khoản đã bị khóa.");
+                            return View(model);
+                        }
+                    }
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:

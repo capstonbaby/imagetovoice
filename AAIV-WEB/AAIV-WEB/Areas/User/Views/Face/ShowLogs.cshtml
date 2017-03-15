@@ -4,11 +4,9 @@
     IEnumerable<PersonViewModel> personList = ViewBag.personList;
     var i = 1;
 }
-
 <h1 class="page-header">Người chưa nhận diện được</h1>
 
-<table class="table table-hover">
-
+<table id="myTable" class="table table-hover" cellspacing="0" width="100%">
     <thead>
         <tr>
             <th>No.</th>
@@ -98,6 +96,11 @@
 
 @section scripts{
     <script>
+
+        $(function () {
+            $('#myTable').DataTable();
+        });
+
         $(document).on("click", "#add-face", function () {
             var logImage = $(this).data("image");
             var name = $(this).data("name");
@@ -139,6 +142,8 @@
                 cancelButtonText: 'Không'
 
             }).then(function () {
+                $('.loader').show();
+                $('.dim-background').show();
                 $.ajax({
                     url: "@Url.Action("UpdateLogToPerson", "Face")",
                     type: 'POST',
@@ -146,8 +151,9 @@
                         personID: updatePerson,
                         logID: id
                     },
-
                     success: function (data) {
+                        $('.loader').hide();
+                        $('.dim-background').hide();
                         if (data.success) {
                             swal({
                                 text: data.message,
@@ -165,6 +171,8 @@
                         }
                     },
                     error: function (error) {
+                        $('.loader').hide();
+                        $('.dim-background').hide();
                         swal({
                             title: "Đã có lỗi xảy ra, vui lòng thử lại sau.",
                             type: 'error',

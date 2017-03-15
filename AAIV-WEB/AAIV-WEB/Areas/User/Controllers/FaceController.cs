@@ -103,7 +103,6 @@ namespace AAIV_WEB.Areas.User.Controllers
                         PersonGroupId = personGroup.PersonGroupId,
                         Active = true,
                         PersonId = personCreateResult.PersonId.ToString(),
-                        IsTrained = true,
                     };
                     await personService.CreateAsync(newPerson);
                     progressHub.SendMessage("50%", 50);
@@ -257,27 +256,35 @@ namespace AAIV_WEB.Areas.User.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                var user = Util.getCurrentUser(this);
-                var personGroup = personGroupService.Get(user.Id);
-
-                var deletePerson = personService.Get(id);
-                //Delete in Microsoft
-                Guid personID = new Guid(deletePerson.PersonId);
-                await faceServiceClient.DeletePersonAsync(personGroup.PersonGroupId, personID);
-
-                //Delete in Database
-
-                await personService.DeactivateAsync(deletePerson);
-
-                foreach (var item in deletePerson.Faces)
+                try
                 {
-                    await faceService.DeactivateAsync(item);
+                    var user = Util.getCurrentUser(this);
+                    var personGroup = personGroupService.Get(user.Id);
+
+                    var deletePerson = personService.Get(id);
+                    //Delete in Microsoft
+                    Guid personID = new Guid(deletePerson.PersonId);
+                    await faceServiceClient.DeletePersonAsync(personGroup.PersonGroupId, personID);
+
+                    //Delete in Database
+
+                    await personService.DeactivateAsync(deletePerson);
+
+                    foreach (var item in deletePerson.Faces)
+                    {
+                        await faceService.DeactivateAsync(item);
+                    }
+
+                    //Train Person
+                    await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupId);
+
+                    return Json(new { message = "Xóa thành công", success = true });
                 }
+                catch (Exception ex)
+                {
 
-                //Train Person
-                await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupId);
-
-                return Json(new { message = "Xóa thành công", success = true });
+                    throw;
+                }
             }
             else
             {
@@ -303,15 +310,14 @@ namespace AAIV_WEB.Areas.User.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> UpdatePerson(PersonViewModel person, IEnumerable<HttpPostedFileBase> file)
+
+        public async Task<JsonResult> UpdatePersonInfo(PersonViewModel person)
         {
             var personService = this.Service<IPersonService>();
             var personGroupService = this.Service<IPersonGroupService>();
             var userService = this.Service<IAspNetUserService>();
-            var faceService = this.Service<IFaceService>();
 
-            if (User.Identity.IsAuthenticated)
-
+            try
             {
                 var user = Util.getCurrentUser(this);
                 var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
@@ -321,12 +327,49 @@ namespace AAIV_WEB.Areas.User.Controllers
                 var updatePerson = personService.Get(person.PersonId);
                 Guid personID = new Guid(updatePerson.PersonId);
 
-                var personUpdateResult = faceServiceClient.UpdatePersonAsync(personGroupID, personID, person.Name, person.Description);
+                await faceServiceClient.UpdatePersonAsync(personGroupID, personID, person.Name, person.Description);
+
+                //train
+                await faceServiceClient.TrainPersonGroupAsync(personGroupID);
 
                 //Update in Database
                 updatePerson.Name = person.Name;
                 updatePerson.Description = person.Description;
                 personService.Save();
+
+
+                return Json(new { message = "Cập nhật thành công", success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { message = "Cập nhật thất bại", success = false });
+            }
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> AddPersonFace(PersonViewModel person, IEnumerable<HttpPostedFileBase> file)
+        {
+            var personService = this.Service<IPersonService>();
+            var personGroupService = this.Service<IPersonGroupService>();
+            var userService = this.Service<IAspNetUserService>();
+            var faceService = this.Service<IFaceService>();
+
+            try
+            {
+                var user = Util.getCurrentUser(this);
+                var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
+
+                //Update in Microsoft
+
+                var updatePerson = personService.Get(person.PersonId);
+                Guid personID = new Guid(updatePerson.PersonId);
+
+                //var personUpdateResult = faceServiceClient.UpdatePersonAsync(personGroupID, personID, person.Name, person.Description);
+
+                //Update in Database
+                //updatePerson.Name = person.Name;
+                //updatePerson.Description = person.Description;
+                //personService.Save();
 
                 //Upload imageS
                 if (file.Count() > 0 && file.FirstOrDefault() != null)
@@ -362,15 +405,14 @@ namespace AAIV_WEB.Areas.User.Controllers
                             Active = true
                         };
                         await faceService.CreateAsync(face);
-
                     }
+                    //return Json(new { message = "Cập nhật thành công", success = true });
                 }
-
-                return RedirectToAction("UpdatePerson", "Face", new { id = person.PersonId });
+                return Json(new { message = "Cập nhật thành công", success = true });
             }
-            else
+            catch (Exception ex)
             {
-                return RedirectToAction("Login", "Account");
+                return Json(new { message = "Cập nhật thất bại", success = false });
             }
 
         }

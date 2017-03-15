@@ -1,0 +1,51 @@
+﻿@model IEnumerable<AspNetUserEditViewModel>
+@{
+    ViewBag.Title = "Tài khoản";
+}
+
+<h1 class="page-header">Danh sách tài khoản</h1>
+
+<a href="javascript:document.getElementById('deactive-form').submit()" id="btn-save" class="btn btn-success pull-right" style="display:none"><i class="glyphicon glyphicon-check"></i> Cập nhật</a>
+<form action="@Url.Action("DeactivateAccounts", "User")" method="post" id="deactive-form">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tài khoản</th>
+                <th>Email</th>
+                <th>Số điện thoại</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in this.Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.UserName</td>
+                    <td>@item.Email</td>
+                    <td>@item.PhoneNumber</td>
+                    <td>
+                        <input type="checkbox" name="SeletedUsers" id="SeletedUsers" class="myCheckBox" checked="@item.Active" 
+                               data-toggle="toggle" 
+                               data-onstyle="success"
+                               value="@item.Id">
+                    </td>
+                </tr>
+                @Html.Hidden(item.Id)
+            }
+        </tbody>
+    </table>
+</form>
+
+
+@section scripts{
+    <script>
+        $(function () {
+            $('.myCheckBox').change(function () {
+                $('#btn-save').show(500);
+            })
+        })
+    </script>
+}
+
