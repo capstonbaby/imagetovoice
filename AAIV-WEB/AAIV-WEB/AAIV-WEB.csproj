@@ -738,6 +738,7 @@
     <Content Include="Content\dropzone\dropzone.min.js" />
     <Content Include="Content\dropzone\images\spritemap%402x.png" />
     <Content Include="Content\dropzone\images\spritemap.png" />
+    <Content Include="Content\icon\add-image.png" />
     <Content Include="Content\sweetalert\sweetalert2.css" />
     <Content Include="Content\sweetalert\sweetalert2.js" />
     <Content Include="Content\sweetalert\sweetalert2.min.css" />

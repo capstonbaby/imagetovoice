@@ -75,12 +75,17 @@
                 cancelButtonText: 'Không'
 
             }).then(function () {
+                $('.loader').show();
+                $('.dim-background').show();
+
                 $.ajax({
                     url: "@Url.Action("DeletePerson", "Face")",
                     type: 'POST',
                     data: { id: i },
 
                     success: function (data) {
+                        $('.loader').hide();
+                        $('.dim-background').hide();
                         if (data.success) {
                             swal({
                                 text: data.message,
@@ -98,6 +103,8 @@
                         }
                     },
                     error: function (error) {
+                        $('.loader').hide();
+                        $('.dim-background').hide();
                         swal({
                             title: "Đã có lỗi xảy ra, vui lòng thử lại sau.",
                             type: 'error',

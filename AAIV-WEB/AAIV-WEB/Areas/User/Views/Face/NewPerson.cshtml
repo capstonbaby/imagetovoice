@@ -41,40 +41,48 @@
         </div>
 
         <div class="col-md-6">
-            @if (Model.LogImage != null)
-            {
-                <div class="form-group">
-                    @Html.HiddenFor(q => q.LogImage)
-                    @Html.HiddenFor(q => q.LogID)
-                    <img src="@Model.LogImage" style="max-width: 150px"/>
-                </div>
-                
-            }
+            @*@if (Model.LogImage != null)
+                {
+                    <div class="form-group">
+                        @Html.HiddenFor(q => q.LogImage)
+                        @Html.HiddenFor(q => q.LogID)
+                        <img src="@Model.LogImage" style="max-width: 150px"/>
+                    </div>
+
+                }*@
             <div class="form-group">
+                @*<div class="col-md-6">*@
                 <label>Hình ảnh</label>
-                <input type="file" name="file" id="file" style="width: 100%;" multiple />
-                <div class="gallery"></div>
+                <input type="file" name="file" id="file" style="width: 100%; visibility:hidden" multiple />
+
+
+                @if (Model.LogImage != null)
+                {
+                    <div class="col-lg-3 col-md-4 col-xs-6 thumb">
+                        <div class="form-group">
+                            @Html.HiddenFor(q => q.LogImage)
+                            @Html.HiddenFor(q => q.LogID)
+                            <img class="img-responsive" src="@Model.LogImage" alt="" />
+                        </div>
+                    </div>
+                }
+
+
+                <div id="imagePreview"></div>
+
+
+
+                <div class="col-lg-3 col-md-4 col-xs-6 thumb" style="vertical-align:middle; text-align:center">
+                    <button type="button" class="btn btn-default btn-circle btn-xl" onclick="AddImage()">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+                @*</div>*@
 
             </div>
-
         </div>
     }
 
-    @*Dropzone
-    <div class="col-md-6">
-        <div class="form-group">
-            <label>Hình ảnh</label>
-
-            <form action="@Url.Action("Uploader", "Face")" method="post" enctype="multipart/form-data" class="dropzone" id="dropzoneForm">
-                <div class="jumbotron">
-                    <div class="fallback">
-                        <input name="file" type="file" multiple />
-                    </div>
-                </div>
-            </form>
-        </div>
-
-    </div>*@
 
 </div>
 
@@ -106,36 +114,20 @@
         }
 
 
-        //File Upload response from the server
-        //Dropzone.options.dropzoneForm = {
-        //    init: function () {
-        //        this.on("maxfilesexceeded", function (data) {
-        //            var res = eval('(' + data.xhr.responseText + ')');
+        function AddImage() {
+            $('#file').trigger('click');
 
-        //        });
-        //        this.on("addedfile", function (file) {
+            $('#file').change(function () {
+                var fileList = this.files;
+                for (var i = 0; i < fileList.length; i++) {
+                    //get a blob
+                    var t = window.URL || window.webkitURL;
+                    var objectUrl = t.createObjectURL(fileList[i]);
+                    $('#imagePreview').append('<div class="col-lg-3 col-md-4 col-xs-6 thumb"> <img class="img-responsive" alt="" src="' + objectUrl + '" /> </div> ');
 
-        //            // Create the remove button
-        //            var removeButton = Dropzone.createElement("<button>Remove file</button>");
+                }
+            })
+        }
 
-        //            // Capture the Dropzone instance as closure.
-        //            var _this = this;
-
-        //            // Listen to the click event
-        //            removeButton.addEventListener("click", function (e) {
-        //                // Make sure the button click doesn't submit the form:
-        //                e.preventDefault();
-        //                e.stopPropagation();
-        //                // Remove the file preview.
-        //                _this.removeFile(file);
-        //                // If you want to the delete the file on the server as well,
-        //                // you can do the AJAX request here.
-        //            });
-
-        //            // Add the button to the file preview element.
-        //            file.previewElement.appendChild(removeButton);
-        //        });
-        //    }
-        //};
     </script>
 }
