@@ -71,7 +71,8 @@ namespace AAIV_WEB.Controllers
             if (System.Web.HttpContext.Current.User.IsInRole("Admin"))
             {
                 return RedirectToAction("Index", "User", new { area = "Admin" });
-            } else if (System.Web.HttpContext.Current.User.IsInRole("User"))
+            }
+            else if (System.Web.HttpContext.Current.User.IsInRole("User"))
             {
                 return RedirectToAction("Index", "Face", new { area = "User" });
             }
@@ -89,6 +90,14 @@ namespace AAIV_WEB.Controllers
             {
                 return View(model);
             }
+
+            var service = this.Service<IAspNetUserService>();
+            var user = service.Get(q => q.Email.Equals(model.Email)).FirstOrDefault();
+            if (!user.Active)
+            {
+                ModelState.AddModelError("", "Tài khoản đã bị khóa.");
+                return View(model);
+            }
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
             var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
@@ -96,16 +105,7 @@ namespace AAIV_WEB.Controllers
             {
                 case SignInStatus.Success:
                     {
-                        var service = this.Service<IAspNetUserService>();
-                        var user = service.Get(q => q.Email.Equals(model.Email)).FirstOrDefault();
-                        if (user.Active)
-                        {
-                            return RedirectToAction("Index", "User", new { area = "Admin" });
-                        }else
-                        {
-                            ModelState.AddModelError("", "Tài khoản đã bị khóa.");
-                            return View(model);
-                        }
+                        return RedirectToAction("Index", "User", new { area = "Admin" });
                     }
                 case SignInStatus.LockedOut:
                     return View("Lockout");
