@@ -55,7 +55,6 @@ namespace AAIV_WEB.Areas.Admin.Controllers
             var conceptService = this.Service<IConceptService>();
             if (conceptService != null)
             {
-                // nope tra ve void thi biet the nao da duoc tao hay la chua
                 await conceptService.CreateAsync(addConcept);
                 var concepts = conceptService.Get(q => q.ConceptName.Equals(conceptName)).FirstOrDefault();
                 int conceptid = concepts.ConceptId;
@@ -71,10 +70,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                         {
                             string createImgURI = Constant.Get_Create_IMG_API_URL(image_url, conceptid);
                             var createImgResponse = HttpClientHelper.Get(createImgURI);
-                            string trainURI = Constant.TRAIN_API;
-                            var trainResponse = HttpClientHelper.Get(trainURI);
-
-                            if (createImgResponse != null && trainResponse != null)
+                            if (createImgResponse != null)
                             {
                                 var addImage = new Picture
                                 {
@@ -92,7 +88,12 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                                 }
                             }
                         }
-                        return Json(new { success = true, message = "Tạo mới thành công!" });
+                        string trainURI = Constant.TRAIN_API;
+                        var trainResponse = HttpClientHelper.Get(trainURI);
+                        if (trainResponse != null)
+                        {
+                            return Json(new { success = true, message = "Tạo mới thành công!" });
+                        }
                     }
                     else
                     {
@@ -154,28 +155,12 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                             var entity = logObjectService.Get(logId);
                             await picService.CreateAsync(addImage);
                             await logObjectService.DeactivateAsync(entity);
+                            return Json(new { success = false, message = "Cập nhật thành công!" });
                         }
-                        else
-                        {
-                            TempData["message"] = "Service không hoạt động!";
-                            return RedirectToAction("addObject", "Object", new { area = "Admin" });
-                        }
-                        return RedirectToAction("Index", "Object", new { area = "Admin" });
                     }
-                    else
-                    {
-                        TempData["message"] = "Service không hoạt động!";
-                        return RedirectToAction("addObject", "Object", new { area = "Admin" });
-                    }
-                }
-                else
-                {
-                    TempData["message"] = "Tạo mới thất bại! Vui lòng thử lại!";
-                    return RedirectToAction("addObject", "Object", new { area = "Admin" });
                 }
             }
-            return RedirectToAction("addNewConcept", "Object", new { imgUrl = ImageUrl, logId = logId, area = "Admin" });
-
+            return Json(new { success = false, message = "Cập nhật thất bại! Vui lòng thử lại!" });
         }
         public ActionResult addNewConcept(int logId)
         {
@@ -221,9 +206,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                         var entity = logObjectService.Get(logId);
                         string createImgURI = Constant.Get_Create_IMG_API_URL(entity.ImageURL, concepts.ConceptId);
                         var createImgResponse = HttpClientHelper.Get(createImgURI);
-                        string trainURI = Constant.TRAIN_API;
-                        var trainResponse = HttpClientHelper.Get(trainURI);
-                        if (createImgResponse != null && trainResponse != null)
+                        if (createImgResponse != null)
                         {
                             var addImage = new Picture
                             {
@@ -233,13 +216,17 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                                 Description = conceptDes
                             };
                             var picService = this.Service<IPictureService>();
-
                             if (picService != null)
                             {
                                 await picService.CreateAsync(addImage);
                                 await logObjectService.DeactivateAsync(entity);
-                                return Json(new { success = true, message = "Tạo mới thành công!" });
                             }
+                        }
+                        string trainURI = Constant.TRAIN_API;
+                        var trainResponse = HttpClientHelper.Get(trainURI);
+                        if (trainResponse != null)
+                        {
+                            return Json(new { success = true, message = "Tạo mới thành công!" });
                         }
                     }
                 }
@@ -316,17 +303,18 @@ namespace AAIV_WEB.Areas.Admin.Controllers
         {
             var service = this.Service<IConceptService>();
             var pictureService = this.Service<IPictureService>();
-
             var model = service.GetActive()
                 .ProjectTo<ConceptEditViewModel>(this.MapperConfig)
                 .ToList();
-
             foreach (var concept in model)
             {
-                var conceptPicture = pictureService.GetActive(q => q.ConceptId == concept.ConceptId).First().ImageURL;
-                concept.ConceptPicture = conceptPicture;
+                var conceptPicture = pictureService.GetActive(q => q.ConceptId == concept.ConceptId).FirstOrDefault();
+                if (null != conceptPicture)
+                {
+                    var conceptPicUrl = conceptPicture.ImageURL;
+                    concept.ConceptPicture = conceptPicUrl;
+                }
             }
-
             return View(model);
         }
         public ActionResult editConcept(int conceptId)
@@ -381,9 +369,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                     {
                         string createImgURI = Constant.Get_Create_IMG_API_URL(image_Url, conceptid);
                         var createImgResponse = HttpClientHelper.Get(createImgURI);
-                        string trainURI = Constant.TRAIN_API;
-                        var trainResponse = HttpClientHelper.Get(trainURI);
-                        if (createImgResponse != null && trainResponse != null)
+                        if (createImgResponse != null)
                         {
                             var addImage = new Picture
                             {
@@ -396,10 +382,15 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                             if (picService != null)
                             {
                                 await picService.CreateAsync(addImage);
-                                return Json(new { success = true, message = "Cập nhật thành công!" });
                             }
                         }
                         return Json(new { success = false, message = "Cập nhật thất bại! Vui lòng thử lại!" });
+                    }
+                    string trainURI = Constant.TRAIN_API;
+                    var trainResponse = HttpClientHelper.Get(trainURI);
+                    if (trainResponse != null)
+                    {
+                        return Json(new { success = true, message = "Cập nhật thành công!" });
                     }
                 }
                 return Json(new { success = true, message = "Cập nhật thành công!" });
@@ -431,26 +422,28 @@ namespace AAIV_WEB.Areas.Admin.Controllers
             if (conService != null && picService != null)
             {
                 var entityConcept = conService.Get(conceptId);
-                var entityPic = picService.GetActive(q => q.ConceptId == conceptId).ProjectTo<PictureViewModel>(this.MapperConfig);
+                var entityPic = picService.GetActive(q => q.ConceptId == conceptId)
+                    .ProjectTo<PictureViewModel>(this.MapperConfig)
+                    .ToList();
                 foreach (var picEntity in entityPic)
                 {
-                    //string delImgURI = Constant.DEL_IMG_API + picEntity.PictureId;
-                    //var delImgResponse = HttpClientHelper.Get(delImgURI);
-                    //if (delImgResponse != null)
-                    //{
-                        var picItem = await picService.GetAsync(picEntity.PictureId);
-                         await picService.DeactivateAsync(picItem);
-                    //}
+                    string delImgURI = Constant.DEL_IMG_API + picEntity.PictureId;
+                    var delImgResponse = HttpClientHelper.Get(delImgURI);
+                    if (delImgResponse != null)
+                    {
+                        var picItem = picService.Get(picEntity.PictureId);
+                        await picService.DeactivateAsync(picItem);
+                    }
                 }
-                //string delConceptURI = Constant.DEL_CONCEPT_API + conceptId;
-                //var delConceptPesponse = HttpClientHelper.Get(delConceptURI);
-                //string trainURI = Constant.TRAIN_API;
-                //var trainResponse = HttpClientHelper.Get(trainURI);
-                //if (delConceptPesponse != null && trainResponse != null)
-                //{
+                string delConceptURI = Constant.DEL_CONCEPT_API + conceptId;
+                var delConceptPesponse = HttpClientHelper.Get(delConceptURI);
+                string trainURI = Constant.TRAIN_API;
+                var trainResponse = HttpClientHelper.Get(trainURI);
+                if (delConceptPesponse != null && trainResponse != null)
+                {
                     await conService.DeactivateAsync(entityConcept);
                     return Json(new { success = true, message = "Xóa đồ vật thành công!" });
-                //}
+                }
             }
             return Json(new { success = false, message = "Xóa đồ vật thất bại! Vui lòng thử lại!" });
         }
@@ -489,20 +482,26 @@ namespace AAIV_WEB.Areas.Admin.Controllers
         {
             var picIdArray = picIdList.Split(',');
             var picService = this.Service<IPictureService>();
-            foreach (var picId in picIdArray)
+            if (picService != null)
             {
-                string delImgURI = Constant.DEL_IMG_API + picId;
-                var delImgResponse = HttpClientHelper.Get(delImgURI);
+                foreach (var picId in picIdArray)
+                {
+                    if(picId != null)
+                    {
+                        string delImgURI = Constant.DEL_IMG_API + picId;
+                        var delImgResponse = HttpClientHelper.Get(delImgURI);
+                        if (delImgResponse != null)
+                        {
+                            var entity = picService.Get(picId);
+                            await picService.DeactivateAsync(entity);
+                        }
+                    }                    
+                }
                 string trainURI = Constant.TRAIN_API;
                 var trainResponse = HttpClientHelper.Get(trainURI);
-                if (delImgResponse != null && trainResponse != null)
+                if (trainResponse != null)
                 {
-                    if (picService != null)
-                    {
-                        var entity = picService.Get(picId);
-                        await picService.DeactivateAsync(entity);
-                        return Json(new { success = true, message = "Xóa hình thành công!" });
-                    }
+                    return Json(new { success = true, message = "Xóa hình thành công!" });
                 }
             }
             return Json(new { success = false, message = "Xóa hình thất bại! Vui lòng thử lại!" });
@@ -521,27 +520,5 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Xóa log thất bại! Vui lòng thử lại!" });
             }
         }
-        public KeyValuePair<int, double> getValueConcept(string url)
-        {
-
-            if (url != null)
-            {
-
-                string detectURI = Constant.DETECT_API + url;
-                var detectResponse = HttpClientHelper.Get(detectURI);
-                if (detectResponse != null)
-                {
-                    var obj = JObject.Parse(detectResponse);
-                    var value = (double)obj["outputs"][0]["data"]["concepts"][0]["value"];
-                    var id = (int)obj["outputs"][0]["data"]["concepts"][0]["id"];
-                    return new KeyValuePair<int, double>(id, value);
-                }
-
-            }
-            return new KeyValuePair<int, double>();
-
-        }
-
     }
-
 }

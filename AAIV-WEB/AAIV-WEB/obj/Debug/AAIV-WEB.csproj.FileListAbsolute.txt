@@ -63,3 +63,4 @@ C:\Users\dyu\Documents\CapstoneProject\imagetovoice\AAIV-WEB\AAIV-WEB\bin\AAIV-W
 C:\Users\dyu\Documents\CapstoneProject\imagetovoice\AAIV-WEB\AAIV-WEB\bin\AAIV-WEB.dll
 C:\Users\dyu\Documents\CapstoneProject\imagetovoice\AAIV-WEB\AAIV-WEB\bin\AAIV-WEB.pdb
 C:\Users\dyu\Documents\CapstoneProject\imagetovoice\AAIV-WEB\AAIV-WEB\obj\Debug\AAIV-WEB.csprojResolveAssemblyReference.cache
+C:\Users\dyu\Documents\CapstoneProject\imagetovoice\AAIV-WEB\AAIV-WEB\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
