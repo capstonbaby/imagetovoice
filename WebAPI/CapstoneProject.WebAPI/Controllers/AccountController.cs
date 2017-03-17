@@ -1,6 +1,7 @@
 ﻿using CapstoneProject.WebAPI.Models;
 using CapstoneProject.WebAPI.Models.Entities;
 using CapstoneProject.WebAPI.Models.Entities.Services;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.ProjectOxford.Face;
 using SkyWeb.DatVM.Mvc;
@@ -70,7 +71,7 @@ namespace CapstoneProject.WebAPI.Controllers
                     case SignInStatus.Success:
                         {
                             var user = userService.Get(q => q.Email.Equals(model.Email)).FirstOrDefault();
-                            if (user.Active)
+                            if (user.Active && user.AspNetRoles.Any(q => !q.Name.Equals("Admin")))
                             {
                                 var personGroupList = personGroupService.GetActive(q => q.UserId.Equals(user.Id)).ToList();
                                 var popular_groupId = personGroupList.Where(q => q.Type == 1).FirstOrDefault().PersonGroupId;
@@ -96,7 +97,7 @@ namespace CapstoneProject.WebAPI.Controllers
                                 return Json(new
                                 {
                                     success = false,
-                                    message = "Tài Khoản đã bị khóa",
+                                    message = "Tài Khoản đã bị khóa hoặc không hợp lệ.",
                                 });
                             }
                             
@@ -148,6 +149,8 @@ namespace CapstoneProject.WebAPI.Controllers
                 {
                     var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                     var result = await UserManager.CreateAsync(user, model.Password);
+                    //add user to role 'User'
+                    UserManager.AddToRole(user.Id, "User");
                     if (result.Succeeded)
                     {
                         try
@@ -156,16 +159,51 @@ namespace CapstoneProject.WebAPI.Controllers
                             if (userEntity != null)
                             {
 
-                                //create person group in MCS
-                                await faceServiceClient.CreatePersonGroupAsync(user.Id, user.UserName, null);
-
-                                //create person group in Db
+                                #region Popular person group
+                                //popular person group
                                 await personGroupService.CreateAsync(new PersonGroup
                                 {
-                                    PersonGroupId = user.Id,
-                                    PersonGroupName = user.UserName,
-                                    Active = true,
+                                    PersonGroupId = "popular_" + user.Id,
+                                    PersonGroupName = "Popular_" + user.UserName,
+                                    Description = user.UserName + " popular person group",
+                                    UserId = user.Id,
+                                    Type = 1,
+                                    Active = true
                                 });
+                                //create popular person group in Microsoft
+                                await faceServiceClient.CreatePersonGroupAsync("popular_" + user.Id, "Popular_" + user.UserName, user.UserName + " popular person group");
+                                #endregion
+
+                                #region Normal person group
+                                //normal person group
+                                await personGroupService.CreateAsync(new PersonGroup
+                                {
+                                    PersonGroupId = "normal_" + user.Id,
+                                    PersonGroupName = "Normal_" + user.UserName,
+                                    Description = user.UserName + " normal person group",
+                                    UserId = user.Id,
+                                    Type = 2,
+                                    Active = true
+                                });
+                                //create normal person group in Microsoft
+                                await faceServiceClient.CreatePersonGroupAsync("normal_" + user.Id, "Normal_" + user.UserName, user.UserName + " normal person group");
+                                #endregion
+
+                                #region Fresh person group
+                                //popular fresh person group
+                                await personGroupService.CreateAsync(new PersonGroup
+                                {
+                                    PersonGroupId = "fresh_" + user.Id,
+                                    PersonGroupName = "Fresh_" + user.UserName,
+                                    Description = user.UserName + " fresh person group",
+                                    UserId = user.Id,
+                                    Type = 3,
+                                    Active = true
+                                });
+                                //create fresh person group in Microsoft
+                                await faceServiceClient.CreatePersonGroupAsync("fresh_" + user.Id, "Fresh_" + user.UserName, user.UserName + " fresh person group");
+                                #endregion
+
 
                                 return Json(new
                                 {
