@@ -21,6 +21,7 @@ namespace AAIV_WEB.Models.Entities
             this.AspNetUserLogins = new HashSet<AspNetUserLogin>();
             this.Logs = new HashSet<Log>();
             this.LogObjects = new HashSet<LogObject>();
+            this.PersonGroups = new HashSet<PersonGroup>();
             this.AspNetRoles = new HashSet<AspNetRole>();
         }
     
@@ -36,6 +37,7 @@ namespace AAIV_WEB.Models.Entities
         public bool LockoutEnabled { get; set; }
         public int AccessFailedCount { get; set; }
         public string UserName { get; set; }
+        public Nullable<int> TotalDetect { get; set; }
         public bool Active { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -46,6 +48,8 @@ namespace AAIV_WEB.Models.Entities
         public virtual ICollection<Log> Logs { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<LogObject> LogObjects { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<PersonGroup> PersonGroups { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AspNetRole> AspNetRoles { get; set; }
     }

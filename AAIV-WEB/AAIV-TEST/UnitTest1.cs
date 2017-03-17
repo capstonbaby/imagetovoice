@@ -12,7 +12,7 @@ namespace AAIV_TEST
         {
                 double checkValue = 0.4;
                 ObjectController objController = new ObjectController();
-                KeyValuePair<int,double> value = objController.getValueConcept(url);
+                //KeyValuePair<int,double> value = objController.getValueConcept(url);
                 //Assert.AreEqual(true, (value > checkValue));
         }
     }

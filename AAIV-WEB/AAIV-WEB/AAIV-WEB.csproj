@@ -346,9 +346,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\Repositories\sysdiagramRepositoryGen.cs">
-      <DependentUpon>Repositories.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Entities\Services\AspNetRoleServiceGen.cs">
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
@@ -387,15 +384,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\Services\sysdiagramServiceGen.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Entities\sysdiagram.cs">
-      <DependentUpon>CapstoneEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Entities\sysdiagramRefined.cs">
-      <DependentUpon>EntityRefinery.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\AspNetRoleViewModelGen.cs">
@@ -431,9 +419,6 @@
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ViewModels\PictureViewModelGen.cs">
-      <DependentUpon>ViewModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\ViewModels\sysdiagramViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ViewModels\ViewModel.cs">
