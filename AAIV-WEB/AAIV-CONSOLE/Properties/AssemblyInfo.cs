@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AAIV-TEST")]
+[assembly: AssemblyTitle("AAIV-CONSOLE")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("AAIV-TEST")]
+[assembly: AssemblyProduct("AAIV-CONSOLE")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("93c6b342-d244-4c23-8a11-7b1c3e162aa6")]
+[assembly: Guid("188975c1-beb5-4f02-8e2e-6e72182a146d")]
 
 // Version information for an assembly consists of the following four values:
 //

@@ -1,0 +1,11 @@
+﻿
+@{
+    ViewBag.Title = "testValue";
+}
+
+<h2>View</h2>
+@using (Html.BeginForm("getValueConcept", "Object", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+<input type="text" name="test" id="test"/>
+<input type="submit" name="create" value="Kiểm tra" class="btn btn-success" />
+}
