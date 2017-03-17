@@ -421,28 +421,35 @@ namespace AAIV_WEB.Areas.Admin.Controllers
             var picService = this.Service<IPictureService>();
             if (conService != null && picService != null)
             {
-                var entityConcept = conService.Get(conceptId);
-                var entityPic = picService.GetActive(q => q.ConceptId == conceptId)
-                    .ProjectTo<PictureViewModel>(this.MapperConfig)
-                    .ToList();
-                foreach (var picEntity in entityPic)
+                try
                 {
-                    string delImgURI = Constant.DEL_IMG_API + picEntity.PictureId;
-                    var delImgResponse = HttpClientHelper.Get(delImgURI);
-                    if (delImgResponse != null)
+                    var entityConcept = conService.Get(conceptId);
+                    var entityPic = picService.GetActive(q => q.ConceptId == conceptId)
+                        .ProjectTo<PictureViewModel>(this.MapperConfig)
+                        .ToList();
+                    foreach (var picEntity in entityPic)
                     {
-                        var picItem = picService.Get(picEntity.PictureId);
+                        string delImgURI = Constant.DEL_IMG_API + picEntity.PictureId;
+                        var delImgResponse = HttpClientHelper.Get(delImgURI);
+                        if (delImgResponse != null)
+                        {
+                            var picItem = picService.Get(picEntity.PictureId);
                         await picService.DeactivateAsync(picItem);
+                        }
+                    }
+                    string delConceptURI = Constant.DEL_CONCEPT_API + conceptId;
+                    var delConceptPesponse = HttpClientHelper.Get(delConceptURI);
+                    string trainURI = Constant.TRAIN_API;
+                    var trainResponse = HttpClientHelper.Get(trainURI);
+                    if (delConceptPesponse != null && trainResponse != null)
+                    {
+                        await conService.DeactivateAsync(entityConcept);
+                    return Json(new { success = true, message = "Xóa đồ vật thành công!" });
                     }
                 }
-                string delConceptURI = Constant.DEL_CONCEPT_API + conceptId;
-                var delConceptPesponse = HttpClientHelper.Get(delConceptURI);
-                string trainURI = Constant.TRAIN_API;
-                var trainResponse = HttpClientHelper.Get(trainURI);
-                if (delConceptPesponse != null && trainResponse != null)
+                catch (Exception ex)
                 {
-                    await conService.DeactivateAsync(entityConcept);
-                    return Json(new { success = true, message = "Xóa đồ vật thành công!" });
+                    return Json(new { success = false, message = "Xóa đồ vật thất bại! Vui lòng thử lại!" });
                 }
             }
             return Json(new { success = false, message = "Xóa đồ vật thất bại! Vui lòng thử lại!" });

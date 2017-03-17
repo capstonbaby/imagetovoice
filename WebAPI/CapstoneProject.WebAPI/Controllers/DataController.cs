@@ -127,7 +127,7 @@ namespace CapstoneProject.WebAPI.Controllers
                 var faceServiceClient = Assets.client;
 
                 var entity = service.Get(q => q.PersonId == model.PersonId).FirstOrDefault();
-                if(entity != null)
+                if (entity != null)
                 {
                     entity.Name = model.Name;
                     entity.Description = model.Description;
@@ -166,6 +166,44 @@ namespace CapstoneProject.WebAPI.Controllers
                 {
                     success = false,
                     message = "Update Person Failed",
+                    error = ex.Message
+                });
+            }
+        }
+
+        public async Task<JsonResult> AddDetectCount(string personId)
+        {
+            try
+            {
+                var service = this.Service<IPersonService>();
+                var person = service.Get(personId);
+                if (person != null)
+                {
+                    person.Count += 1;
+                    await service.UpdateAsync(person);
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Update detect count successfully",
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Update detect count failed",
+                        error = "Person not found"
+                    });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Update detect count failed",
                     error = ex.Message
                 });
             }

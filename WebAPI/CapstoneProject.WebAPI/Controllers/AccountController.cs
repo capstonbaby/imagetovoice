@@ -72,7 +72,11 @@ namespace CapstoneProject.WebAPI.Controllers
                             var user = userService.Get(q => q.Email.Equals(model.Email)).FirstOrDefault();
                             if (user.Active)
                             {
-                                var personGroup = personGroupService.Get(user.Id);
+                                var personGroupList = personGroupService.GetActive(q => q.UserId.Equals(user.Id)).ToList();
+                                var popular_groupId = personGroupList.Where(q => q.Type == 1).FirstOrDefault().PersonGroupId;
+                                var normal_groupId = personGroupList.Where(q => q.Type == 2).FirstOrDefault().PersonGroupId;
+                                var fresh_groupId = personGroupList.Where(q => q.Type == 3).FirstOrDefault().PersonGroupId;
+
                                 return Json(new
                                 {
                                     success = true,
@@ -80,7 +84,9 @@ namespace CapstoneProject.WebAPI.Controllers
                                     data = new
                                     {
                                         username = user.UserName,
-                                        personGroupId = personGroup.PersonGroupId,
+                                        popular_personGroupId = popular_groupId,
+                                        normal_personGroupId = normal_groupId,
+                                        fresh_personGroupId = fresh_groupId,
                                         userId = user.Id
                                     },
                                 });

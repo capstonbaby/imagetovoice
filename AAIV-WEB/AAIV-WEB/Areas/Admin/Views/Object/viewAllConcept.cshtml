@@ -23,6 +23,7 @@
     <tbody>
         @foreach (var items in this.Model)
             {
+<<<<<<< HEAD
             <tr>
                 <td>@i</td>
                 <td><input type="hidden" value="@items.ConceptId" name="conceptId" /></td>
@@ -37,6 +38,25 @@
             i++;
         }
     </tbody>
+=======
+                <tr>
+                    <td>@i</td>
+                    <input type="hidden" value="@items.ConceptId" name="conceptId" />
+                    <td><img src="@items.ConceptPicture" style="max-width: 100px" /></td>
+                    <td>@items.ConceptName</td>
+                    <td>@items.ConceptDescription</td>
+                    <td>
+                        <a href="@Url.Action("editConcept", new { conceptID = items.ConceptId })" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
+                        <button type="button" onclick="DeleteConcept(@items.ConceptId);" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>
+                        @*<button type="button" onclick="DeleteImage();" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>*@
+                    </td>
+                </tr>
+                i++;
+            }
+        </tbody>
+    @*}*@
+    }
+>>>>>>> 1028ae3204bddbecfb21c6f53577d555037248cd
 </table>
 @section scripts{
     <script>

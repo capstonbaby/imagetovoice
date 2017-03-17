@@ -23,8 +23,11 @@ namespace CapstoneProject.WebAPI.Models.Entities
         public string PersonGroupId { get; set; }
         public string PersonGroupName { get; set; }
         public string Description { get; set; }
+        public string UserId { get; set; }
+        public Nullable<int> Type { get; set; }
         public bool Active { get; set; }
     
+        public virtual AspNetUser AspNetUser { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Person> People { get; set; }
     }
