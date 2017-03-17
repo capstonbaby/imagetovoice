@@ -70,32 +70,50 @@ namespace CapstoneProject.WebAPI.Controllers
                     case SignInStatus.Success:
                         {
                             var user = userService.Get(q => q.Email.Equals(model.Email)).FirstOrDefault();
-                            var personGroup = personGroupService.Get(user.Id);
-                            return Json(new
+                            if (user.Active)
                             {
-                                success = true,
-                                message = "Login Successfully",
-                                data = new
+                                var personGroupList = personGroupService.GetActive(q => q.UserId.Equals(user.Id)).ToList();
+                                var popular_groupId = personGroupList.Where(q => q.Type == 1).FirstOrDefault().PersonGroupId;
+                                var normal_groupId = personGroupList.Where(q => q.Type == 2).FirstOrDefault().PersonGroupId;
+                                var fresh_groupId = personGroupList.Where(q => q.Type == 3).FirstOrDefault().PersonGroupId;
+
+                                return Json(new
                                 {
-                                    username = user.UserName,
-                                    personGroupId = personGroup.PersonGroupId,
-                                    userId = user.Id
-                                },
-                            });
+                                    success = true,
+                                    message = "Login Successfully",
+                                    data = new
+                                    {
+                                        username = user.UserName,
+                                        popular_personGroupId = popular_groupId,
+                                        normal_personGroupId = normal_groupId,
+                                        fresh_personGroupId = fresh_groupId,
+                                        userId = user.Id
+                                    },
+                                });
+                            }
+                            else
+                            {
+                                return Json(new
+                                {
+                                    success = false,
+                                    message = "Tài Khoản đã bị khóa",
+                                });
+                            }
+                            
                         }
                     case SignInStatus.Failure:
                         {
                             return Json(new
                             {
                                 success = false,
-                                message = "Login Failed",
+                                message = "Đăng nhập thất bại",
                             });
                         }
                     default:
                         return Json(new
                         {
                             success = false,
-                            message = "Login Failed",
+                            message = "Đăng nhập thất bại",
                         });
                 }
             }
@@ -104,7 +122,7 @@ namespace CapstoneProject.WebAPI.Controllers
                 return Json(new
                 {
                     success = false,
-                    message = "Login Falled",
+                    message = "Đăng nhập thất bại",
                     error = ex.Message
                 });
             }

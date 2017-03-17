@@ -25,6 +25,10 @@ public partial class PersonGroupViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel
 	
 		public virtual string Description { get; set; }
 	
+		public virtual string UserId { get; set; }
+	
+		public virtual Nullable<int> Type { get; set; }
+	
 		public virtual bool Active { get; set; }
 	
 

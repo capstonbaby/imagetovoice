@@ -1,7 +1,8 @@
 ﻿@model BigViewModel
 @{
-    ViewBag.Title = "editConcept";
+    ViewBag.Title = "Đồ vật";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    IEnumerable<PictureViewModel> PictureList = ViewBag.PictureList;
 }
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <style type="text/css">
@@ -13,85 +14,82 @@
     }
 </style>
 <h2>Cập nhật đồ vật</h2>
-<div class="error">
-    @{
-        var message = TempData["message"] as string;
-        if (message != null)
-        {
-            <span class="label label-danger">@message</span>
-        }
-    }
-</div>
+
 <div class="panel-body">
     <div class="row">
-        <div class="col-md-6">
-            @using (Html.BeginForm("updateNewConcept", "Object", FormMethod.Post, new { enctype = "multipart/form-data" }))
-            {
-                <div class="form-group">
-                    <label>ID: @Model.ConceptId</label>
-                    @Html.HiddenFor(q => q.ConceptId)
-                </div>
-                <div class="form-group">
-                    <label>Tên đồ vật: <input type="text" name="conceptName" value="@Model.ConceptName" required placeholder="Nhập tên đồ vật!"/></label>
-                </div>
-                <div class="form-group">
-                    <label>Mô tả: <input type="text" name="conceptDes" value="@Model.ConceptDescription" placeholder="Nhập mô tả đồ vật!"/></label>
-                </div>
-                <div class="form-group">
-                    <label>Ngày tạo: @Model.CreateDate</label>
-                </div>
-                <div class="form-group">
-                    <label>Thêm hình: <input type="file" name="fileUpload" id="fileUpload" multiple="multiple" /></label>
-                    <div id="image-holder"></div>
-                </div>
-                <div class="clearfix"></div>
-                <div class="form-group">
-                    <input type="submit" value="Cập nhật" class="btn btn-success" />
-                </div>
-            }
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>ID</label>
+                <input type="text" readonly id="conceptId" value="@Model.ConceptId" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Tên Đồ Vật</label>
+                <input type="text" name="conceptName" id="conceptName" value="@Model.ConceptName" class="form-control" placeholder="Nhập tên đồ vật!">
+            </div>
+            <div class="form-group">
+                <label>Mô Tả Đồ Vật</label>
+                <textarea name="conceptDes" id="conceptDes" value="@Model.ConceptDescription" class="form-control" rows="4" cols="50" placeholder="Nhập mô tả đồ vật!"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Ngày tạo</label>
+                <input type="text" readonly value="@Model.CreateDate" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Thêm hình: <input type="file" name="fileUpload" id="fileUpload" multiple="multiple" /></label>
+                <div id="image-holder"></div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group">
+                <button type="button" onclick="updateConcept();" class="btn btn-success">Cập Nhật</button>
+                <a href="@Url.Action("viewAllConcept", "Object")" class="btn btn-danger">Hủy</a>
+            </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-offset-6">
             @foreach (var item in this.Model.PictureList)
             {
-                <div class="col-lg-3 col-md-4 col-xs-6 thumb">
-                    <a class="thumbnail person-face" data-toggle="modal" data-target="#myModal" data-image="@item.ImageURL" data-id="@item.PictureId">
+                <div class="col-lg-3 col-md-3 col-xs-3 thumb">
+                    <a class="thumbnail concept-image" data-toggle="modal" data-target="#myModal" data-image="@item.ImageURL" data-id="@item.PictureId">
                         <img class="img-responsive" src="@item.ImageURL" alt="">
                     </a>
-                    <input type="checkbox" class="select-image" data-id="@item.PictureId"/>
+                    <input type="checkbox" class="select-image" data-id="@item.PictureId" />
                 </div>
             }
+            <div class="clearfix"></div>
             <button type="button" onclick="DeleteImageBySelect();" class="btn btn-danger">Delete</button>
-        </div>
-    </div>
-</div>
-@if (TempData["notice"] != null)
-{
-    <p>@TempData["notice"]</p>
-}
-@using (Html.BeginForm("updateDeleteImage", "Object", FormMethod.Post, new { enctype = "multipart/form-data", id = "EditImageObjectForm" }))
-{
-    <!-- Modal -->
-    <div id="myModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Xóa hình ảnh</h4>
-                </div>
-                <div class="modal-body">
-                    <img id="image-modal" src="" style="max-width:400px" />
-                    @Html.Hidden("conceptImageId")
-                    @Html.HiddenFor(q => q.ConceptId)
-                </div>
-                <div class="modal-footer">
-                    <button type="button" onclick="DeleteImage();" class="btn btn-danger">Delete</button>
-                </div>
-            </div>
+            @*<select id="image-pick-container" multiple="multiple" class="image-picker show-html">
+                    @foreach (var item in this.Model.PictureList)
+                    {
+                        <option data-img-src="@item.ImageURL" value="@item.PictureId">@item.PictureId</option>
+                    }
+
+                </select>
+                <div class="clearfix"></div>
+                <button type="button" onclick="DeleteImageBySelect2();" class="btn btn-danger">Delete</button>*@
 
         </div>
     </div>
-}
+</div>
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Xóa hình ảnh</h4>
+            </div>
+            <div class="modal-body">
+                <img id="image-modal" src="" style="max-width:400px" />
+                @Html.Hidden("conceptImageId")
+                @Html.HiddenFor(q => q.ConceptId)
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="DeleteImage();" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+
+    </div>
+</div>
 <script>
     $(document).ready(function () {
         $("#fileUpload").on('change', function () {
@@ -116,10 +114,10 @@
                         reader.readAsDataURL($(this)[0].files[i]);
                     }
                 } else {
-                    alert("This browser does not support FileReader.");
+                    alert("File không được hỗ trợ! Vui lòng chọn file hình!");
                 }
             } else {
-                alert("Pls select only images");
+                alert("Vui lòng chỉ chọn hình!");
             }
         });
     });
@@ -154,15 +152,71 @@
 
             form.submit();
         }
-        $(document).on("click", ".person-face", function () {
+        $(document).on("click", ".concept-image", function () {
             var image = $(this).data("image");
             var pictureId = $(this).data("id");
 
             $(".modal-body #image-modal").attr("src", image);
             $(".modal-body #conceptImageId").val(pictureId);
         });
+        function updateConcept() {
+            swal({
+                title: 'Bạn có chắc chắn cập nhật?',
+                text: "",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Có',
+                cancelButtonText: 'Không'
 
+            }).then(function () {
+                var formData = new FormData();
+                var fileInput = $('#fileUpload').get(0);
+                var files = fileInput.files;
+
+                for (var i = 0; i < files.length; i++) {
+                    formData.append('files', files[i]);
+                }
+                var id = document.getElementById("conceptId").value;
+                var name = document.getElementById("conceptName").value;
+                var des = document.getElementById("conceptDes").value;
+                formData.append('conceptId', id);
+                formData.append('conceptName', name);
+                formData.append('conceptDes', des);
+                $.ajax({
+                    method: 'POST',
+                    url: "@Url.Action("updateNewConcept", "Object")",
+                    data: formData,
+                    contentType: false, // Not to set any content header
+                    processData: false, // Not to process data
+                    success: function (result) {
+                        if (result.success) {
+
+                            swal({
+                                text: result.message,
+                                type: 'success',
+                            }).then(function () {
+                                location.href = "@Url.Action("editConcept", "Object", new { conceptId = this.Model.ConceptId })";
+                            });
+                        } else {
+                            swal({
+                                text: result.message,
+                                type: 'error',
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        swal({
+                            text: "Đã có lỗi xảy ra!",
+                            type: 'error',
+                        });
+                    }
+                });
+            })
+        }
         function DeleteImage() {
+            var imageId = $(".modal-body #conceptImageId").val()
             swal({
                 title: 'Bạn có chắc chắn xóa?',
                 text: "",
@@ -174,8 +228,37 @@
                 cancelButtonText: 'Không'
 
             }).then(function () {
-                $("#mode").val("DeleteImage");
-                $("#EditImageObjectForm").submit();
+                $.ajax({
+                    url: "@Url.Action("updateDeleteImage", "Object")",
+                    type: 'POST',
+                    data: {
+                        conceptImageId: imageId,
+                        conceptId: conceptId
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            swal({
+                                text: data.message,
+                                type: 'success',
+                            }).then(function () {
+                                location.href = "@Url.Action("editConcept", "Object", new { conceptId = this.Model.ConceptId })";
+                            })
+                        } else {
+                            swal({
+                                text: data.message,
+                                type: 'error',
+                            }).then(function () {
+                                location.href = "@Url.Action("editConcept", "Object", new { conceptId = this.Model.ConceptId })";
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        swal({
+                            text: 'Đã có lỗi xảy ra!',
+                            type: 'error',
+                        });
+                    }
+                });
             })
 
         };
@@ -186,11 +269,81 @@
                 if (item.is(':checked')) {
                     picIdList += item.attr('data-id') + ",";
                 }
-                
+
 
             })
-            if (picIdList === "")
-            {
+            if (picIdList === "") {
+                swal({
+                    title: 'Bạn chưa lựa chọn bất kỳ hình nào?',
+                    text: "",
+                    type: 'warning',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'ok',
+                    cancelButtonText: 'Không'
+
+                });
+                return
+            }
+            ///
+            swal({
+                title: 'Bạn có chắc chắn xóa?',
+                text: "",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Có',
+                cancelButtonText: 'Không'
+
+            }).then(function () {
+                $.ajax({
+                    url: "@Url.Action("deleteImageBySelect", "Object")",
+                    type: 'POST',
+                    data: {
+                        picIdList: picIdList,
+                        conceptId: conceptId
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            swal({
+                                text: data.message,
+                                type: 'success',
+                            }).then(function () {
+                                location.href = "@Url.Action("editConcept", "Object", new { conceptId = this.Model.ConceptId })";
+                            })
+                        } else {
+                            swal({
+                                text: data.message,
+                                type: 'error',
+                            }).then(function () {
+                                location.href = "@Url.Action("editConcept", "Object", new { conceptId = this.Model.ConceptId })";
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        swal({
+                            text: 'Đã có lỗi xảy ra!',
+                            type: 'error',
+                        });
+                    }
+                });
+                @*PostDataRedirect([picIdList, conceptId], ["picIdList", "conceptId"], '@Url.Action("deleteImageBySelect","Object")')*@
+            })
+
+        };
+        @*function DeleteImageBySelect2() {
+            var picIdList = "";
+            $("#image-pick-container :selected").each(function () {
+                var item = $(this);
+                if (item.is(':selected')) {
+                    picIdList += item.val() + ",";
+                }
+
+
+            })
+            if (picIdList === "") {
                 swal({
                     title: 'Ban chua lua chon bat ky hinh nao?',
                     text: "",
@@ -217,9 +370,21 @@
 
             }).then(function () {
                 //PostDataRedirect([ un, pw ], ["un", "pw"], "login.php");
-                PostDataRedirect([picIdList,conceptId], ["picIdList", "conceptId"], '@Url.Action("deleteImageBySelect","Object")')
+                PostDataRedirect([picIdList, conceptId], ["picIdList", "conceptId"], '@Url.Action("deleteImageBySelect","Object")')
             })
 
         };
+        $(document).ready(function () {
+            $(".thumbnail :selected").click(function () {
+                $entity = $(this);
+                $entity.addClass("selected");
+
+
+            });
+            $(".image-picker").imagepicker({
+                hide_select: false,
+                show_label: false
+            });
+        });*@
     </script>
 }

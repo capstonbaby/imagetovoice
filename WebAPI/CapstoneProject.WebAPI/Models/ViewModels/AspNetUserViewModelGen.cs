@@ -27,6 +27,8 @@ namespace CapstoneProject.WebAPI.Models.ViewModels
     			public virtual bool LockoutEnabled { get; set; }
     			public virtual int AccessFailedCount { get; set; }
     			public virtual string UserName { get; set; }
+    			public virtual Nullable<int> TotalDetect { get; set; }
+    			public virtual bool Active { get; set; }
     	
     	public AspNetUserViewModel() : base() { }
     	public AspNetUserViewModel(CapstoneProject.WebAPI.Models.Entities.AspNetUser entity) : base(entity) { }

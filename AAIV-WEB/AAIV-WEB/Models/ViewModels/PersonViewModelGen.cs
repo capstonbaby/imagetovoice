@@ -27,7 +27,7 @@ public partial class PersonViewModel : SkyWeb.DatVM.Mvc.BaseEntityViewModel<Mode
 	
 		public virtual string Description { get; set; }
 	
-		public virtual bool IsTrained { get; set; }
+		public virtual Nullable<int> Count { get; set; }
 	
 		public virtual bool Active { get; set; }
 	

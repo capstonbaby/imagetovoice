@@ -15,7 +15,7 @@ namespace AAIV_WEB.Models.Entities
 using System;
     using System.Collections.Generic;
     
-public partial class AspNetUser : SkyWeb.DatVM.Data.IEntity
+public partial class AspNetUser : SkyWeb.DatVM.Data.IEntity, SkyWeb.DatVM.Data.IActivable
 {
 }
 
