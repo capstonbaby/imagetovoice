@@ -65,6 +65,69 @@ namespace CapstoneProject.WebAPI.Controllers
             }
         }
 
+        public JsonResult GetPeopleOfUser(string userId)
+        {
+            try
+            {
+                var personservice = this.Service<IPersonService>();
+                var personGroupService = this.Service<IPersonGroupService>();
+                var faceService = this.Service<IFaceService>();
+                var personList = new List<PersonEditViewModel>();
+
+                var personGroupList = personGroupService.GetActive(q => q.UserId.Equals(userId)).ToList();
+
+                if (personGroupList != null)
+                {
+                    foreach (var personGroup in personGroupList)
+                    {
+                        personList.AddRange(personservice.GetActive(q => q.PersonGroupId.Equals(personGroup.PersonGroupId))
+                            .ProjectTo<PersonEditViewModel>(this.MapperConfig));
+                    }
+                    foreach (var person in personList)
+                    {
+                        var faces = faceService.GetActive(q => q.PersonID.Equals(person.PersonId))
+                            .ProjectTo<FaceViewModel>(this.MapperConfig)
+                            .ToList();
+                        person.Faces = faces;
+                    }
+                    return Json(new
+                    {
+                        success = true,
+                        data = personList.Select(q => new
+                        {
+                            personid = q.PersonId,
+                            name = q.Name,
+                            userData = q.Description,
+                            personGroupId = q.PersonGroupId,
+                            faces = q.Faces.Select(f => new
+                            {
+                                persistedFaceId = f.PersistedFaceId,
+                                imageUrl = f.ImageURL
+                            }),
+                        }),
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Get People of user failed",
+                        error = "Person Group Not Found",
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Get People of user failed",
+                    error = ex.Message,
+                });
+            }
+        }
+
         public async Task<JsonResult> CreatePerson(PersonViewModel model)
         {
             var service = this.Service<IPersonService>();
@@ -171,6 +234,40 @@ namespace CapstoneProject.WebAPI.Controllers
             }
         }
 
+        public async Task<JsonResult> DeletePerson(string personId)
+        {
+            var personService = this.Service<IPersonService>();
+            var faceService = this.Service<IFaceService>();
+
+
+            try
+            {
+                var person = personService.Get(personId);
+                await personService.DeactivateAsync(person);
+
+                var faceList = person.Faces.ToList();
+                foreach (var face in faceList)
+                {
+                    await faceService.DeactivateAsync(face);
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Delete person successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Delete person failed",
+                    error = ex.Message
+                });
+            }
+        }
+
         public async Task<JsonResult> AddDetectCount(string personId)
         {
             try
@@ -209,6 +306,8 @@ namespace CapstoneProject.WebAPI.Controllers
             }
         }
 
+
+        //Log
         public async Task<JsonResult> DeactiveLog(int logId)
         {
             try
@@ -223,7 +322,7 @@ namespace CapstoneProject.WebAPI.Controllers
                 return Json(new { message = "Deactive Log File Failled", error = ex.Message });
             }
         }
-
+        
         public async Task<JsonResult> CreateLog(LogViewModel model, string userId)
         {
             var service = this.Service<ILogService>();

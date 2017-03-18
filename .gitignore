@@ -9,6 +9,22 @@
 *.sln.docstates
 
 # Build results
+AAIV-WEB/AAIV-WEB/
+AAIV-WEB/AAIV-WEB/[Dd]ebug/
+AAIV-WEB/AAIV-WEB/[Rr]elease/
+AAIV-WEB/AAIV-WEB/x64/
+AAIV-WEB/AAIV-WEB/build/
+AAIV-WEB/AAIV-WEB/[Bb]in/
+AAIV-WEB/AAIV-WEB/[Oo]bj/
+
+
+
+WebAPI/CapstoneProject.WebAPI/[Dd]ebug/
+WebAPI/CapstoneProject.WebAPI/[Rr]elease/
+WebAPI/CapstoneProject.WebAPI/x64/
+WebAPI/CapstoneProject.WebAPI/build/
+WebAPI/CapstoneProject.WebAPI/[Bb]in/
+WebAPI/CapstoneProject.WebAPI/[Oo]bj/
 
 [Dd]ebug/
 [Rr]elease/
