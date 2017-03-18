@@ -43,8 +43,11 @@ namespace AAIV_WEB.Areas.User.Controllers
 
             if (curUser != null)
             {
-                var personList = personService.GetActive(q => q.PersonGroupId == curUser.Id)
-                    .ProjectTo<PersonEditViewModel>(this.MapperConfig)
+                //var personList = personService.GetActive(q => q.PersonGroupId == curUser.Id)
+                //    .ProjectTo<PersonEditViewModel>(this.MapperConfig)
+                //    .ToList();
+
+                var personList = personService.GetActive().Where(q => (q.PersonGroupId).Contains(curUser.Id)).ProjectTo<PersonEditViewModel>(this.MapperConfig)
                     .ToList();
 
                 foreach (var person in personList)
@@ -89,8 +92,8 @@ namespace AAIV_WEB.Areas.User.Controllers
                 try
                 {
                     var user = Util.getCurrentUser(this);
-                    var personGroup = personGroupService.Get(user.Id);
-
+                    var personGroup = personGroupService.GetActive(q => q.UserId == user.Id && q.Type == 3).FirstOrDefault();
+                    
                     //create in Microsoft
                     var personCreateResult = await faceServiceClient.CreatePersonAsync(personGroup.PersonGroupId, person.Name, person.Description);
                     progressHub.SendMessage("33%", 33);
@@ -259,12 +262,14 @@ namespace AAIV_WEB.Areas.User.Controllers
                 try
                 {
                     var user = Util.getCurrentUser(this);
-                    var personGroup = personGroupService.Get(user.Id);
-
+                    
                     var deletePerson = personService.Get(id);
+
+                    var personGroup = deletePerson.PersonGroupId;
+
                     //Delete in Microsoft
                     Guid personID = new Guid(deletePerson.PersonId);
-                    await faceServiceClient.DeletePersonAsync(personGroup.PersonGroupId, personID);
+                    await faceServiceClient.DeletePersonAsync(personGroup, personID);
 
                     //Delete in Database
 
@@ -276,7 +281,7 @@ namespace AAIV_WEB.Areas.User.Controllers
                     }
 
                     //Train Person
-                    await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupId);
+                    await faceServiceClient.TrainPersonGroupAsync(personGroup);
 
                     return Json(new { message = "Xóa thành công", success = true });
                 }
@@ -302,6 +307,7 @@ namespace AAIV_WEB.Areas.User.Controllers
             var person = personService.Get(id);
             var faceList = faceService.GetActive(q => q.PersonID.Equals(person.PersonId))
                             .ProjectTo<FaceViewModel>(this.MapperConfig);
+
             var personViewModel = new PersonViewModel(person);
             var model = this.Mapper.Map<PersonEditViewModel>(personViewModel);
             model.FaceList = faceList.ToList();
@@ -320,7 +326,7 @@ namespace AAIV_WEB.Areas.User.Controllers
             try
             {
                 var user = Util.getCurrentUser(this);
-                var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
+                var personGroupID = person.PersonGroupId;
 
                 //Update in Microsoft
 
@@ -336,7 +342,6 @@ namespace AAIV_WEB.Areas.User.Controllers
                 updatePerson.Name = person.Name;
                 updatePerson.Description = person.Description;
                 personService.Save();
-
 
                 return Json(new { message = "Cập nhật thành công", success = true });
             }
@@ -357,7 +362,8 @@ namespace AAIV_WEB.Areas.User.Controllers
             try
             {
                 var user = Util.getCurrentUser(this);
-                var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
+                //var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
+                var personGroupID = person.PersonGroupId;
 
                 //Update in Microsoft
 
@@ -426,7 +432,8 @@ namespace AAIV_WEB.Areas.User.Controllers
             var faceService = this.Service<IFaceService>();
 
             var user = Util.getCurrentUser(this);
-            var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
+            //var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
+            var personGroupID = person.PersonGroupId;
 
             //Delete in Microsoft
             Guid personID = new Guid(person.PersonId);
@@ -492,7 +499,8 @@ namespace AAIV_WEB.Areas.User.Controllers
             var logList = logService.GetActive(q => q.UserID.Equals(curUser.Id))
                         .ProjectTo<LogViewModel>(this.MapperConfig);
 
-            var personList = personService.GetActive().ProjectTo<PersonViewModel>(this.MapperConfig);
+            var personList = personService.GetActive().Where(q => (q.PersonGroupId).Contains(curUser.Id)).ProjectTo<PersonEditViewModel>(this.MapperConfig)
+                    .ToList();
             ViewBag.personList = personList;
 
             return this.View(logList);
@@ -524,7 +532,8 @@ namespace AAIV_WEB.Areas.User.Controllers
             var logService = this.Service<ILogService>();
 
             var user = Util.getCurrentUser(this);
-            var personGroupID = personGroupService.Get(user.Id).PersonGroupId;
+             
+            var personGroupID = (personService.GetActive(q => q.PersonId == personID).FirstOrDefault()).PersonGroupId;
 
             var log = logService.Get(logID);
 
