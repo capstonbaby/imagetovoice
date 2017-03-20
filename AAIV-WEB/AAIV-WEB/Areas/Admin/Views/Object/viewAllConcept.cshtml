@@ -4,13 +4,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     var i = 1;
 }
-
-<h1 class="page-header">Danh sách đồ vật</h1>
-<div class="pull-right">
-    <a href="@Url.Action("createObject", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-plus-sign"></i> Tạo mới đồ vật</a>
-    <a href="@Url.Action("testPredict", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-question-sign"></i> Kiểm tra đồ vật</a>
-</div>
-<table class="table table-striped">
+<h1 class="page-header">
+    Danh sách đồ vật
+    <div class="pull-right">
+        <a href="@Url.Action("createObject", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-plus-sign"></i> Tạo mới đồ vật</a>
+        <a href="@Url.Action("testPredict", "Object")" class="btn btn-info"><i class="glyphicon glyphicon-question-sign"></i> Kiểm tra đồ vật</a>
+    </div>
+</h1>
+<table class="table table-hover" id="myTable" cellspacing="0" width="100%">
     <thead>
         <tr>
             <th>No.</th>
@@ -21,12 +22,12 @@
         </tr>
     </thead>
     <tbody>
+
         @foreach (var items in this.Model)
             {
-<<<<<<< HEAD
             <tr>
                 <td>@i</td>
-                <td><input type="hidden" value="@items.ConceptId" name="conceptId" /></td>
+                <input type="hidden" value="@items.ConceptId" name="conceptId" />
                 <td><img src="@items.ConceptPicture" style="max-width: 100px" /></td>
                 <td>@items.ConceptName</td>
                 <td>@items.ConceptDescription</td>
@@ -37,30 +38,15 @@
             </tr>
             i++;
         }
+
     </tbody>
-=======
-                <tr>
-                    <td>@i</td>
-                    <input type="hidden" value="@items.ConceptId" name="conceptId" />
-                    <td><img src="@items.ConceptPicture" style="max-width: 100px" /></td>
-                    <td>@items.ConceptName</td>
-                    <td>@items.ConceptDescription</td>
-                    <td>
-                        <a href="@Url.Action("editConcept", new { conceptID = items.ConceptId })" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
-                        <button type="button" onclick="DeleteConcept(@items.ConceptId);" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>
-                        @*<button type="button" onclick="DeleteImage();" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>*@
-                    </td>
-                </tr>
-                i++;
-            }
-        </tbody>
-    @*}*@
-    }
->>>>>>> 1028ae3204bddbecfb21c6f53577d555037248cd
 </table>
 @section scripts{
     <script>
 
+        $(function () {
+            $('#myTable').DataTable();
+        });
         function DeleteConcept(conceptId) {
             swal({
                 title: 'Bạn có chắc chắn xóa?',
@@ -71,14 +57,17 @@
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Có',
                 cancelButtonText: 'Không'
-
             }).then(function () {
+                $('.loader').show();
+                $('.dim-background').show();
                 $.ajax({
                     method: 'POST',
                     url: "@Url.Action("deleteConcept", "Object")",
                     data: { conceptId: conceptId },
                     success: function (result) {
                         if (result.success) {
+                            $('.loader').hide();
+                            $('.dim-background').hide();
                             swal({
                                 text: result.message,
                                 type: 'success',
@@ -86,6 +75,8 @@
                                 location.reload();
                             });
                         } else {
+                            $('.loader').hide();
+                            $('.dim-background').hide();
                             swal({
                                 text: result.message,
                                 type: 'error',
@@ -93,6 +84,8 @@
                         }
                     },
                     error: function (error) {
+                        $('.loader').hide();
+                        $('.dim-background').hide();
                         swal({
                             text: "Đã có lỗi xảy ra!",
                             type: 'error',

@@ -3,7 +3,6 @@
     ViewBag.Title = "addNewConcept";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <h2>Tạo mới đồ vật</h2>
 <div class="panel-body">
     @using (Html.BeginForm("addImageNewConcept", "Object", FormMethod.Post))
@@ -19,11 +18,12 @@
                 <textarea name="conceptDes" id="conceptDes" class="form-control" rows="4" cols="50" placeholder="Nhập mô tả đồ vật!"></textarea>
             </div>
             <div class="form-group">
-                @*<input type="submit" value="Tạo Mới" class="btn btn-success" />*@
-                <button type="button" onclick="AddConcept(@this.Model.LogId)" class="btn btn-success">Tạo Mới</button>
+                <a href="@Url.Action("Index", "Object")" class="btn btn-default"><i class="glyphicon glyphicon-chevron-left"></i> Quay Lại</a>
+                <button type="button" onclick="AddConcept(@this.Model.LogId)" class="btn btn-success"><i class="glyphicon glyphicon-ok"></i> Tạo Mới</button>
             </div>
         </div>
         <div class="col-md-6">
+            <label>Hình Ảnh</label>
             @if (Model.ImageURL != null)
             {
                 @Html.HiddenFor(q => q.ImageURL)
@@ -52,6 +52,8 @@
             }).then(function () {
                 var name = document.getElementById("conceptName").value;
                 var des = document.getElementById("conceptDes").value;
+                $('.loader').show();
+                $('.dim-background').show();
                 $.ajax({
                     method: 'POST',
                     url: "@Url.Action("addImageNewConcept", "Object")",
@@ -62,14 +64,18 @@
                             conceptDes: des
                         },
                     success: function(result){
+                        $('.loader').hide();
+                        $('.dim-background').hide();
                         if (result.success) {
                             swal({
                                 text: result.message,
                                 type: 'success',
                             }).then(function () {
-                                Window.location.href = "@Url.Action("Index", "Object")";
+                                location.href = "@Url.Action("Index", "Object")";
                             });
                         } else {
+                            $('.loader').hide();
+                            $('.dim-background').hide();
                             swal({
                                 text: result.message,
                                 type: 'error',
@@ -77,6 +83,8 @@
                         }
                     },
                     error: function(error){
+                        $('.loader').hide();
+                        $('.dim-background').hide();
                         swal({
                             text: "Đã có lỗi xảy ra!",
                             type: 'error',

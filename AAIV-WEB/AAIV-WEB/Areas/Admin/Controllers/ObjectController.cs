@@ -44,6 +44,10 @@ namespace AAIV_WEB.Areas.Admin.Controllers
             {
                 return Json(new { success = false, message = "Tên đồ vật không được bỏ trống!" });
             }
+            if(files == null)
+            {
+                return Json(new { success = false, message = "Vui lòng chọn hình ảnh!" });
+            }
             //            
             var addConcept = new Concept
             {
@@ -155,7 +159,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                             var entity = logObjectService.Get(logId);
                             await picService.CreateAsync(addImage);
                             await logObjectService.DeactivateAsync(entity);
-                            return Json(new { success = false, message = "Cập nhật thành công!" });
+                            return Json(new { success = true, message = "Cập nhật thành công!" });
                         }
                     }
                 }
@@ -384,7 +388,10 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                                 await picService.CreateAsync(addImage);
                             }
                         }
-                        return Json(new { success = false, message = "Cập nhật thất bại! Vui lòng thử lại!" });
+                        else
+                        {
+                            return Json(new { success = false, message = "Cập nhật thất bại! Vui lòng thử lại!" });
+                        }
                     }
                     string trainURI = Constant.TRAIN_API;
                     var trainResponse = HttpClientHelper.Get(trainURI);

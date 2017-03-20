@@ -3,11 +3,11 @@
     ViewBag.Title = "Tài khoản";
 }
 
-<h1 class="page-header">Danh sách tài khoản</h1>
+<h1 class="page-header">Danh sách tài khoản <a href="javascript:document.getElementById('deactive-form').submit()" id="btn-save" class="btn btn-success pull-right" style="display:none"><i class="glyphicon glyphicon-check"></i> Cập nhật</a></h1>
 
-<a href="javascript:document.getElementById('deactive-form').submit()" id="btn-save" class="btn btn-success pull-right" style="display:none"><i class="glyphicon glyphicon-check"></i> Cập nhật</a>
+
 <form action="@Url.Action("DeactivateAccounts", "User")" method="post" id="deactive-form">
-    <table class="table table-hover">
+    <table class="table table-hover" id="myTable" cellspacing="0" width="100%">
         <thead>
             <tr>
                 <th>ID</th>
@@ -42,6 +42,8 @@
 @section scripts{
     <script>
         $(function () {
+            $('#myTable').DataTable();
+
             $('.myCheckBox').change(function () {
                 $('#btn-save').show(500);
             })
