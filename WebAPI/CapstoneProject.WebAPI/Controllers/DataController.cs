@@ -135,6 +135,7 @@ namespace CapstoneProject.WebAPI.Controllers
 
             try
             {
+                model.Count = 0;
                 model.Active = true;
                 await service.CreatePersonAsync(model);
 
@@ -238,10 +239,11 @@ namespace CapstoneProject.WebAPI.Controllers
         {
             var personService = this.Service<IPersonService>();
             var faceService = this.Service<IFaceService>();
-
+            var faceServiceClient = Assets.client;
 
             try
             {
+                //Deactive Person in DB
                 var person = personService.Get(personId);
                 await personService.DeactivateAsync(person);
 
@@ -250,6 +252,11 @@ namespace CapstoneProject.WebAPI.Controllers
                 {
                     await faceService.DeactivateAsync(face);
                 }
+
+                //Delete person in MCS
+                await faceServiceClient.DeletePersonAsync(person.PersonGroupId, new Guid(personId));
+                //Train person group after delete
+                await faceServiceClient.TrainPersonGroupAsync(person.PersonGroupId);
 
                 return Json(new
                 {
@@ -268,20 +275,46 @@ namespace CapstoneProject.WebAPI.Controllers
             }
         }
 
-        public async Task<JsonResult> AddDetectCount(string personId)
+        public async Task<JsonResult> GetPersonInfo(List<string> personIds)
         {
             try
             {
                 var service = this.Service<IPersonService>();
-                var person = service.Get(personId);
-                if (person != null)
+                var userService = this.Service<IAspNetUserService>();
+
+                var result = new List<Person>();
+
+                if (personIds != null)
                 {
-                    person.Count += 1;
-                    await service.UpdateAsync(person);
+
+
+                    foreach (var personId in personIds)
+                    {
+                        var person = service.Get(personId);
+                        if (person != null)
+                        {
+                            person.Count += 1;
+                            await service.UpdateAsync(person);
+                            result.Add(person);
+                        }
+                    }
+
+                    //var user = userService.Get(userId);
+                    //if(user != null)
+                    //{
+                    //    user.TotalDetect += 1;
+                    //}
+
                     return Json(new
                     {
                         success = true,
-                        message = "Update detect count successfully",
+                        message = "Get person info successfully",
+                        data = result.Select(q => new
+                        {
+                            personid = q.PersonId,
+                            name = q.Name,
+                            userdata = q.Description
+                        })
                     });
                 }
                 else
@@ -289,11 +322,9 @@ namespace CapstoneProject.WebAPI.Controllers
                     return Json(new
                     {
                         success = false,
-                        message = "Update detect count failed",
-                        error = "Person not found"
+                        message = "person not found",
                     });
                 }
-
             }
             catch (Exception ex)
             {
@@ -322,7 +353,7 @@ namespace CapstoneProject.WebAPI.Controllers
                 return Json(new { message = "Deactive Log File Failled", error = ex.Message });
             }
         }
-        
+
         public async Task<JsonResult> CreateLog(LogViewModel model, string userId)
         {
             var service = this.Service<ILogService>();
