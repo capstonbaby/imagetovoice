@@ -5,30 +5,34 @@
     var i = 1;
 
 }
-
-<h2>Danh sách Log</h2>
-<a href="@Url.Action("createObject", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-plus-sign"></i> Tạo mới đồ vật</a>
-<a href="@Url.Action("testPredict", "Object")" class="btn btn-success"><i class="glyphicon glyphicon-question-sign"></i> Kiểm tra đồ vật</a>
-<br /><br />
-<table class="table table-striped">
-        <tbody>
-            @foreach (var items in this.Model)
+<h1 class="page-header">Danh Sách Vật Thể Chưa Nhận Diện Được</h1>
+<table class="table table-hover" id="myTable" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Hình ảnh</th>
+            <th>Ngày tạo</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var items in this.Model)
             {
-                <tr>
-                    <td>@i</td>
-                    <td><input type="hidden" value="@items.ID" name="logId" /></td>
-                    <td><img src="@items.ImageURL" style="with:100px; height:100px;" /></td>
-                    <td>@items.CreatedDate</td>
-                    <td>
-                        <a class="btn btn-success log-image" data-toggle="modal" data-target="#myModal" data-image="@items.ImageURL" data-logid="@items.ID">
-                            <i class="glyphicon glyphicon-plus"></i>
-                        </a>
-                        <button type="button" onclick="DeleteLog(@items.ID);" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>
-                    </td>
-                </tr>
-                i++;
-            }
-        </tbody>
+            <tr>
+                <td>@i</td>
+                <input type="hidden" value="@items.ID" name="logId" />
+                <td><img src="@items.ImageURL" style="with:100px; height:100px;" /></td>
+                <td>@items.CreatedDate</td>
+                <td>
+                    <a class="btn btn-info log-image" data-toggle="modal" data-target="#myModal" data-image="@items.ImageURL" data-logid="@items.ID">
+                        <i class="glyphicon glyphicon-plus"></i>
+                    </a>
+                    <button type="button" onclick="DeleteLog(@items.ID);" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>
+                </td>
+            </tr>
+            i++;
+        }
+    </tbody>
 </table>
 @using (Html.BeginForm("addNewConcept", "Object", FormMethod.Post, new { enctype = "multipart/form-data", id = "createConceptForm" }))
 {
@@ -43,7 +47,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-lg-7" >
+                        <div class="col-lg-7">
                             <img id="image-modal" src="" style="max-width:300px" />
                         </div>
                         <div class="col-lg-5">
@@ -57,8 +61,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" onclick="UpdateImagetoConcept();" class="btn btn-success">Cập Nhật</button>
-                    <button type="button" onclick="CreateConcept();" class="btn btn-success">Tạo Mới</button>
+                    <button type="button" onclick="CreateConcept();" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i> Tạo Mới</button>
+                    <button type="button" onclick="UpdateImagetoConcept();" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Cập Nhật</button>
                 </div>
             </div>
         </div>
@@ -68,6 +72,9 @@
 }
 @section scripts{
     <script>
+        $(function () {
+            $('#myTable').DataTable();
+        });
         $(document).on("click", ".log-image", function () {
             var image = $(this).data("image");
             var pictureId = $(this).data("logid");
@@ -94,6 +101,8 @@
                 cancelButtonText: 'Không'
             })
             .then(function () {
+                $('.loader').show();
+                $('.dim-background').show();
                 $.ajax({
                     url: "@Url.Action("addImageConcept", "Object")",
                     type: 'POST',
@@ -104,6 +113,8 @@
                     },
                     success: function (data) {
                         if (data.success) {
+                            $('.loader').hide();
+                            $('.dim-background').hide();
                             swal({
                                 text: data.message,
                                 type: 'success',
@@ -111,6 +122,8 @@
                                 location.href = "@Url.Action("Index", "Object")";
                             })
                         } else {
+                            $('.loader').hide();
+                            $('.dim-background').hide();
                             swal({
                                 text: data.message,
                                 type: 'error',
@@ -120,6 +133,8 @@
                         }
                     },
                     error: function (error) {
+                        $('.loader').hide();
+                        $('.dim-background').hide();
                         swal({
                             text: 'Đã có lỗi xảy ra!',
                             type: 'error',
@@ -145,12 +160,16 @@
                 cancelButtonText: 'Không'
 
             }).then(function () {
+                $('.loader').show();
+                $('.dim-background').show();
                 $.ajax({
                     method: 'POST',
                     url: "@Url.Action("deleteLog", "Object")",
-                    data: {logId: id},
-                    success: function(result){
+                    data: { logId: id },
+                    success: function (result) {
                         if (result.success) {
+                            $('.loader').hide();
+                            $('.dim-background').hide();
                             swal({
                                 text: result.message,
                                 type: 'success',
@@ -158,13 +177,17 @@
                                 location.reload();
                             });
                         } else {
+                            $('.loader').hide();
+                            $('.dim-background').hide();
                             swal({
                                 text: result.message,
                                 type: 'error',
                             });
                         }
                     },
-                    error: function(error){
+                    error: function (error) {
+                        $('.loader').hide();
+                        $('.dim-background').hide();
                         swal({
                             text: "Đã có lỗi xảy ra!",
                             type: 'error',
