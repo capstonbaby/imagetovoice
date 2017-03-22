@@ -138,6 +138,8 @@
                         swal({
                             text: 'Đã có lỗi xảy ra!',
                             type: 'error',
+                        }).then(function () {
+                            location.reload();
                         });
                     }
                 });
@@ -147,7 +149,6 @@
 
             $("#createConceptForm").submit();
         }
-
         function DeleteLog(id) {
             swal({
                 title: 'Bạn có chắc chắn xóa?',
@@ -182,6 +183,8 @@
                             swal({
                                 text: result.message,
                                 type: 'error',
+                            }).then(function () {
+                                location.reload();
                             });
                         }
                     },
@@ -191,6 +194,8 @@
                         swal({
                             text: "Đã có lỗi xảy ra!",
                             type: 'error',
+                        }).then(function () {
+                            location.reload();
                         });
                     }
                 });

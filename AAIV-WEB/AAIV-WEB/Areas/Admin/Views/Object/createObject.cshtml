@@ -10,6 +10,13 @@
         width: 100px;
         position: relative;
         padding: 5px;
+        height: 100px;
+    }
+
+    .check {
+        opacity: 0.5;
+        color: #996;
+        background-color: #1fe9e9;
     }
 </style>
 <h2>Tạo mới đồ vật</h2>
@@ -34,7 +41,7 @@
         <div class="col-md-6">
             <label>Hình Ảnh</label>
             <input type="file" name="fileUpload" id="fileUpload" multiple="multiple" style="visibility:hidden" />
-            <div id="image-holder"></div>
+            <div class="select-image" id="image-holder"></div>
             <div class="col-lg-3 col-md-4 col-xs-6 thumb" style="vertical-align:middle; text-align:center">
                 <button type="button" class="btn btn-default btn-circle btn-xl" onclick="AddImage()">
                     <i class="fa fa-plus"></i>
@@ -45,6 +52,9 @@
 </div>
 @section scripts{
     <script>
+        function AddImage() {
+            $('#fileUpload').trigger('click');
+        }
         $(document).ready(function () {
             $("#fileUpload").on('change', function () {
                 //Get count of selected files
@@ -75,9 +85,6 @@
                 }
             });
         });
-        function AddImage() {
-            $('#fileUpload').trigger('click');
-        }
         function createConcept() {
             swal({
                 title: 'Bạn có chắc chắn tạo mới?',
@@ -126,6 +133,8 @@
                             swal({
                                 text: result.message,
                                 type: 'error',
+                            }).then(function () {
+                                location.reload();
                             });
                         }
                     },
@@ -136,11 +145,12 @@
                         swal({
                             text: "Đã có lỗi xảy ra!",
                             type: 'error',
+                        }).then(function () {
+                            location.reload();
                         });
                     }
                 });
             })
-
         }
     </script>
 }

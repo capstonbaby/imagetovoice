@@ -5,36 +5,32 @@
 }
 <h2>Tạo mới đồ vật</h2>
 <div class="panel-body">
-    @using (Html.BeginForm("addImageNewConcept", "Object", FormMethod.Post))
-    {
-        <div class="col-md-4">
-            <div class="form-group">
-                <label>Tên Đồ Vật</label>
-                <input type="text" name="conceptName" id="conceptName" class="form-control" placeholder="Nhập tên đồ vật!">
-            </div>
-
-            <div class="form-group">
-                <label>Mô Tả Đồ Vật</label>
-                <textarea name="conceptDes" id="conceptDes" class="form-control" rows="4" cols="50" placeholder="Nhập mô tả đồ vật!"></textarea>
-            </div>
-            <div class="form-group">
-                <a href="@Url.Action("Index", "Object")" class="btn btn-default"><i class="glyphicon glyphicon-chevron-left"></i> Quay Lại</a>
-                <button type="button" onclick="AddConcept(@this.Model.LogId)" class="btn btn-success"><i class="glyphicon glyphicon-ok"></i> Tạo Mới</button>
-            </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>Tên Đồ Vật</label>
+            <input type="text" name="conceptName" id="conceptName" class="form-control" placeholder="Nhập tên đồ vật!">
         </div>
-        <div class="col-md-6">
-            <label>Hình Ảnh</label>
-            @if (Model.ImageURL != null)
+        <div class="form-group">
+            <label>Mô Tả Đồ Vật</label>
+            <textarea name="conceptDes" id="conceptDes" class="form-control" rows="4" cols="50" placeholder="Nhập mô tả đồ vật!"></textarea>
+        </div>
+        <div class="form-group">
+            <a href="@Url.Action("Index", "Object")" class="btn btn-default"><i class="glyphicon glyphicon-chevron-left"></i> Quay Lại</a>
+            <button type="button" onclick="AddConcept(@this.Model.LogId)" class="btn btn-success"><i class="glyphicon glyphicon-ok"></i> Tạo Mới</button>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <label>Hình Ảnh</label>
+        @if (Model.ImageURL != null)
             {
-                @Html.HiddenFor(q => q.ImageURL)
-                @Html.HiddenFor(q => q.LogId)
-                <div class="form-group">
-                    <img src="@Model.ImageURL" style="max-width: 150px" />
-                </div>
+            @Html.HiddenFor(q => q.ImageURL)
+            @Html.HiddenFor(q => q.LogId)
+            <div class="form-group">
+                <img src="@Model.ImageURL" style="max-width: 150px" />
+            </div>
 
-            }
-        </div>
-    }
+        }
+    </div>
 </div>
 @section scripts{
     <script>
@@ -59,11 +55,11 @@
                     url: "@Url.Action("addImageNewConcept", "Object")",
                     data:
                         {
-                            logId : id,
+                            logId: id,
                             conceptName: name,
                             conceptDes: des
                         },
-                    success: function(result){
+                    success: function (result) {
                         $('.loader').hide();
                         $('.dim-background').hide();
                         if (result.success) {
@@ -82,7 +78,7 @@
                             });
                         }
                     },
-                    error: function(error){
+                    error: function (error) {
                         $('.loader').hide();
                         $('.dim-background').hide();
                         swal({

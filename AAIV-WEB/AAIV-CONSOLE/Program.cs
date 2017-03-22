@@ -24,7 +24,7 @@ namespace AAIV_CONSOLE
             Console.WriteLine("Total Concept:" + count);
             Console.WriteLine("****************************************************************");
 
-            string[] lines = System.IO.File.ReadAllLines(@"D:\giaydep.txt");
+            string[] lines = System.IO.File.ReadAllLines(@"D:\table.txt");
             //Console.WriteLine("Contents of imageUrl.txt = ");
             int count_1 = 0;
             int count_2 = 0;
