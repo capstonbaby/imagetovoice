@@ -317,8 +317,8 @@ namespace CapstoneProject.WebAPI.Controllers
             //set to model for extract to json
             DetectPerson d = new DetectPerson();
             d.personGroupId = personGroupId;
-            d.maxNumOfCandidatesReturned = 1;
-            d.confidenceThreshold = 0.7;
+            d.maxNumOfCandidatesReturned = 5;
+            d.confidenceThreshold = 0.0;
             d.faceIds = new List<string> { faceid };
 
             var client = new HttpClient();
