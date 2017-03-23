@@ -241,9 +241,13 @@ namespace AAIV_WEB.Areas.Admin.Controllers
         {
             return View();
         }
-        public ActionResult testConcept(IEnumerable<HttpPostedFileBase> fileUpload)
+        public ActionResult testConcept(IEnumerable<HttpPostedFileBase> files)
         {
-            var list_image = getImageURL(fileUpload);
+            if(files == null)
+            {
+                return Json(new { success = false, message = "Vui lòng chọn hình ảnh!" });
+            }
+            var list_image = getImageURL(files);
             if (list_image != null)
             {
                 foreach (var image_Url in list_image)
@@ -260,48 +264,21 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                         if (service != null)
                         {
                             var entity = service.Get(id);
-                            if (value > 0.4)
+                            if (value > 0.6)
                             {
                                 var model = new ConceptViewModel
                                 {
-                                    ConceptId = id,
                                     ConceptName = entity.ConceptName,
                                     ConceptDescription = entity.ConceptDescription,
-                                    CreateDate = entity.CreateDate
                                 };
-                                return View(model);
-                            }
-                            else
-                            {
-                                var model = new ConceptViewModel
-                                {
-                                    ConceptId = 0,
-                                    ConceptName = "Không xác định được",
-                                    ConceptDescription = "",
-                                    CreateDate = null,
-                                };
-                                return View(model);
+                                //return View(model);
+                                return Json(new {success = true, response = model });
                             }
                         }
-                        else
-                        {
-                            TempData["message"] = "Service không hoạt động!";
-                            return RedirectToAction("testPredict", "Object", new { area = "Admin" });
-                        }
-                    }
-                    else
-                    {
-                        TempData["message"] = "Không nhận dạng được vật thể!";
-                        return RedirectToAction("testPredict", "Object", new { area = "Admin" });
                     }
                 }
             }
-            else
-            {
-                TempData["message"] = "Vui lòng chọn hình ảnh!";
-                return RedirectToAction("testPredict", "Object", new { area = "Admin" });
-            }
-            return View();
+            return Json(new { success = false, message = "Không nhận diện được đồ vật! Vui lòng thử lại!" });
         }
         public ActionResult viewAllConcept()
         {

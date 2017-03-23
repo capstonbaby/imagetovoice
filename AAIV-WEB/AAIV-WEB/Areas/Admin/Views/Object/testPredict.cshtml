@@ -1,4 +1,4 @@
-﻿
+﻿@model ConceptViewModel
 @{
     ViewBag.Title = "Kiểm tra";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -22,30 +22,23 @@
         }
     }
 </div>
-@using (Html.BeginForm("testConcept", "Object", FormMethod.Post, new { enctype = "multipart/form-data" }))
-{
-    <fieldset>
-        <table>
-            <tr>
-                <td>
-                    <label>Thêm Hình</label>
-                    <input type="file" name="fileUpload" id="fileUpload" required style="visibility:hidden" />
-                    <div id="image-holder"></div>
-                    <div class="col-lg-3 col-md-4 col-xs-6 thumb" style="vertical-align:middle; text-align:center">
-                        <button type="button" class="btn btn-default btn-circle btn-xl" onclick="AddImage()">
-                            <i class="fa fa-plus"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="submit" name="create" value="Kiểm tra" class="btn btn-info" />
-                </td>
-            </tr>
-        </table>
-    </fieldset>
-}
+<div class="col-md-6">
+    <div class="form-group">
+        <label>Thêm Hình</label>
+        <input type="file" name="fileUpload" id="fileUpload" required style="visibility:hidden" />
+        <div id="image-holder"></div>
+        <div class="col-lg-3 col-md-4 col-xs-6 thumb" style="vertical-align:middle; text-align:center">
+            <button type="button" class="btn btn-default btn-circle btn-xl" onclick="AddImage()">
+                <i class="fa fa-plus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="form-group">
+        <a href="@Url.Action("viewAllConcept", "Object")" class="btn btn-default"><i class="glyphicon glyphicon-chevron-left"></i> Quay Lại</a>
+        <button type="button" onclick="testConcept()" class="btn btn-info"><i class="glyphicon glyphicon-question-sign"></i> Kiểm Tra</button>
+    </div>
+</div>
 <script>
     function AddImage() {
         $('#fileUpload').trigger('click');
@@ -80,4 +73,57 @@
             }
         });
     });
+    function testConcept() {
+        var formData = new FormData();
+        var fileInput = $('#fileUpload').get(0);
+        var files = fileInput.files;
+
+        for (var i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+        }
+        $('.loader').show();
+        $('.dim-background').show();
+        $.ajax({
+            method: 'POST',
+            url: "@Url.Action("testConcept", "Object")",
+            data: formData,
+            contentType: false, // Not to set any content header
+            processData: false, // Not to process data
+            success: function (result) {
+                if (result.success) {
+                    $('.loader').hide();
+                    $('.dim-background').hide();
+                    swal({
+                        title: 'Success',
+                        html:
+                            '<p>' + 'Tên đồ vật: ' + result.response.ConceptName + '</p>' +
+                            '<p>' + 'Mô tả: ' + result.response.ConceptDescription + '</p>',
+                        type: 'info',
+                    }).then(function () {
+                        location.reload();
+                    });
+                } else {
+                    $('.loader').hide();
+                    $('.dim-background').hide();
+                    swal({
+                        text: result.message,
+                        type: 'error',
+                    }).then(function () {
+                        location.reload();
+                    });
+                }
+            },
+            error: function (error) {
+                $('.loader').hide();
+                $('.dim-background').hide();
+                showPageMain("Đã có lỗi xảy ra!");
+                swal({
+                    text: "Đã có lỗi xảy ra!",
+                    type: 'error',
+                }).then(function () {
+                    location.reload();
+                });
+            }
+        });
+    }
 </script>
