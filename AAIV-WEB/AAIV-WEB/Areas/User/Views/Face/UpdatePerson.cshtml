@@ -1,6 +1,6 @@
 ﻿@model PersonEditViewModel
 @{
-    ViewBag.Title = "UpdatePerson";
+    ViewBag.Title = "Cập nhật";
 }
 
 <h1 class="page-header">Cập nhật thông tin</h1>
@@ -32,25 +32,29 @@
             </div>
 
             <div style="text-align:right">
-                <button type="button" class="btn btn-default" onclick="location.href ='@Url.Action("Index", "Face")'"> Quay lại</button> 
+                <button type="button" class="btn btn-default" onclick="location.href ='@Url.Action("Index", "Face")'"> Quay lại</button>
                 <input name="UpdatePersonButton" id="UpdatePersonButton" type="button" onclick="UpdatePersonInfo()" value="Cập nhật thông tin" class="btn btn-primary" />
             </div>
 
         }
     </div>
     <div class="col-md-6">
-        @foreach (var face in this.Model.FaceList)
-        {
-            <div class="col-lg-3 col-md-4 col-xs-6 thumb">
-                <a class="thumbnail" id="person-face" data-toggle="modal" data-target="#myModal" data-image="@face.ImageURL" data-id="@face.PersistedFaceId">
-                    <img class="img-responsive" src="@face.ImageURL" alt="">
-                </a>
+        <div class="row">
+            @foreach (var face in this.Model.FaceList)
+            {
+                <div class="col-md-4">
+                    <div class="thumbnail" style="width: 135px;height: 140px;overflow: hidden;">
+                        <a id="person-face" data-toggle="modal" data-target="#myModal" data-image="@face.ImageURL" data-id="@face.PersistedFaceId">
+                            <img class="img-responsive" src="@face.ImageURL" alt="">
+                        </a>
+                    </div>
+                </div>
+            }
+            <div class="col-md-4" style="vertical-align:middle; text-align:center">
+                <button type="button" class="btn btn-default btn-circle btn-xl" onclick="AddNewFace()">
+                    <i class="fa fa-plus"></i>
+                </button>
             </div>
-        }
-        <div class="col-lg-3 col-md-4 col-xs-6 thumb" style="vertical-align:middle; text-align:center">
-            <button type="button" class="btn btn-default btn-circle btn-xl" onclick="AddNewFace()">
-                <i class="fa fa-plus"></i>
-            </button>
         </div>
     </div>
 
@@ -67,7 +71,7 @@
                     </div>
                     <div class="modal-body">
                         <div style="text-align:center">
-                            <img id="image-modal" src="" style="max-width:400px; text-align:center" />
+                            <img id="image-modal" src="" style="max-width:280px; text-align:center" />
                         </div>
 
                         <input type="file" name="fileModal" id="fileModal" style="visibility:hidden" />

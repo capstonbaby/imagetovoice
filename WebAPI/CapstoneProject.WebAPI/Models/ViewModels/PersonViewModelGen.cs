@@ -19,7 +19,6 @@ namespace CapstoneProject.WebAPI.Models.ViewModels
     			public virtual string PersonGroupId { get; set; }
     			public virtual string Name { get; set; }
     			public virtual string Description { get; set; }
-    			public virtual Nullable<int> Count { get; set; }
     			public virtual bool Active { get; set; }
     	
     	public PersonViewModel() : base() { }

@@ -65,69 +65,6 @@ namespace CapstoneProject.WebAPI.Controllers
             }
         }
 
-        public JsonResult GetPeopleOfUser(string userId)
-        {
-            try
-            {
-                var personservice = this.Service<IPersonService>();
-                var personGroupService = this.Service<IPersonGroupService>();
-                var faceService = this.Service<IFaceService>();
-                var personList = new List<PersonEditViewModel>();
-
-                var personGroupList = personGroupService.GetActive(q => q.UserId.Equals(userId)).ToList();
-
-                if (personGroupList != null)
-                {
-                    foreach (var personGroup in personGroupList)
-                    {
-                        personList.AddRange(personservice.GetActive(q => q.PersonGroupId.Equals(personGroup.PersonGroupId))
-                            .ProjectTo<PersonEditViewModel>(this.MapperConfig));
-                    }
-                    foreach (var person in personList)
-                    {
-                        var faces = faceService.GetActive(q => q.PersonID.Equals(person.PersonId))
-                            .ProjectTo<FaceViewModel>(this.MapperConfig)
-                            .ToList();
-                        person.Faces = faces;
-                    }
-                    return Json(new
-                    {
-                        success = true,
-                        data = personList.Select(q => new
-                        {
-                            personid = q.PersonId,
-                            name = q.Name,
-                            userData = q.Description,
-                            personGroupId = q.PersonGroupId,
-                            faces = q.Faces.Select(f => new
-                            {
-                                persistedFaceId = f.PersistedFaceId,
-                                imageUrl = f.ImageURL
-                            }),
-                        }),
-                    });
-                }
-                else
-                {
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Get People of user failed",
-                        error = "Person Group Not Found",
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Get People of user failed",
-                    error = ex.Message,
-                });
-            }
-        }
-
         public async Task<JsonResult> CreatePerson(PersonViewModel model)
         {
             var service = this.Service<IPersonService>();
@@ -135,7 +72,6 @@ namespace CapstoneProject.WebAPI.Controllers
 
             try
             {
-                model.Count = 0;
                 model.Active = true;
                 await service.CreatePersonAsync(model);
 
@@ -286,24 +222,14 @@ namespace CapstoneProject.WebAPI.Controllers
 
                 if (personIds != null)
                 {
-
-
                     foreach (var personId in personIds)
                     {
                         var person = service.Get(personId);
                         if (person != null)
                         {
-                            person.Count += 1;
-                            await service.UpdateAsync(person);
                             result.Add(person);
                         }
                     }
-
-                    //var user = userService.Get(userId);
-                    //if(user != null)
-                    //{
-                    //    user.TotalDetect += 1;
-                    //}
 
                     return Json(new
                     {
@@ -354,9 +280,12 @@ namespace CapstoneProject.WebAPI.Controllers
             }
         }
 
-        public async Task<JsonResult> CreateLog(LogViewModel model, string userId)
+        public async Task<JsonResult> CreateLog(LogViewModel model, string userId, string personGroupId)
         {
             var service = this.Service<ILogService>();
+            var personService = this.Service<IPersonService>();
+            var faceService = this.Service<IFaceService>();
+            var faceServiceClient = Assets.client;
 
             model.CreatedDate = DateTime.Now;
             model.UserID = userId;
@@ -367,7 +296,57 @@ namespace CapstoneProject.WebAPI.Controllers
 
             try
             {
+                //create log in DB
                 await service.CreateAsync(entity);
+
+                //check person name in DB
+                var person = personService.GetActive(q => q.Name.ToLower().Equals(model.Name.ToLower())).FirstOrDefault();
+
+                //person available in DB => add face in log to person
+                if (null != person)
+                {
+                    //in MS
+                    var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, new Guid(person.PersonId), model.ImageURL);
+
+                    //in DB
+                    var face = new Face
+                    {
+                        PersistedFaceId = addPersonFaceResult.PersistedFaceId.ToString(),
+                        ImageURL = model.ImageURL,
+                        PersonID = person.PersonId,
+                        Active = true
+                    };
+                    await faceService.CreateAsync(face);
+                }
+                else //no person match in the DB, create new person + add face in MS & DB
+                {
+                    //create new person + add person face in MS
+                    var createPersonResult = await faceServiceClient.CreatePersonAsync(personGroupId, model.Name, "");
+                    var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, createPersonResult.PersonId, model.ImageURL);
+
+                    //create person + face in DB
+                    var newPerson = new Person
+                    {
+                        PersonId = createPersonResult.PersonId.ToString(),
+                        PersonGroupId = personGroupId,
+                        Name = model.Name,
+                        Active = true,
+                    };
+                    await personService.CreateAsync(newPerson);
+
+                    var newPersonFace = new Face
+                    {
+                        PersistedFaceId = addPersonFaceResult.PersistedFaceId.ToString(),
+                        PersonID = newPerson.PersonId,
+                        ImageURL = model.ImageURL,
+                        Active = true
+                    };
+                    await faceService.CreateAsync(newPersonFace);
+                }
+
+                //train person group
+                await faceServiceClient.TrainPersonGroupAsync(personGroupId);
+
                 return Json(new
                 {
                     message = "Create Log Successfully",

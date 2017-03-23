@@ -93,10 +93,13 @@ namespace AAIV_WEB.Controllers
 
             var service = this.Service<IAspNetUserService>();
             var user = service.Get(q => q.Email.Equals(model.Email)).FirstOrDefault();
-            if (!user.Active)
+            if (null != user)
             {
-                ModelState.AddModelError("", "Tài khoản đã bị khóa.");
-                return View(model);
+                if (!user.Active)
+                {
+                    ModelState.AddModelError("", "Tài khoản đã bị khóa.");
+                    return View(model);
+                }
             }
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
@@ -191,49 +194,17 @@ namespace AAIV_WEB.Controllers
                         //create person group in DB
                         var personGroupService = this.Service<IPersonGroupService>();
 
-                        #region Popular person group
+                        #region Create person group
                         //popular person group
                         await personGroupService.CreateAsync(new PersonGroup
                         {
-                            PersonGroupId = "popular_" + user.Id,
-                            PersonGroupName = "Popular_" + user.UserName,
-                            Description = user.UserName + " popular person group",
-                            UserId = user.Id,
-                            Type = 1,
+                            PersonGroupId = user.Id,
+                            PersonGroupName = user.UserName,
+                            Description = user.UserName + " person group",
                             Active = true
                         });
                         //create popular person group in Microsoft
-                        await faceServiceClient.CreatePersonGroupAsync("popular_" + user.Id, "Popular_" + user.UserName, user.UserName + " popular person group");
-                        #endregion
-
-                        #region Normal person group
-                        //normal person group
-                        await personGroupService.CreateAsync(new PersonGroup
-                        {
-                            PersonGroupId = "normal_" + user.Id,
-                            PersonGroupName = "Normal_" + user.UserName,
-                            Description = user.UserName + " normal person group",
-                            UserId = user.Id,
-                            Type = 2,
-                            Active = true
-                        });
-                        //create normal person group in Microsoft
-                        await faceServiceClient.CreatePersonGroupAsync("normal_" + user.Id, "Normal_" + user.UserName, user.UserName + " normal person group"); 
-                        #endregion
-
-                        #region Fresh person group
-                        //popular fresh person group
-                        await personGroupService.CreateAsync(new PersonGroup
-                        {
-                            PersonGroupId = "fresh_" + user.Id,
-                            PersonGroupName = "Fresh_" + user.UserName,
-                            Description = user.UserName + " fresh person group",
-                            UserId = user.Id,
-                            Type = 3,
-                            Active = true
-                        });
-                        //create fresh person group in Microsoft
-                        await faceServiceClient.CreatePersonGroupAsync("fresh_" + user.Id, "Fresh_" + user.UserName, user.UserName + " fresh person group"); 
+                        await faceServiceClient.CreatePersonGroupAsync(user.Id, user.UserName, user.UserName + " person group");
                         #endregion
 
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);

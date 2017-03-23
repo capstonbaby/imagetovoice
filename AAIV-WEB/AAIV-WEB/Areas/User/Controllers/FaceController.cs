@@ -92,7 +92,7 @@ namespace AAIV_WEB.Areas.User.Controllers
                 try
                 {
                     var user = Util.getCurrentUser(this);
-                    var personGroup = personGroupService.GetActive(q => q.UserId == user.Id && q.Type == 3).FirstOrDefault();
+                    var personGroup = personGroupService.Get(user.Id);
                     
                     //create in Microsoft
                     var personCreateResult = await faceServiceClient.CreatePersonAsync(personGroup.PersonGroupId, person.Name, person.Description);

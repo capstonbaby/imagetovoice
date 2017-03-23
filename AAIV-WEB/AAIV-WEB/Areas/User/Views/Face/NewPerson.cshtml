@@ -1,6 +1,6 @@
 ﻿@model PersonEditViewModel
 @{
-    ViewBag.Title = "NewPerson";
+    ViewBag.Title = "Tạo mới";
 }
 
 <h1 class="page-header">Thêm người mới</h1>
@@ -41,17 +41,7 @@
         </div>
 
         <div class="col-md-6">
-            @*@if (Model.LogImage != null)
-                {
-                    <div class="form-group">
-                        @Html.HiddenFor(q => q.LogImage)
-                        @Html.HiddenFor(q => q.LogID)
-                        <img src="@Model.LogImage" style="max-width: 150px"/>
-                    </div>
-
-                }*@
             <div class="form-group">
-                @*<div class="col-md-6">*@
                 <label>Hình ảnh</label>
                 <input type="file" name="file" id="file" style="width: 100%; visibility:hidden" multiple />
 
@@ -67,18 +57,16 @@
                     </div>
                 }
 
+                <div class="row">
+                    <div id="imagePreview">
+                    </div>
+                </div>
 
-                <div id="imagePreview"></div>
-
-
-
-                <div class="col-lg-3 col-md-4 col-xs-6 thumb" style="vertical-align:middle; text-align:center">
+                <div class="col-md-4" style="vertical-align:middle; text-align:center">
                     <button type="button" class="btn btn-default btn-circle btn-xl" onclick="AddImage()">
                         <i class="fa fa-plus"></i>
                     </button>
                 </div>
-                @*</div>*@
-
             </div>
         </div>
     }
@@ -123,8 +111,8 @@
                     //get a blob
                     var t = window.URL || window.webkitURL;
                     var objectUrl = t.createObjectURL(fileList[i]);
-                    $('#imagePreview').append('<div class="col-lg-3 col-md-4 col-xs-6 thumb"> <img class="img-responsive" alt="" src="' + objectUrl + '" /> </div> ');
-
+                    $('#imagePreview').append('<div class="col-md-4"><div class="thumbnail" style="width: 135px;height: 140px;overflow: hidden;"><img src="' + objectUrl + '" style="width:100%"/></div></div>');
+        
                 }
             })
         }
