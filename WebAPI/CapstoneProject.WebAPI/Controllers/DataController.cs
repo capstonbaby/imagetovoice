@@ -126,7 +126,7 @@ namespace CapstoneProject.WebAPI.Controllers
                 var faceService = this.Service<IFaceService>();
                 var faceServiceClient = Assets.client;
 
-                var entity = service.Get(q => q.PersonId == model.PersonId).FirstOrDefault();
+                var entity = service.Get(model.PersonId);
                 if (entity != null)
                 {
                     entity.Name = model.Name;

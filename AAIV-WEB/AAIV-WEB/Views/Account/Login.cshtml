@@ -1,7 +1,7 @@
 ﻿@using AAIV_WEB.Models
 @model LoginViewModel
 @{
-    ViewBag.Title = "Log in";
+    ViewBag.Title = "Đăng nhập";
     Layout = "";
 }
 
@@ -26,8 +26,9 @@
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
             <div class="login-panel panel panel-default">
-                <div class="panel-heading">
-                    <h1 class="panel-title" style="text-align: center">AAIV 1.0</h1>
+                <div class="panel-heading" style="text-align:center">
+                    @*<h1 class="panel-title" style="text-align: center">AAIV 1.0</h1>*@
+                    <img src="~/Content/icon/logo_black.png" style="max-width:140px" />
                 </div>
                 <div class="panel-body">
                     @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
@@ -37,11 +38,13 @@
                         <fieldset>
                             <div class="form-group">
                                 @*<input class="form-control" placeholder="Username" name="email" type="email" autofocus>*@
+                                @Html.Label("Email")
                                 @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = "Email" })
                                 @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
                                 @*<input class="form-control" placeholder="Password" name="password" type="password" value="">*@
+                                @Html.Label("Password")
                                 @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Mật khẩu" })
                                 @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                             </div>
@@ -63,6 +66,7 @@
 </div>
 
 @section Scripts {
+
     <!-- jQuery -->
     <script src="~/Content/vendor/jquery/jquery.min.js"></script>
     <!-- Bootstrap Core JavaScript -->

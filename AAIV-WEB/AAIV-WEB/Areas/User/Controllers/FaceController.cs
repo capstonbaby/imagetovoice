@@ -37,7 +37,6 @@ namespace AAIV_WEB.Areas.User.Controllers
             var personService = this.Service<IPersonService>();
             var faceService = this.Service<IFaceService>();
 
-
             // PErson Group
             var curUser = Util.getCurrentUser(this);
 
@@ -47,7 +46,9 @@ namespace AAIV_WEB.Areas.User.Controllers
                 //    .ProjectTo<PersonEditViewModel>(this.MapperConfig)
                 //    .ToList();
 
-                var personList = personService.GetActive().Where(q => (q.PersonGroupId).Contains(curUser.Id)).ProjectTo<PersonEditViewModel>(this.MapperConfig)
+                var personList = personService.GetActive()
+                    .Where(q => (q.PersonGroupId).Contains(curUser.Id))
+                    .ProjectTo<PersonEditViewModel>(this.MapperConfig)
                     .ToList();
 
                 foreach (var person in personList)
@@ -93,7 +94,7 @@ namespace AAIV_WEB.Areas.User.Controllers
                 {
                     var user = Util.getCurrentUser(this);
                     var personGroup = personGroupService.Get(user.Id);
-                    
+
                     //create in Microsoft
                     var personCreateResult = await faceServiceClient.CreatePersonAsync(personGroup.PersonGroupId, person.Name, person.Description);
                     progressHub.SendMessage("33%", 33);
@@ -262,7 +263,7 @@ namespace AAIV_WEB.Areas.User.Controllers
                 try
                 {
                     var user = Util.getCurrentUser(this);
-                    
+
                     var deletePerson = personService.Get(id);
 
                     var personGroup = deletePerson.PersonGroupId;
@@ -532,7 +533,7 @@ namespace AAIV_WEB.Areas.User.Controllers
             var logService = this.Service<ILogService>();
 
             var user = Util.getCurrentUser(this);
-             
+
             var personGroupID = (personService.GetActive(q => q.PersonId == personID).FirstOrDefault()).PersonGroupId;
 
             var log = logService.Get(logID);
@@ -566,5 +567,93 @@ namespace AAIV_WEB.Areas.User.Controllers
 
         }
 
+        public async Task<ActionResult> CheckDuplicate()
+        {
+            var personGroupService = this.Service<IPersonGroupService>();
+            var personService = this.Service<IPersonService>();
+            var faceService = this.Service<IFaceService>();
+
+            var currentUser = Util.getCurrentUser(this);
+            var personGroup = personGroupService.Get(currentUser.Id);
+            if (currentUser != null)
+            {
+                /*
+                 * List of duplicate person. 
+                 * Type: List<IGrouping<string, Person>> 
+                 * => string: duplicate person name
+                */
+                var duplicatePersonList = personService.GetActive()
+                    .Where(q => (q.PersonGroupId).Contains(currentUser.Id))
+                    .GroupBy(q => q.Name)
+                    .Where(g => g.Count() > 1)
+                    .ToList();
+
+                var listPersonList = new ListPersonListViewModel();
+                listPersonList.ListPersonList = new List<List<Person>>();
+                /*
+                 * Foreach duplicate case, order by the number of faces of each person
+                 * Get the person with the least amount of faces to be the prime person
+                 * Use prime person faces to compare with others person faces
+                 * If found at least 1 match, add that person + faces to a list.
+                 */
+                foreach (var duplicate_case in duplicatePersonList)
+                {
+                    //order person list of each case by amount of faces
+                    var personList = duplicate_case
+                        .OrderBy(q => q.Faces.Count)
+                        .ToList();
+                    Person prime_person = null;
+
+                    //check if prime person's faces is not 0. 
+                    //If face = 0 -> prime person = next person; personList remove that person from list
+                    for (int i = 0; i < personList.Count; i++)
+                    {
+                        if(personList.ElementAt(i).Faces.Count > 0)
+                        {
+                            prime_person = personList.ElementAt(i);
+                            break;
+                        }
+
+                        personList.RemoveAt(i);
+                    }
+
+                    if(null != prime_person)
+                    {
+
+                        var prime_person_face_imgUrls = prime_person.Faces.Where(q => q.Active = true)
+                            .Select(q => q.ImageURL)
+                            .ToList();
+
+                        var match_person_list = new List<Person>();
+                        match_person_list.Add(prime_person);
+
+                        for (int i = 0; i < prime_person_face_imgUrls.Count; i++)
+                        {
+                            if(personList.Count == 1)
+                            {
+                                break;
+                            }
+                            var faceId = await faceServiceClient.DetectAsync(prime_person_face_imgUrls.ElementAt(i));
+                            if(faceId.Length > 0)
+                            {
+                                for (int j = 1; j < personList.Count; j++)
+                                {
+                                    var result = await faceServiceClient.VerifyAsync(faceId[0].FaceId, personGroup.PersonGroupId, new Guid(personList.ElementAt(j).PersonId));
+                                    if (result.IsIdentical)
+                                    {
+                                        match_person_list.Add(personList.ElementAt(j));
+                                        personList.RemoveAt(j);
+                                    }
+                                }
+                            }
+                        }
+                        listPersonList.ListPersonList.Add(match_person_list);
+                    }
+                }
+                return this.View(listPersonList);
+            }
+
+            return RedirectToAction("Login", "Account", new { area = ""});
+        }
     }
 }

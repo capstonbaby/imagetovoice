@@ -183,13 +183,15 @@ namespace AAIV_WEB.Controllers
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
-                //set role for user. Default is USER
-                UserManager.AddToRole(user.Id, "User");
+                
 
                 if (result.Succeeded)
                 {
                     try
                     {
+                        //set role for user. Default is USER
+                        UserManager.AddToRole(user.Id, "User");
+
                         //create person group with personGroupId = user id
                         //create person group in DB
                         var personGroupService = this.Service<IPersonGroupService>();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AAIV_WEB.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -14,5 +15,10 @@ namespace AAIV_WEB.Models.ViewModels
         //Log
         public int LogID { get; set; }
 
+    }
+
+    public class ListPersonListViewModel
+    {
+        public List<List<Person>> ListPersonList { get; set; }
     }
 }
