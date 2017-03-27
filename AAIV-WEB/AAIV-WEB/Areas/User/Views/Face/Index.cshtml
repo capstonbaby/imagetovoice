@@ -25,7 +25,14 @@
             <tr>
                 <td> @i</td>
                 <td>
-                    <img src="@item.PersonAvatar" style="max-width:100px" alt="No image available" />
+                    @if (item.PersonAvatar != null)
+                    {
+                        <img src="@item.PersonAvatar" style="max-width:100px" />
+                    }
+                    else
+                    {
+                        <img src="~/Content/icon/icon-user-default.png" style="max-width:100px" />
+                    }
                 </td>
                 <td> @item.Name</td>
                 <td> @item.Description</td>

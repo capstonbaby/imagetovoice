@@ -591,35 +591,39 @@ namespace AAIV_WEB.Areas.User.Controllers
                 var listPersonList = new ListPersonListViewModel();
                 listPersonList.ListPersonList = new List<List<Person>>();
                 /*
-                 * Foreach duplicate case, order by the number of faces of each person
+                 * Foreach duplicate case, order by the amount of faces of each person
                  * Get the person with the least amount of faces to be the prime person
-                 * Use prime person faces to compare with others person faces
+                 * Use prime person faces to compare with others person by PersonId
                  * If found at least 1 match, add that person + faces to a list.
                  */
                 foreach (var duplicate_case in duplicatePersonList)
                 {
+
                     //order person list of each case by amount of faces
                     var personList = duplicate_case
                         .OrderBy(q => q.Faces.Count)
                         .ToList();
                     Person prime_person = null;
 
-                    //check if prime person's faces is not 0. 
-                    //If face = 0 -> prime person = next person; personList remove that person from list
+                    //check if prime person's face.count is not 0. 
+                    //If face.count = 0 -> prime person = next person; personList remove that person from list
                     for (int i = 0; i < personList.Count; i++)
                     {
-                        if(personList.ElementAt(i).Faces.Count > 0)
+                        prime_person = personList.ElementAt(i);
+
+                        if (prime_person.Faces.Count > 0)
                         {
-                            prime_person = personList.ElementAt(i);
-                            break;
+                            break;  //found prime person, end loop
                         }
 
-                        personList.RemoveAt(i);
+                        personList.RemoveAt(i); // person face.count = 0, remove person from list, continue loop
                     }
 
-                    if(null != prime_person)
+                    if (null != prime_person && prime_person.Faces.Count != 0)
                     {
-
+                        /*
+                         * Get the prime person face list to verify with other person
+                         */
                         var prime_person_face_imgUrls = prime_person.Faces.Where(q => q.Active = true)
                             .Select(q => q.ImageURL)
                             .ToList();
@@ -627,14 +631,21 @@ namespace AAIV_WEB.Areas.User.Controllers
                         var match_person_list = new List<Person>();
                         match_person_list.Add(prime_person);
 
+                        /*
+                         * use each face of prime person to verify with the other person. 
+                         * If match found -> end loop + add that person to match_person_list
+                         * else -> next face
+                         */
                         for (int i = 0; i < prime_person_face_imgUrls.Count; i++)
                         {
-                            if(personList.Count == 1)
+                            if (personList.Count == 1)
                             {
                                 break;
                             }
+
+                            // detect to get face id from prime person image
                             var faceId = await faceServiceClient.DetectAsync(prime_person_face_imgUrls.ElementAt(i));
-                            if(faceId.Length > 0)
+                            if (faceId.Length > 0)
                             {
                                 for (int j = 1; j < personList.Count; j++)
                                 {
@@ -647,13 +658,81 @@ namespace AAIV_WEB.Areas.User.Controllers
                                 }
                             }
                         }
-                        listPersonList.ListPersonList.Add(match_person_list);
+                        if(match_person_list.Count > 1)
+                        {
+                            listPersonList.ListPersonList.Add(match_person_list);
+                        }
                     }
                 }
                 return this.View(listPersonList);
             }
 
-            return RedirectToAction("Login", "Account", new { area = ""});
+            return RedirectToAction("Login", "Account", new { area = "" });
+        }
+
+        public async Task<JsonResult> MergePerson(List<string> personId, string personName, string personGroupId)
+        {
+            var personService = this.Service<IPersonService>();
+            var faceService = this.Service<IFaceService>();
+
+            try
+            {
+                //create new person in MS
+                var createPersonResult = await faceServiceClient.CreatePersonAsync(personGroupId, personName, "");
+
+                //add newly created person to DB
+                var newPerson = new Person
+                {
+                    PersonId = createPersonResult.PersonId.ToString(),
+                    Name = personName,
+                    PersonGroupId = personGroupId,
+                    Active = true,
+                };
+                await personService.CreateAsync(newPerson);
+
+                //get all faces of all person
+                foreach (var id in personId)
+                {
+                    var person = personService.Get(id);
+
+                    //add faces of duplicate person to the new person + deactivate face in DB + add newly created face to DB
+                    foreach (var face in person.Faces)
+                    {
+                        //add face to person in MS
+                        var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, createPersonResult.PersonId, face.ImageURL);
+                        //create new face with returned persisted face ID in DB
+                        await faceService.CreateAsync(new Models.Entities.Face
+                        {
+                            PersistedFaceId = addPersonFaceResult.PersistedFaceId.ToString(),
+                            ImageURL = face.ImageURL,
+                            PersonID = createPersonResult.PersonId.ToString(),
+                            Active = true
+                        });
+                        //deactivate old face of duplication person in DB
+                        await faceService.DeactivateAsync(face);
+                    }
+                    //Delete duplicate person in MS
+                    await faceServiceClient.DeletePersonAsync(personGroupId, new Guid(id));
+                    //deactivate person in DB
+                    await personService.DeactivateAsync(person);
+
+                    //train person group
+                    await faceServiceClient.TrainPersonGroupAsync(personGroupId);
+                }
+                return Json(new
+                {
+                    success = true,
+                    message = "Thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Đã có lỗi xảy ra, vui lòng thử lại sau"
+                });
+            }
         }
     }
 }
