@@ -659,7 +659,7 @@ namespace AAIV_WEB.Areas.User.Controllers
                                 }
                             }
                         }
-                        if(match_person_list.Count > 1)
+                        if (match_person_list.Count > 1)
                         {
                             listPersonList.ListPersonList.Add(match_person_list);
                         }
@@ -671,46 +671,87 @@ namespace AAIV_WEB.Areas.User.Controllers
             return RedirectToAction("Login", "Account", new { area = "" });
         }
 
-        public async Task<JsonResult> MergePerson(List<string> personId, string personName, string personGroupId)
+        public ActionResult CheckDuplicateByName()
+        {
+            var personGroupService = this.Service<IPersonGroupService>();
+            var personService = this.Service<IPersonService>();
+            var faceService = this.Service<IFaceService>();
+
+            var currentUser = Util.getCurrentUser(this);
+            var personGroup = personGroupService.Get(currentUser.Id);
+            if (currentUser != null)
+            {
+                /*
+                 * List of duplicate person. 
+                 * Type: List<IGrouping<string, Person>> 
+                 * => string: duplicate person name
+                */
+                var duplicatePersonList = personService.GetActive()
+                    .Where(q => (q.PersonGroupId).Contains(currentUser.Id))
+                    .GroupBy(q => q.Name.ToLower())
+                    .Where(g => g.Count() > 1)
+                    .ToList();
+
+                var personList = new ListPersonListViewModel();
+                personList.ListPersonList = new List<List<Person>>();
+
+                foreach (var group in duplicatePersonList)
+                {
+                    var list = group.ToList();
+                    personList.ListPersonList.Add(list);
+                }
+
+                return this.View(personList);
+            }
+            return RedirectToAction("Login", "Account", new { area = "" });
+        }
+
+        public async Task<JsonResult> MergePerson(string personName, string personGroupId, List<string> SeletedPersonIDs)
         {
             var personService = this.Service<IPersonService>();
             var faceService = this.Service<IFaceService>();
 
+            if (SeletedPersonIDs.Count == 1)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Xin chọn nhiều hơn 1 người!"
+                });
+            }
+
             try
             {
-                //create new person in MS
-                var createPersonResult = await faceServiceClient.CreatePersonAsync(personGroupId, personName, "");
+                ////create new person in MS
+                //var createPersonResult = await faceServiceClient.CreatePersonAsync(personGroupId, personName, "");
 
-                //add newly created person to DB
-                var newPerson = new Person
-                {
-                    PersonId = createPersonResult.PersonId.ToString(),
-                    Name = personName,
-                    PersonGroupId = personGroupId,
-                    Active = true,
-                };
-                await personService.CreateAsync(newPerson);
+                ////add newly created person to DB
+                //var newPerson = new Person
+                //{
+                //    PersonId = createPersonResult.PersonId.ToString(),
+                //    Name = personName,
+                //    PersonGroupId = personGroupId,
+                //    Active = true,
+                //};
+                //await personService.CreateAsync(newPerson);
+
+               
+                //add face to person in MS
+                var firstPersonID = new Guid(SeletedPersonIDs.First());
 
                 //get all faces of all person
-                foreach (var id in personId)
+                for (int i = 1; i < SeletedPersonIDs.Count; i++)
                 {
+                    var id = SeletedPersonIDs.ElementAt(i);
                     var person = personService.Get(id);
 
                     //add faces of duplicate person to the new person + deactivate face in DB + add newly created face to DB
-                    foreach (var face in person.Faces)
+                    foreach (var face in person.Faces.ToList())
                     {
-                        //add face to person in MS
-                        var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, createPersonResult.PersonId, face.ImageURL);
-                        //create new face with returned persisted face ID in DB
-                        await faceService.CreateAsync(new Models.Entities.Face
-                        {
-                            PersistedFaceId = addPersonFaceResult.PersistedFaceId.ToString(),
-                            ImageURL = face.ImageURL,
-                            PersonID = createPersonResult.PersonId.ToString(),
-                            Active = true
-                        });
-                        //deactivate old face of duplication person in DB
-                        await faceService.DeactivateAsync(face);
+                        var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, firstPersonID , face.ImageURL);
+                        //Update PersonID of face to the firstPersonID
+                        face.PersonID = firstPersonID.ToString();
+                        await faceService.UpdateAsync(face);
                     }
                     //Delete duplicate person in MS
                     await faceServiceClient.DeletePersonAsync(personGroupId, new Guid(id));

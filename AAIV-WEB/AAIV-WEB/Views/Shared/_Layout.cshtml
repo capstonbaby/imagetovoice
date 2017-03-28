@@ -133,7 +133,11 @@
                                 <a href="@Url.Action("ShowLogs", "Face", new { area = "User"})"><i class="fa fa-copy"></i> Người chưa nhận diện được</a>
                             </li>
                             <li>
-                                <a href="@Url.Action("CheckDuplicate", "Face", new { area = "User"})"><i class="fa fa-search" onclick="$('.loader').show();$('.dim-background').show();"></i> Kiểm tra trùng lặp</a>
+                                <a href="#"><i class="fa fa-search"></i> Kiểm tra trùng lặp <span class="fa arrow"> </span></a>
+                                <ul class="nav nav-second-level">
+                                    <li> <a href="@Url.Action("CheckDuplicateByName","Face")"> Theo tên </a> </li>
+                                    <li> <a href="@Url.Action("CheckDuplicateByFace","Face")"> Theo gương mặt </a> </li>
+                                </ul>
                             </li>
                         }
                     </ul>

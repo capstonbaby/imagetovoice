@@ -966,6 +966,7 @@
     <Content Include="Areas\Admin\Views\Object\testValue.cshtml" />
     <Content Include="Areas\Admin\Views\Object\Index.cshtml" />
     <Content Include="Areas\User\Views\Face\CheckDuplicate.cshtml" />
+    <Content Include="Areas\User\Views\Face\CheckDuplicateByName.cshtml" />
     <None Include="bin\AAIV-WEB.dll.config" />
     <Content Include="bin\roslyn\Microsoft.CSharp.Core.targets" />
     <Content Include="bin\roslyn\Microsoft.VisualBasic.Core.targets" />
