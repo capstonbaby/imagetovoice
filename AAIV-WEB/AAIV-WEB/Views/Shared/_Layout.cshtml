@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - AAIV</title>
+    <title>@ViewBag.Title - See4U</title>
     @*<link href="~/Content/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />*@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link href="~/Content/vendor/metisMenu/metisMenu.min.css" rel="stylesheet" />
@@ -18,6 +18,7 @@
     <link href="~/Content/imagePicker/image-picker/image-picker.css" rel="stylesheet" />
     <link href="~/Content/bootstrap-toggle/css/bootstrap-toggle.min.css" rel="stylesheet" />
     <link href="~/Content/bootstrap-datatable/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/w3/w3.css" rel="stylesheet" />
     @Styles.Render("~/Content/dropzonescss")
     <style>
         .nav-icon {
@@ -88,10 +89,15 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#" style="color:#fff">AAIV 1.0</a>
+                <a class="navbar-brand" href="@Url.Action("Index")" style="color:#fff">
+                    <img src="~/Content/icon/Logo_Done.png" style="max-width:130px; margin-top:-5px" alt="See4U" />
+                </a>
             </div>
             <!-- /.navbar-header -->
             <ul class="nav navbar-top-links navbar-right">
+                <li>
+                    <h4 style="color:aliceblue">@user.Identity.Name</h4>
+                </li>
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fa fa-user fa-fw nav-icon"></i> <i class="fa fa-caret-down nav-icon"></i>
@@ -124,7 +130,10 @@
                                 <a href="@Url.Action("Index", "Face", new { area = "User"})"><i class="fa fa-users"></i> Quản lý người thân</a>
                             </li>
                             <li>
-                                <a href="@Url.Action("ShowLogs", "Face", new { area = "User"})"><i class="fa-copy  "></i> Người chưa nhận diện được</a>
+                                <a href="@Url.Action("ShowLogs", "Face", new { area = "User"})"><i class="fa fa-copy"></i> Người chưa nhận diện được</a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("CheckDuplicate", "Face", new { area = "User"})"><i class="fa fa-search" onclick="$('.loader').show();$('.dim-background').show();"></i> Kiểm tra trùng lặp</a>
                             </li>
                         }
                     </ul>

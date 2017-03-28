@@ -143,12 +143,14 @@ namespace CapstoneProject.WebAPI.Controllers
                 {
                     var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                     var result = await UserManager.CreateAsync(user, model.Password);
-                    //add user to role 'User'
-                    UserManager.AddToRole(user.Id, "User");
-
-                    var userEntity = userService.Get(user.Id);
+                    
                     if (result.Succeeded)
                     {
+                        //add user to role 'User'
+                        UserManager.AddToRole(user.Id, "User");
+
+                        var userEntity = userService.Get(user.Id);
+
                         try
                         {
                             if (userEntity != null)
