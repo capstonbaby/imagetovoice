@@ -299,50 +299,50 @@ namespace CapstoneProject.WebAPI.Controllers
                 //create log in DB
                 await service.CreateAsync(entity);
 
-                //check person name in DB
-                var person = personService.GetActive(q => q.Name.ToLower().Equals(model.Name.ToLower())).FirstOrDefault();
+                ////check person name in DB
+                //var person = personService.GetActive(q => q.Name.ToLower().Equals(model.Name.ToLower())).FirstOrDefault();
 
-                //person available in DB => add face in log to person
-                if (null != person)
-                {
-                    //in MS
-                    var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, new Guid(person.PersonId), model.ImageURL);
+                ////person available in DB => add face in log to person
+                //if (null != person)
+                //{
+                //    //in MS
+                //    var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, new Guid(person.PersonId), model.ImageURL);
 
-                    //in DB
-                    var face = new Face
-                    {
-                        PersistedFaceId = addPersonFaceResult.PersistedFaceId.ToString(),
-                        ImageURL = model.ImageURL,
-                        PersonID = person.PersonId,
-                        Active = true
-                    };
-                    await faceService.CreateAsync(face);
-                }
-                else //no person match in the DB, create new person + add face in MS & DB
-                {
-                    //create new person + add person face in MS
-                    var createPersonResult = await faceServiceClient.CreatePersonAsync(personGroupId, model.Name, "");
-                    var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, createPersonResult.PersonId, model.ImageURL);
+                //    //in DB
+                //    var face = new Face
+                //    {
+                //        PersistedFaceId = addPersonFaceResult.PersistedFaceId.ToString(),
+                //        ImageURL = model.ImageURL,
+                //        PersonID = person.PersonId,
+                //        Active = true
+                //    };
+                //    await faceService.CreateAsync(face);
+                //}
+                //else //no person match in the DB, create new person + add face in MS & DB
+                //{
+                //    //create new person + add person face in MS
+                //    var createPersonResult = await faceServiceClient.CreatePersonAsync(personGroupId, model.Name, "");
+                //    var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, createPersonResult.PersonId, model.ImageURL);
 
-                    //create person + face in DB
-                    var newPerson = new Person
-                    {
-                        PersonId = createPersonResult.PersonId.ToString(),
-                        PersonGroupId = personGroupId,
-                        Name = model.Name,
-                        Active = true,
-                    };
-                    await personService.CreateAsync(newPerson);
+                //    //create person + face in DB
+                //    var newPerson = new Person
+                //    {
+                //        PersonId = createPersonResult.PersonId.ToString(),
+                //        PersonGroupId = personGroupId,
+                //        Name = model.Name,
+                //        Active = true,
+                //    };
+                //    await personService.CreateAsync(newPerson);
 
-                    var newPersonFace = new Face
-                    {
-                        PersistedFaceId = addPersonFaceResult.PersistedFaceId.ToString(),
-                        PersonID = newPerson.PersonId,
-                        ImageURL = model.ImageURL,
-                        Active = true
-                    };
-                    await faceService.CreateAsync(newPersonFace);
-                }
+                //    var newPersonFace = new Face
+                //    {
+                //        PersistedFaceId = addPersonFaceResult.PersistedFaceId.ToString(),
+                //        PersonID = newPerson.PersonId,
+                //        ImageURL = model.ImageURL,
+                //        Active = true
+                //    };
+                //    await faceService.CreateAsync(newPersonFace);
+                //}
 
                 //train person group
                 await faceServiceClient.TrainPersonGroupAsync(personGroupId);

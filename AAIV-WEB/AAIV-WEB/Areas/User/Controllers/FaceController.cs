@@ -584,7 +584,7 @@ namespace AAIV_WEB.Areas.User.Controllers
                 */
                 var duplicatePersonList = personService.GetActive()
                     .Where(q => (q.PersonGroupId).Contains(currentUser.Id))
-                    .GroupBy(q => q.Name)
+                    .GroupBy(q => q.Name.ToLower())
                     .Where(g => g.Count() > 1)
                     .ToList();
 
@@ -654,6 +654,7 @@ namespace AAIV_WEB.Areas.User.Controllers
                                     {
                                         match_person_list.Add(personList.ElementAt(j));
                                         personList.RemoveAt(j);
+                                        j--;
                                     }
                                 }
                             }
