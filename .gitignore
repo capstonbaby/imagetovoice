@@ -9,7 +9,6 @@
 *.sln.docstates
 
 # Build results
-AAIV-WEB/AAIV-WEB/
 AAIV-WEB/AAIV-WEB/[Dd]ebug/
 AAIV-WEB/AAIV-WEB/[Rr]elease/
 AAIV-WEB/AAIV-WEB/x64/

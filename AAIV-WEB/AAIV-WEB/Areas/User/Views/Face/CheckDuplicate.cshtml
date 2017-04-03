@@ -1,0 +1,95 @@
+﻿@model ListPersonListViewModel
+@{
+    ViewBag.Title = "Trùng Lặp";
+}
+
+<h1 class="page-header">Trùng lặp</h1>
+
+@if (this.Model.ListPersonList.Count > 0)
+{
+    foreach (var person in this.Model.ListPersonList)
+    {
+        <div class="w3-card-4">
+            <header class="w3-container" id="header" style="margin-bottom:20px;background-color:#277998;color:#fff">
+                <h2>@person.ElementAt(0).Name <input type="button" class="btn btn-default pull-right" data-person="@person" value="Nhóm" onclick="MergePerson(this)" /></h2>
+            </header>
+            <form action="@Url.Action("MergePerson", "Face")" method="post" id="mergeForm">
+                @Html.Hidden("personName", person.ElementAt(0).Name)
+                @Html.Hidden("personGroupId", person.ElementAt(0).PersonGroupId)
+
+                @foreach (var item in person)
+                {
+                    @Html.Hidden("PersonId", item.PersonId)
+
+                    <div class="container" style="margin-bottom:20px">
+                        <div class="w3-row">
+                            <div class="w3-col" style="width:15%">
+                                <img src="@item.Faces.First().ImageURL" style="max-width:70px" />
+                            </div>
+                            <div class="w3-rest">
+                                <h3>@item.Name</h3>
+                                <p>@item.Description</p>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                }
+            </form>
+        </div>
+    }
+}
+else
+{
+    <h3>Không có trường hợp nào</h3>
+}
+
+
+
+@section scripts{
+    <script>
+        function MergePerson(e) {
+
+            var formData = $($(e.closest('header')).next().get(0)).serialize();
+
+            $('.loader').show();
+            $('.dim-background').show();
+
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("MergePerson", "Face", new { area = "User"})",
+                data: formData,
+                success: function (result) {
+                    if (result.success) {
+                        $('.loader').hide();
+                        $('.dim-background').hide();
+                        swal({
+                            title: result.message,
+                            type: 'success',
+                            text: 'Nhóm người thành công',
+                        }).then(function () {
+                            window.location.reload();
+                        });
+                    } else {
+                        $('.loader').hide();
+                        $('.dim-background').hide();
+                        swal({
+                            title: 'Lỗi',
+                            type: 'error',
+                            text: result.message,
+                        })
+                    }
+                },
+                error: function (error) {
+                    $('.loader').hide();
+                    $('.dim-background').hide();
+                    swal({
+                        title: 'Lỗi',
+                        type: 'error',
+                        text: 'Đã có lỗi xảy ra.',
+                    })
+                }
+            });
+        }
+    </script>
+}
+

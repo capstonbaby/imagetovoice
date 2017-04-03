@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CA5026FF-3CDC-476F-997C-3255FA5970FE}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>test_verify</RootNamespace>
+    <AssemblyName>test verify</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.ProjectOxford.Face">
+      <HintPath>..\AAIV-WEB\bin\Microsoft.ProjectOxford.Face.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ImageSource\1016472_1068638949816900_3987011359085440974_n.jpg" />
+    <Resource Include="ImageSource\10385590_873716732642457_7403752229657335062_n.jpg" />
+    <Resource Include="ImageSource\10409322_10209116873504991_8097182109173940317_n.jpg" />
+    <Resource Include="ImageSource\10463901_1115255441821917_1717803161451683963_n.jpg" />
+    <Resource Include="ImageSource\10481190_907954399218690_5688541175398752773_n.jpg" />
+    <Resource Include="ImageSource\10685332_1032112196802909_2312297329876680996_n.jpg" />
+    <Resource Include="ImageSource\10690094_997419173605545_8142779352831337500_n.jpg" />
+    <Resource Include="ImageSource\10690252_995737307107065_3970428323590620703_n.jpg" />
+    <Resource Include="ImageSource\10734227_980748175272645_8256696000653922376_n.jpg" />
+    <Resource Include="ImageSource\1075597_10209116873544992_3780170522905080110_o.jpg" />
+    <Resource Include="ImageSource\10802046_992794804067982_5127386635472029726_n.jpg" />
+    <Resource Include="ImageSource\10898137_1018940018120127_6412090813342921474_n.jpg" />
+    <Resource Include="ImageSource\10917832_1020963747917754_1518337761621074805_n.jpg" />
+    <Resource Include="ImageSource\110325star1vt-2.jpg" />
+    <Resource Include="ImageSource\11114771_1103339979680130_3703963552581070359_n.jpg" />
+    <Resource Include="ImageSource\11159477_1087306057950189_5368033222468254733_n.jpg" />
+    <Resource Include="ImageSource\11159490_1092841297396665_7485746039746464283_n.jpg" />
+    <Resource Include="ImageSource\11403488_1121438844536910_1955652513153320820_n.jpg" />
+    <Resource Include="ImageSource\11665508_1136131036401024_2247040594309846200_n.jpg" />
+    <Resource Include="ImageSource\12032801_10209116878505116_8385266949545135595_o.jpg" />
+    <Resource Include="ImageSource\12141529_10209116874305011_5228646943387823079_n.jpg" />
+    <Resource Include="ImageSource\12239755_1217670678247059_4199477753682328755_n.jpg" />
+    <Resource Include="ImageSource\12359910_1233901179957342_3443407029688009284_n.jpg" />
+    <Resource Include="ImageSource\12391802_1233901173290676_5950369623005252923_n.jpg" />
+    <Resource Include="ImageSource\12647077_1264859616861498_7780688929897573822_n.jpg" />
+    <Resource Include="ImageSource\12647541_1260297373984389_3709112965094452759_n.jpg" />
+    <Resource Include="ImageSource\12841365_10209116878065105_7384402371137569746_o.jpg" />
+    <Resource Include="ImageSource\12961704_1309072539106872_8927839731522366712_n.jpg" />
+    <Resource Include="ImageSource\13000213_1319875558026570_4883651976339744430_n.jpg" />
+    <Resource Include="ImageSource\13012665_10153918156872911_8318104657593117238_n.jpg" />
+    <Resource Include="ImageSource\13040953_586992584803993_1013786226478367888_o.jpg" />
+    <Resource Include="ImageSource\13076800_1320516014629191_6803490634212288675_n.jpg" />
+    <Resource Include="ImageSource\13082525_1320516017962524_372055902080509101_n.jpg" />
+    <Resource Include="ImageSource\13226694_1334320323248760_3433858063216757762_n.jpg" />
+    <Resource Include="ImageSource\13239144_1344115505602575_9052394012132085125_n.jpg" />
+    <Resource Include="ImageSource\13239276_1344114685602657_1646147381123596540_n.jpg" />
+    <Resource Include="ImageSource\13244791_1344114715602654_6325778709893261009_n.jpg" />
+    <Resource Include="ImageSource\13245354_1344114765602649_6640367524808793893_n.jpg" />
+    <Resource Include="ImageSource\13256233_1344114525602673_2821106375934182813_n.jpg" />
+    <Resource Include="ImageSource\13256324_1344115468935912_1607773355832785679_n.jpg" />
+    <Resource Include="ImageSource\13256428_1344115062269286_2121782479217784046_n.jpg" />
+    <Resource Include="ImageSource\13256451_1344114752269317_8732642874678544241_n.jpg" />
+    <Resource Include="ImageSource\13260084_1344115088935950_5639121062485494690_n.jpg" />
+    <Resource Include="ImageSource\13269294_1344115202269272_5149605989787253225_n.jpg" />
+    <Resource Include="ImageSource\13320913_10209818508525428_8168245559955568174_o.jpg" />
+    <Resource Include="ImageSource\13332731_1162286033801730_1181100791536653373_n.jpg" />
+    <Resource Include="ImageSource\13340082_10209848938686163_7799435633966554769_o.jpg" />
+    <Resource Include="ImageSource\13340225_10209848938606161_2055239453528496080_o.jpg" />
+    <Resource Include="ImageSource\13394135_1356394727707986_4107603432634579768_n.jpg" />
+    <Resource Include="ImageSource\13419111_1356394927707966_8082081075275640904_n.jpg" />
+    <Resource Include="ImageSource\13423912_1356393807708078_2864644640823051654_n.jpg" />
+    <Resource Include="ImageSource\13516222_1370860819594710_1852691891394160025_n.jpg" />
+    <Resource Include="ImageSource\13532819_1379083022105823_1251703718855123229_n.jpg" />
+    <Resource Include="ImageSource\1387941748-2.jpg" />
+    <Resource Include="ImageSource\1430184251-qbbxvinh_thuy_1_vbge.jpg" />
+    <Resource Include="ImageSource\1450238738-1450231508-7.jpg" />
+    <Resource Include="ImageSource\1451591_10151977966393948_1727777059_n.jpg" />
+    <Resource Include="ImageSource\1454728_767200839960714_1741073285_n.jpg" />
+    <Resource Include="ImageSource\1465176825-1465174240-hoang-thuy-linh-2.jpg" />
+    <Resource Include="ImageSource\1487247_779846498696148_1373433316_n.jpg" />
+    <Resource Include="ImageSource\149070_178380198842784_2484016_n.jpg" />
+    <Resource Include="ImageSource\149256_178704138810390_3436699_n.jpg" />
+    <Resource Include="ImageSource\1501750_775636302450501_1474992239_n.jpg" />
+    <Resource Include="ImageSource\150824_178393045508166_2229042_n.jpg" />
+    <Resource Include="ImageSource\155725_178395438841260_3895222_n.jpg" />
+    <Resource Include="ImageSource\155756_184588774888593_1842312_n.jpg" />
+    <Resource Include="ImageSource\15590649_1556144467733010_7082384506597639439_n.jpg" />
+    <Resource Include="ImageSource\15665877_1556144401066350_9036344651123934116_n.jpg" />
+    <Resource Include="ImageSource\15697288_1557777550903035_5313243491300234761_n.jpg" />
+    <Resource Include="ImageSource\15697550_1556145177732939_3693586858080015715_n.jpg" />
+    <Resource Include="ImageSource\16473482_1607889025891887_8735317933950931959_n.jpg" />
+    <Resource Include="ImageSource\1661105_833730286641102_791358294_n.jpg" />
+    <Resource Include="ImageSource\17098559_1637726876241435_841009629638383953_n.jpg" />
+    <Resource Include="ImageSource\1902052_993309364016526_2171370386853963128_n.jpg" />
+    <Resource Include="ImageSource\1917359_101801546515522_3709141_n.jpg" />
+    <Resource Include="ImageSource\196369_211062462241224_5840415_n.jpg" />
+    <Resource Include="ImageSource\1D4A3617-copy.jpg" />
+    <Resource Include="ImageSource\21833_107651775915627_1299779_n.jpg" />
+    <Resource Include="ImageSource\26167_116695715011233_8285700_n.jpg" />
+    <Resource Include="ImageSource\27777_118655281496525_4540479_n.jpg" />
+    <Resource Include="ImageSource\28743_557969304217203_1037431333_n.jpg" />
+    <Resource Include="ImageSource\75396876-Vinh_Thuy.JPG" />
+    <Resource Include="ImageSource\76097_178381288842675_2266558_n.jpg" />
+    <Resource Include="ImageSource\76162_178691025478368_239288_n.jpg" />
+    <Resource Include="ImageSource\76317_178381402175997_6209689_n.jpg" />
+    <Resource Include="ImageSource\a5ef6a70be5a920b83cde4759521e7189c3c0893.jpg" />
+    <Resource Include="ImageSource\dsc7742.jpg" />
+    <Resource Include="ImageSource\images1623759_vinh_thuy_blogtamsuvn08_puhb.jpg" />
+    <Resource Include="ImageSource\khong-phai-bo-ba-giam-khao---day-moi-la-nguoi-nhieu-fan-nhat-the-face-vinh-thuy-the-face10jpg-1467602525-width500height732.jpg" />
+    <Resource Include="ImageSource\la-19.jpg" />
+    <Resource Include="ImageSource\nh-1.JPG" />
+    <Resource Include="ImageSource\nhung-nghe-it-biet-cua-ban-trai-hoang-thuy-linh-hinh-5.jpg" />
+    <Resource Include="ImageSource\t542383.jpg" />
+    <Resource Include="ImageSource\truongthimay36-2-ngoisao-vn_03.jpg" />
+    <Resource Include="ImageSource\vinh-thuy-01-3657.jpg" />
+    <Resource Include="ImageSource\vinh-thuy-dep-hut-hon-sau-khi-cong-khai-yeu-hoang-thuy-linh-img_6987-1458637253-width499height404.jpg" />
+    <Resource Include="ImageSource\vinh-thuy-gay-bat-ngo-khi-dam-nhan-vai-tro-host-tai-the-face.jpg" />
+    <Resource Include="ImageSource\vinh-thuy-khoe-ve-lich-lam-nam-tinh-tai-su-kien-hinh-2.jpg" />
+    <Resource Include="ImageSource\vinhthuy.jpg" />
+    <Resource Include="ImageSource\VinhThuy1.jpg" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
