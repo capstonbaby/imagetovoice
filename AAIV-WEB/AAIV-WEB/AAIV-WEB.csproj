@@ -782,6 +782,9 @@
     <Content Include="Content\imagePicker\image-picker\image-picker.js" />
     <Content Include="Content\imagePicker\image-picker\image-picker.min.js" />
     <Content Include="Content\icon\add-image.png" />
+    <Content Include="Content\sweetalert\sweetalert-dev.js" />
+    <Content Include="Content\sweetalert\sweetalert.css" />
+    <Content Include="Content\sweetalert\sweetalert.min.js" />
     <Content Include="Content\sweetalert\sweetalert2.css" />
     <Content Include="Content\sweetalert\sweetalert2.js" />
     <Content Include="Content\sweetalert\sweetalert2.min.css" />
@@ -967,6 +970,7 @@
     <Content Include="Areas\Admin\Views\Object\Index.cshtml" />
     <Content Include="Areas\User\Views\Face\CheckDuplicate.cshtml" />
     <Content Include="Areas\User\Views\Face\CheckDuplicateByName.cshtml" />
+    <Content Include="Areas\User\Views\Face\CheckDuplicateByFace.cshtml" />
     <None Include="bin\AAIV-WEB.dll.config" />
     <Content Include="bin\roslyn\Microsoft.CSharp.Core.targets" />
     <Content Include="bin\roslyn\Microsoft.VisualBasic.Core.targets" />

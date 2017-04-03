@@ -1,0 +1,171 @@
+﻿@model ListPersonListViewModel
+@{
+    ViewBag.Title = "CheckDuplicateByFace";
+}
+
+<!--Demo zoom image mouse over-->
+<style>
+        .zoom {
+            -webkit-transition: all 0.35s ease-in-out;
+            -moz-transition: all 0.35s ease-in-out;
+            transition: all 0.35s ease-in-out;
+            cursor: -webkit-zoom-in;
+            cursor: -moz-zoom-in;
+            cursor: zoom-in;
+        }
+
+            .zoom:hover,
+            .zoom:active,
+            .zoom:focus {
+                /**adjust scale to desired size,
+    add browser prefixes**/
+                -ms-transform: scale(2.5);
+                -moz-transform: scale(2.5);
+                -webkit-transform: scale(2.5);
+                -o-transform: scale(2.5);
+                transform: scale(2.5);
+                position: relative;
+                z-index: 100;
+            }
+</style>
+
+<h1 class="page-header">Kiểm tra trùng gương mặt</h1>
+
+@if (this.Model.ListPersonList.Count > 0)
+{
+    var count = 0;
+    foreach (var personList in this.Model.ListPersonList)
+    {
+        count++;
+        <div class="w3-card-4">
+            <header class="w3-container" id="header" style="margin-bottom:20px;background-color:#277998;color:#fff">
+                <h2>#@count <input type="button" class="btn btn-default pull-right" data-person="@personList" value="Nhóm" onclick="MergePerson(this)" /></h2>
+            </header>
+            <form action="@Url.Action("MergePersonByFace", "Face")" method="post" id="mergeForm">
+                @Html.Hidden("personName")
+                @Html.Hidden("personGroupId", personList.ElementAt(0).PersonGroupId)
+
+                @foreach (var item in personList)
+                {
+                    @Html.Hidden("PersonId", item.PersonId)
+
+                    <div class="container" style="margin-bottom:20px">
+                        <div class="w3-row">
+
+                            <div class="w3-col" style="width:15%">
+                                <h3><b>@item.Name</b></h3>
+                                <p>@item.Description</p>
+                            </div>
+
+                            <div class="w3-col" style="width:80%">
+                                @if (item.Faces.Count > 0)
+                                {
+
+                                    foreach (var image in item.Faces.Where(q => q.Active))
+                                    {
+                                        <img class="zoom" src="@image.ImageURL" style="max-width:70px" />
+                                    }
+
+                                }
+                                else
+                                {
+                                    <img src="~/Content/icon/icon-user-default.png" style="max-width:70px" />
+                                }
+
+                            </div>
+
+                            <div class="w3-rest">
+                                <input type="checkbox" name="SeletedPersonIDs" id="SeletedPersonIDs" class="myCheckBox" checked
+                                       data-toggle="toggle"
+                                       data-onstyle="success"
+                                       data-size="small"
+                                       data-style="ios"
+                                       data-on="<i class='fa fa-check'></i>"
+                                       data-off="<i class='fa fa-times'></i>"
+                                       value="@item.PersonId">
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                }
+            </form>
+        </div>
+    }
+}
+else
+{
+    <h3>Không có trường hợp nào</h3>
+}
+
+@section scripts{
+    <script>
+        function MergePerson(e) {
+
+            swal({
+                title: 'Nhập tên',
+                input: 'text',
+                showCancelButton: true,
+                inputValidator: function (value) {
+                    return new Promise(function (resolve, reject) {
+                        if (value) {
+                            resolve()
+                        } else {
+                            reject('Vui lòng nhập tên!')
+                        }
+                    })
+                }
+            }).then(function (result) {
+
+
+                // Set input value to Name hidden file
+                //Get name succesfully
+
+                var personInput = $($(e.closest('header')).next().get(0)).find(':input[id=personName]').get(0);
+                $(personInput).val(result);
+
+                var formData = $($(e.closest('header')).next().get(0)).serialize();
+
+
+                $('.loader').show();
+                $('.dim-background').show();
+
+                $.ajax({
+                    type: 'POST',
+                    url: "@Url.Action("MergePersonByFace", "Face", new { area = "User"})",
+                    data: formData,
+                    success: function (result) {
+                        if (result.success) {
+                            $('.loader').hide();
+                            $('.dim-background').hide();
+                            swal({
+                                title: result.message,
+                                type: 'success',
+                                text: 'Nhóm người thành công',
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                        } else {
+                            $('.loader').hide();
+                            $('.dim-background').hide();
+                            swal({
+                                title: 'Lỗi',
+                                type: 'error',
+                                text: result.message,
+                            })
+                        }
+                    },
+                    error: function (error) {
+                        $('.loader').hide();
+                        $('.dim-background').hide();
+                        swal({
+                            title: 'Lỗi',
+                            type: 'error',
+                            text: 'Đã có lỗi xảy ra.',
+                        })
+                    }
+                });
+            });
+
+        }
+    </script>
+}

@@ -14,11 +14,14 @@
     <link href="~/Content/dist/css/sb-admin-2.css" rel="stylesheet" />
     <link href="~/Content/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
     <link href="~/Content/bootstrapselect/dist/css/bootstrap-select.min.css" rel="stylesheet" />
-    <link href="~/Content/sweetalert/sweetalert2.min.css" rel="stylesheet" />
+    @*<link href="~/Content/sweetalert/sweetalert2.min.css" rel="stylesheet" />*@
+    @*<link href="~/Content/sweetalert/sweetalert.css" rel="stylesheet" />*@
+    <link href="~/Content/sweetalert/sweetalert2.css" rel="stylesheet" />
     <link href="~/Content/imagePicker/image-picker/image-picker.css" rel="stylesheet" />
     <link href="~/Content/bootstrap-toggle/css/bootstrap-toggle.min.css" rel="stylesheet" />
     <link href="~/Content/bootstrap-datatable/css/dataTables.bootstrap.min.css" rel="stylesheet" />
     <link href="~/Content/w3/w3.css" rel="stylesheet" />
+
     @Styles.Render("~/Content/dropzonescss")
     <style>
         .nav-icon {
@@ -135,8 +138,8 @@
                             <li>
                                 <a href="#"><i class="fa fa-search"></i> Kiểm tra trùng lặp <span class="fa arrow"> </span></a>
                                 <ul class="nav nav-second-level">
-                                    <li> <a href="@Url.Action("CheckDuplicateByName","Face")"> Theo tên </a> </li>
-                                    <li> <a href="@Url.Action("CheckDuplicateByFace","Face")"> Theo gương mặt </a> </li>
+                                    <li> <a href="@Url.Action("CheckDuplicateByName","Face")" target="_blank"> Theo tên </a> </li>
+                                    <li> <a href="@Url.Action("CheckDuplicateByFace","Face")" target="_blank"> Theo gương mặt </a> </li>
                                 </ul>
                             </li>
                         }
@@ -170,12 +173,15 @@
         <!-- Custom Theme JavaScript -->
         <script src="~/Content/dist/js/sb-admin-2.js"></script>
         <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
-        <script src="~/Content/sweetalert/sweetalert2.min.js"></script>
+        @*<script src="~/Content/sweetalert/sweetalert2.min.js"></script>*@
         <script src="~/Content/bootstrapselect/js/bootstrap-select.js"></script>
         <script src="~/Content/imagePicker/image-picker/image-picker.min.js"></script>
         <script src="~/Content/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
         <script src="~/Content/bootstrap-datatable/js/jquery.dataTables.js"></script>
         <script src="~/Content/bootstrap-datatable/js/dataTables.bootstrap.min.js"></script>
+        @*<script src="~/Content/sweetalert/sweetalert.min.js"></script>*@
+        <script src="~/Content/sweetalert/sweetalert2.min.js"></script>
+
 
         @Scripts.Render("~/bundles/dropzonescripts")
         @RenderSection("scripts", required: false)

@@ -4,10 +4,39 @@
     ViewBag.Title = "CheckDuplicateByName";
 }
 
+<!--Demo zoom image mouse over-->
+<style>
+
+    .zoom {      
+-webkit-transition: all 0.35s ease-in-out;    
+-moz-transition: all 0.35s ease-in-out;    
+transition: all 0.35s ease-in-out;     
+cursor: -webkit-zoom-in;      
+cursor: -moz-zoom-in;      
+cursor: zoom-in;  
+}     
+
+.zoom:hover,  
+.zoom:active,   
+.zoom:focus {
+/**adjust scale to desired size, 
+add browser prefixes**/
+-ms-transform: scale(2.5);    
+-moz-transform: scale(2.5);  
+-webkit-transform: scale(2.5);  
+-o-transform: scale(2.5);  
+transform: scale(2.5);    
+position:relative;      
+z-index:100;  
+}
+
+
+</style>
+
 <h1 class="page-header">Kiểm tra trùng tên</h1>
 
 @if (this.Model.ListPersonList.Count > 0)
-{
+{   
     foreach (var personList in this.Model.ListPersonList)
     {
         <div class="w3-card-4">
@@ -24,10 +53,20 @@
 
                     <div class="container" style="margin-bottom:20px">
                         <div class="w3-row">
+
                             <div class="w3-col" style="width:15%">
+                                <h3>@item.Name</h3>
+                                <p>@item.Description</p>
+                            </div>
+
+                            <div class="w3-col" style="width:80%">
                                 @if (item.Faces.Count > 0)
                                 {
-                                    <img src="@item.Faces.First().ImageURL" style="max-width:70px" />
+                                    foreach (var image in item.Faces.Where(q => q.Active))
+                                    {
+                                            <img class="zoom" src="@image.ImageURL" style="max-width:90px" />
+                                    }
+
                                 }
                                 else
                                 {
@@ -35,10 +74,7 @@
                                 }
                                 
                             </div>
-                            <div class="w3-col" style="width:80%">
-                                <h3>@item.Name</h3>
-                                <p>@item.Description</p>
-                            </div>
+                            
                             <div class="w3-rest">
                                 <input type="checkbox" name="SeletedPersonIDs" id="SeletedPersonIDs" class="myCheckBox" checked
                                        data-toggle="toggle"
@@ -85,7 +121,7 @@ else
                         text: 'Nhóm người thành công',
                     }).then(function () {
                         window.location.reload();
-                    });
+                    })
                 } else {
                     $('.loader').hide();
                     $('.dim-background').hide();
