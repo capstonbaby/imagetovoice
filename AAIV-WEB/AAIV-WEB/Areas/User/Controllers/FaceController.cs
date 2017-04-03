@@ -659,7 +659,7 @@ namespace AAIV_WEB.Areas.User.Controllers
                                 }
                             }
                         }
-                        if(match_person_list.Count > 1)
+                        if (match_person_list.Count > 1)
                         {
                             listPersonList.ListPersonList.Add(match_person_list);
                         }
@@ -671,46 +671,341 @@ namespace AAIV_WEB.Areas.User.Controllers
             return RedirectToAction("Login", "Account", new { area = "" });
         }
 
-        public async Task<JsonResult> MergePerson(List<string> personId, string personName, string personGroupId)
+        public async Task<ActionResult> CheckDuplicateByName()
+        {
+            var personGroupService = this.Service<IPersonGroupService>();
+            var personService = this.Service<IPersonService>();
+            var faceService = this.Service<IFaceService>();
+
+            var currentUser = Util.getCurrentUser(this);
+            var personGroup = personGroupService.Get(currentUser.Id);
+            if (currentUser != null)
+            {
+                /*
+                 * List of duplicate person. 
+                 * Type: List<IGrouping<string, Person>> 
+                 * => string: duplicate person name
+                */
+                var duplicatePersonList = personService.GetActive()
+                    .Where(q => (q.PersonGroupId).Contains(currentUser.Id))
+                    .GroupBy(q => q.Name.ToLower())
+                    .Where(g => g.Count() > 1)
+                    .ToList();
+
+                var listPersonList = new ListPersonListViewModel();
+                listPersonList.ListPersonList = new List<List<Person>>();
+
+                foreach (var group in duplicatePersonList)
+                {
+                    var personList = group.OrderBy(q => q.Faces.Count).ToList();
+
+                    //Filter persons have same face
+
+                    //Create an isDuplicate array
+                    bool[] isDuplicate = new bool[personList.Count];
+
+                    //Get each person for finding duplicate
+                    for (int i = 0; i < personList.Count; i++)
+                    {
+                        var prime_person = personList.ElementAt(i);
+
+                        //Create a list of person which match with prime_person
+                        var match_person_list = new List<Person>();
+                        match_person_list.Add(prime_person);
+
+                        //Check if person[i] is not duplicate yet and has >= 1 image
+                        if ((!isDuplicate[i]) && (prime_person.Faces.Count > 0))
+                        {
+                            //Get all images of person[i]
+                            var prime_person_image_list = prime_person.Faces.Where(q => q.Active = true)
+                                                                            .Select(q => q.ImageURL).ToList();
+
+
+                            //Get the rest persons to compare
+                            for (int j = i + 1; j < personList.Count; j++)
+                            {
+                                var count = 0;
+                                var person_to_compare = personList.ElementAt(j);
+                                //Select each image of prime_person to compare with 
+                                foreach (var image in prime_person_image_list)
+                                {
+                                    // detect to get face id from prime person image
+                                    var faceId = await faceServiceClient.DetectAsync(image);
+
+                                    if (faceId.Length > 0)
+                                    {
+                                        var result = await faceServiceClient.VerifyAsync(faceId[0].FaceId, personGroup.PersonGroupId, new Guid(personList.ElementAt(j).PersonId));
+                                        var confident = result.Confidence;
+                                        if (result.IsIdentical && confident > 0.7)
+                                        {
+                                            count++;
+                                            //Check if more than 3 faces are identical
+                                            if (count >= 3 || count >= (prime_person_image_list.Count / 2) + (prime_person_image_list.Count % 2 > 0 ? 1 : 0))
+                                            {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                // Check if prime_person matchs with person[j] or not
+                                if (count >= (prime_person_image_list.Count / 2) + (prime_person_image_list.Count % 2 > 0 ? 1 : 0) || count >= 3)
+                                {
+                                    //Matched
+                                    //Add person[j] to match_list of current prime_person
+                                    match_person_list.Add(personList.ElementAt(j));
+
+                                    //Flag that person[j] is checked
+                                    isDuplicate[j] = true;
+                                }
+                            }
+                            // Check if prime_person has duplicate person or not
+                            if (match_person_list.Count > 1)
+                            {
+                                //Add to listPersonList
+                                listPersonList.ListPersonList.Add(match_person_list.OrderByDescending(q => q.Faces.Count).ToList());
+                            }
+                        }
+
+
+                    }
+
+
+
+
+                    //End of filter
+
+                    //var list = group.OrderByDescending(q => q.Faces.Count).ToList();
+                    //listPersonList.ListPersonList.Add(list);
+                }
+
+                return this.View(listPersonList);
+            }
+            return RedirectToAction("Login", "Account", new { area = "" });
+        }
+
+        public async Task<ActionResult> CheckDuplicateByFace()
+        {
+            var personGroupService = this.Service<IPersonGroupService>();
+            var personService = this.Service<IPersonService>();
+            var faceService = this.Service<IFaceService>();
+
+            var currentUser = Util.getCurrentUser(this);
+            var personGroup = personGroupService.Get(currentUser.Id);
+            if (currentUser != null)
+            {
+                //Create a list contain list of duplicate persons
+                var listPersonList = new ListPersonListViewModel();
+                listPersonList.ListPersonList = new List<List<Person>>();
+
+                //Get person list of current user -> Sort by number of face images
+                var personList = personService.GetActive().Where(q => (q.PersonGroupId).Contains(currentUser.Id))
+                                                          .OrderBy(q => q.Faces.Count).ToList();
+
+                //Create an isDuplicate array
+                bool[] isDuplicate = new bool[personList.Count];
+
+                //Get each person for finding duplicate
+                for (int i = 0; i < personList.Count; i++)
+                {
+                    var prime_person = personList.ElementAt(i);
+
+                    //Create a list of person which match with prime_person
+                    var match_person_list = new List<Person>();
+                    match_person_list.Add(prime_person);
+
+                    //Check if person[i] is not duplicate yet and has >= 1 image
+                    if ((!isDuplicate[i]) && (prime_person.Faces.Count > 0))
+                    {
+                        //Get all images of person[i]
+                        var prime_person_image_list = prime_person.Faces.Where(q => q.Active = true)
+                                                                        .Select(q => q.ImageURL).ToList();
+
+                        //Detect all images of person[i]
+                        var prime_faceID_list = new List<Guid>();
+
+                        foreach (var image in prime_person_image_list)
+                        {
+                            var detectResult = await faceServiceClient.DetectAsync(image);
+                            prime_faceID_list.Add(detectResult.First().FaceId);
+                        }
+
+                        //Get the rest persons to compare
+                        for (int j = i + 1; j < personList.Count; j++)
+                        {
+                            if (!isDuplicate[j])
+                            {
+
+                                var count = 0;
+                                var person_to_compare = personList.ElementAt(j);
+
+                                //Select each image of prime_person to compare with 
+                                foreach (var faceID in prime_faceID_list)
+                                {
+                                    //// detect to get face id from prime person image
+                                    //var faceId = await faceServiceClient.DetectAsync(image);
+
+                                    if (faceID.ToString().Length > 0)
+                                    {
+                                        var result = await faceServiceClient.VerifyAsync(faceID, personGroup.PersonGroupId, new Guid(personList.ElementAt(j).PersonId));
+                                        var confident = result.Confidence;
+                                        if (result.IsIdentical && confident > 0.7)
+                                        {
+                                            count++;
+                                            //Check if more than 3 faces are identical
+                                            if (count >= 3 || count >= (prime_person_image_list.Count / 2) + (prime_person_image_list.Count % 2 > 0 ? 1 : 0))
+                                            {
+                                                break;
+                                            }
+                                        }
+                                        
+                                    }
+
+                                }
+                                // Check if prime_person matchs with person[j] or not
+                                if (count >= (prime_person_image_list.Count / 2) + (prime_person_image_list.Count % 2 > 0 ? 1 : 0) || count >= 3)
+                                {
+                                    //Matched
+                                    //Add person[j] to match_list of current prime_person
+                                    match_person_list.Add(personList.ElementAt(j));
+
+                                    //Flag that person[j] is checked
+                                    isDuplicate[j] = true;
+                                }
+                            }
+                            ////Sleep
+                            //Thread.Sleep(5000);
+                        }
+
+                        // Check if prime_person has duplicate person or not
+                        if (match_person_list.Count > 1)
+                        {
+                            //Add to listPersonList
+                            listPersonList.ListPersonList.Add(match_person_list.OrderByDescending(q => q.Faces.Count).ToList());
+                        }
+                    }
+
+
+                }
+
+                return this.View(listPersonList);
+            }
+            return RedirectToAction("Login", "Account", new { area = "" });
+        }
+
+        public async Task<JsonResult> MergePerson(string personName, string personGroupId, List<string> SeletedPersonIDs)
         {
             var personService = this.Service<IPersonService>();
             var faceService = this.Service<IFaceService>();
 
+            if (SeletedPersonIDs.Count == 1)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Xin chọn nhiều hơn 1 người!"
+                });
+            }
+
             try
             {
-                //create new person in MS
-                var createPersonResult = await faceServiceClient.CreatePersonAsync(personGroupId, personName, "");
+                ////create new person in MS
+                //var createPersonResult = await faceServiceClient.CreatePersonAsync(personGroupId, personName, "");
 
-                //add newly created person to DB
-                var newPerson = new Person
-                {
-                    PersonId = createPersonResult.PersonId.ToString(),
-                    Name = personName,
-                    PersonGroupId = personGroupId,
-                    Active = true,
-                };
-                await personService.CreateAsync(newPerson);
+                ////add newly created person to DB
+                //var newPerson = new Person
+                //{
+                //    PersonId = createPersonResult.PersonId.ToString(),
+                //    Name = personName,
+                //    PersonGroupId = personGroupId,
+                //    Active = true,
+                //};
+                //await personService.CreateAsync(newPerson);
+
+
+                //add face to person in MS
+                var firstPersonID = new Guid(SeletedPersonIDs.First());
 
                 //get all faces of all person
-                foreach (var id in personId)
+                for (int i = 1; i < SeletedPersonIDs.Count; i++)
                 {
+                    var id = SeletedPersonIDs.ElementAt(i);
                     var person = personService.Get(id);
 
                     //add faces of duplicate person to the new person + deactivate face in DB + add newly created face to DB
-                    foreach (var face in person.Faces)
+                    foreach (var face in person.Faces.ToList())
                     {
-                        //add face to person in MS
-                        var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, createPersonResult.PersonId, face.ImageURL);
-                        //create new face with returned persisted face ID in DB
-                        await faceService.CreateAsync(new Models.Entities.Face
-                        {
-                            PersistedFaceId = addPersonFaceResult.PersistedFaceId.ToString(),
-                            ImageURL = face.ImageURL,
-                            PersonID = createPersonResult.PersonId.ToString(),
-                            Active = true
-                        });
-                        //deactivate old face of duplication person in DB
-                        await faceService.DeactivateAsync(face);
+                        var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, firstPersonID, face.ImageURL);
+                        //Update PersonID of face to the firstPersonID
+                        face.PersonID = firstPersonID.ToString();
+                        await faceService.UpdateAsync(face);
+                    }
+                    //Delete duplicate person in MS
+                    await faceServiceClient.DeletePersonAsync(personGroupId, new Guid(id));
+                    //deactivate person in DB
+                    await personService.DeactivateAsync(person);
+
+                    //train person group
+                    await faceServiceClient.TrainPersonGroupAsync(personGroupId);
+                }
+                return Json(new
+                {
+                    success = true,
+                    message = "Thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Đã có lỗi xảy ra, vui lòng thử lại sau"
+                });
+            }
+        }
+
+        public async Task<JsonResult> MergePersonByFace(string personName, string personGroupId, List<string> SeletedPersonIDs)
+        {
+            var personService = this.Service<IPersonService>();
+            var faceService = this.Service<IFaceService>();
+
+            if (SeletedPersonIDs.Count == 1)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Xin chọn nhiều hơn 1 người!"
+                });
+            }
+
+            try
+            {
+                //Update Person name to new name
+                //Update in Microsoft
+
+                var updatePerson = personService.Get(SeletedPersonIDs.First());
+                Guid personID = new Guid(updatePerson.PersonId);
+
+                await faceServiceClient.UpdatePersonAsync(personGroupId, personID, personName, "");
+
+                //Update in Database
+                updatePerson.Name = personName;
+                updatePerson.Description = "";
+                personService.Save();
+
+
+                //get all faces of all person
+                for (int i = 1; i < SeletedPersonIDs.Count; i++)
+                {
+                    var id = SeletedPersonIDs.ElementAt(i);
+                    var person = personService.Get(id);
+
+                    //add faces of duplicate person to the new person + deactivate face in DB + add newly created face to DB
+                    foreach (var face in person.Faces.ToList())
+                    {
+                        var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, personID, face.ImageURL);
+                        //Update PersonID of face to the firstPersonID
+                        face.PersonID = personID.ToString();
+                        await faceService.UpdateAsync(face);
                     }
                     //Delete duplicate person in MS
                     await faceServiceClient.DeletePersonAsync(personGroupId, new Guid(id));
@@ -736,4 +1031,6 @@ namespace AAIV_WEB.Areas.User.Controllers
             }
         }
     }
+
+
 }

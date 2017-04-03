@@ -20,5 +20,7 @@ namespace AAIV_WEB.Models.ViewModels
     public class ListPersonListViewModel
     {
         public List<List<Person>> ListPersonList { get; set; }
+
+        public List<string> SelectedPersonIDs { get; set; }
     }
 }
