@@ -320,28 +320,28 @@ namespace CapstoneProject.WebAPI.Controllers
                 //}
                 //else //no person match in the DB, create new person + add face in MS & DB
                 //{
-                //    //create new person + add person face in MS
-                //    var createPersonResult = await faceServiceClient.CreatePersonAsync(personGroupId, model.Name, "");
-                //    var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, createPersonResult.PersonId, model.ImageURL);
+                //create new person + add person face in MS
+                var createPersonResult = await faceServiceClient.CreatePersonAsync(personGroupId, model.Name, "");
+                var addPersonFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroupId, createPersonResult.PersonId, model.ImageURL);
 
-                //    //create person + face in DB
-                //    var newPerson = new Person
-                //    {
-                //        PersonId = createPersonResult.PersonId.ToString(),
-                //        PersonGroupId = personGroupId,
-                //        Name = model.Name,
-                //        Active = true,
-                //    };
-                //    await personService.CreateAsync(newPerson);
+                //create person + face in DB
+                var newPerson = new Person
+                {
+                    PersonId = createPersonResult.PersonId.ToString(),
+                    PersonGroupId = personGroupId,
+                    Name = model.Name,
+                    Active = true,
+                };
+                await personService.CreateAsync(newPerson);
 
-                //    var newPersonFace = new Face
-                //    {
-                //        PersistedFaceId = addPersonFaceResult.PersistedFaceId.ToString(),
-                //        PersonID = newPerson.PersonId,
-                //        ImageURL = model.ImageURL,
-                //        Active = true
-                //    };
-                //    await faceService.CreateAsync(newPersonFace);
+                var newPersonFace = new Face
+                {
+                    PersistedFaceId = addPersonFaceResult.PersistedFaceId.ToString(),
+                    PersonID = newPerson.PersonId,
+                    ImageURL = model.ImageURL,
+                    Active = true
+                };
+                await faceService.CreateAsync(newPersonFace);
                 //}
 
                 //train person group
@@ -353,7 +353,7 @@ namespace CapstoneProject.WebAPI.Controllers
                     response = new
                     {
                         logId = entity.ID,
-                        createdate = entity.CreatedDate.ToString("dd/mm/yyyy hh:mm:ss")
+                        createdate = entity.CreatedDate.ToString("dd/MM/yyyy hh:mm:ss")
                     }
                 });
 
@@ -373,7 +373,7 @@ namespace CapstoneProject.WebAPI.Controllers
             {
                 id = q.ID,
                 imgUrl = q.ImageURL,
-                createdate = q.CreatedDate.ToString("dd/mm/yyyy hh:mm:ss"),
+                createdate = q.CreatedDate.ToString("dd/MM/yyyy hh:mm:ss"),
                 name = q.Name
             }));
         }
