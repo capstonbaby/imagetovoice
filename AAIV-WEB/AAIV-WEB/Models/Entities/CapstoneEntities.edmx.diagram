@@ -6,12 +6,12 @@
     <edmx:Diagrams>
       <Diagram DiagramId="53f181d576dc46278a6ea7e6944089bb" Name="Diagram1">
         <EntityTypeShape EntityType="CapstoneModel.AspNetRole" Width="1.5" PointX="0.75" PointY="5.875" />
-        <EntityTypeShape EntityType="CapstoneModel.AspNetUserClaim" Width="1.5" PointX="5.25" PointY="7.375" />
+        <EntityTypeShape EntityType="CapstoneModel.AspNetUserClaim" Width="1.5" PointX="5.25" PointY="4.25" />
         <EntityTypeShape EntityType="CapstoneModel.AspNetUserLogin" Width="1.5" PointX="5.25" PointY="10.125" />
         <EntityTypeShape EntityType="CapstoneModel.AspNetUser" Width="1.5" PointX="3" PointY="4.375" />
         <EntityTypeShape EntityType="CapstoneModel.Concept" Width="1.5" PointX="7.75" PointY="4.875" />
         <EntityTypeShape EntityType="CapstoneModel.Face" Width="1.5" PointX="12.25" PointY="1.125" />
-        <EntityTypeShape EntityType="CapstoneModel.Log" Width="1.5" PointX="5.25" PointY="4.25" />
+        <EntityTypeShape EntityType="CapstoneModel.Log" Width="1.5" PointX="5.25" PointY="7" />
         <EntityTypeShape EntityType="CapstoneModel.LogObject" Width="1.5" PointX="5.25" PointY="1.375" />
         <EntityTypeShape EntityType="CapstoneModel.Person" Width="1.5" PointX="10" PointY="1" />
         <EntityTypeShape EntityType="CapstoneModel.PersonGroup" Width="1.5" PointX="7.75" PointY="1.125" />
