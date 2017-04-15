@@ -33,7 +33,7 @@ namespace CapstoneProject.WebAPI.Controllers
 
             // Request parameters
             queryString["maxCandidates"] = "1";
-            var uri = "https://api.projectoxford.ai/vision/v1.0/describe?" + queryString;
+            var uri = "https://westus.api.cognitive.microsoft.com/vision/v1.0/describe?" + queryString;
 
             HttpResponseMessage response;
 
