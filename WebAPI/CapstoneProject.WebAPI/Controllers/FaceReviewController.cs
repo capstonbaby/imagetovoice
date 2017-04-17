@@ -37,7 +37,7 @@ namespace CapstoneProject.WebAPI.Controllers
             // Request headers
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
 
-            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId + "?" + queryString;
+            var uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/" + personGroupId + "?" + queryString;
 
             HttpResponseMessage response;
 
@@ -63,7 +63,7 @@ namespace CapstoneProject.WebAPI.Controllers
             // Request headers
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
 
-            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId;
+            var uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/" + personGroupId;
 
             HttpResponseMessage response;
             response = await client.GetAsync(uri);
@@ -80,7 +80,7 @@ namespace CapstoneProject.WebAPI.Controllers
             // Request headers
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
 
-            string uri = "https://api.projectoxford.ai/face/v1.0/persongroups";
+            string uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups";
 
             HttpResponseMessage response;
             response = await client.GetAsync(uri);
@@ -102,7 +102,7 @@ namespace CapstoneProject.WebAPI.Controllers
             // Request headers
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
 
-            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId + "/persons?" + queryString;
+            var uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/" + personGroupId + "/persons?" + queryString;
 
             HttpResponseMessage response;
 
@@ -136,7 +136,7 @@ namespace CapstoneProject.WebAPI.Controllers
             // Request headers
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
 
-            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId + "/persons/" + personId;
+            var uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/" + personGroupId + "/persons/" + personId;
             HttpResponseMessage response;
 
             string body = @"{'name':'" + personName + "','userData':'" + userData + "'}";
@@ -169,7 +169,7 @@ namespace CapstoneProject.WebAPI.Controllers
             // Request headers
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
 
-            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId + "/persons/" + personId;
+            var uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/" + personGroupId + "/persons/" + personId;
 
             HttpResponseMessage response;
             response = await client.GetAsync(uri);
@@ -186,7 +186,7 @@ namespace CapstoneProject.WebAPI.Controllers
             // Request headers
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
 
-            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId + "/persons";
+            var uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/" + personGroupId + "/persons";
 
             HttpResponseMessage response;
             response = await client.GetAsync(uri);
@@ -212,7 +212,7 @@ namespace CapstoneProject.WebAPI.Controllers
             // Request parameters
             queryString["userData"] = $"{userData}";
             //queryString["targetFace"] = $"{string}";
-            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId + "/persons/" + personId + "/persistedFaces?" + queryString;
+            var uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/" + personGroupId + "/persons/" + personId + "/persistedFaces?" + queryString;
 
             HttpResponseMessage response;
 
@@ -242,7 +242,7 @@ namespace CapstoneProject.WebAPI.Controllers
             // Request headers
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
 
-            var uri = "https://api.projectoxford.ai/face/v1.0/persongroups/" + personGroupId + "/train?" + queryString;
+            var uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/" + personGroupId + "/train?" + queryString;
 
             HttpResponseMessage response;
 
@@ -288,7 +288,7 @@ namespace CapstoneProject.WebAPI.Controllers
             queryString["returnFaceId"] = "true";
             queryString["returnFaceLandmarks"] = "false";
             queryString["returnFaceAttributes"] = "gender";
-            var uri = "https://api.projectoxford.ai/face/v1.0/detect?" + queryString;
+            var uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/detect?" + queryString;
 
             HttpResponseMessage response;
 
@@ -327,7 +327,7 @@ namespace CapstoneProject.WebAPI.Controllers
             // Request headers
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Assets.KEY_FACE_REVIEW);
 
-            var uri = "https://api.projectoxford.ai/face/v1.0/identify?" + queryString;
+            var uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/identify?" + queryString;
 
             HttpResponseMessage response;
 

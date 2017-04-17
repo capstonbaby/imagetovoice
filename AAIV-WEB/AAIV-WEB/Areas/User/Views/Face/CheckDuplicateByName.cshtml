@@ -62,7 +62,7 @@ z-index:100;
                             <div class="w3-col" style="width:80%">
                                 @if (item.Faces.Count > 0)
                                 {
-                                    foreach (var image in item.Faces.Where(q => q.Active))
+                                    foreach (var image in item.Faces.Where(q => q.Active).ToList())
                                     {
                                             <img class="zoom" src="@image.ImageURL" style="max-width:90px" />
                                     }

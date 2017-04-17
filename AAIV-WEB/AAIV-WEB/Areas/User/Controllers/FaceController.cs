@@ -747,8 +747,9 @@ namespace AAIV_WEB.Areas.User.Controllers
                         if ((!isDuplicate[i]) && (prime_person.Faces.Count > 0))
                         {
                             //Get all images of person[i]
-                            var prime_person_image_list = prime_person.Faces.Where(q => q.Active = true)
-                                                                            .Select(q => q.ImageURL).ToList();
+                            var prime_person_image_list = prime_person.Faces.Where(q => q.Active == true)
+                                                                            .Select(q => q.ImageURL)
+                                                                            .ToList();
 
 
                             //Get the rest persons to compare
@@ -847,7 +848,7 @@ namespace AAIV_WEB.Areas.User.Controllers
                     if ((!isDuplicate[i]) && (prime_person.Faces.Count > 0))
                     {
                         //Get all images of person[i]
-                        var prime_person_image_list = prime_person.Faces.Where(q => q.Active = true)
+                        var prime_person_image_list = prime_person.Faces.Where(q => q.Active == true)
                                                                         .Select(q => q.ImageURL).ToList();
 
                         //Detect all images of person[i]

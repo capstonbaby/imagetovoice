@@ -44,7 +44,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
             {
                 return Json(new { success = false, message = "Tên đồ vật không được bỏ trống!" });
             }
-            if(files == null)
+            if (files == null)
             {
                 return Json(new { success = false, message = "Vui lòng chọn hình ảnh!" });
             }
@@ -243,7 +243,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
         }
         public ActionResult testConcept(IEnumerable<HttpPostedFileBase> files)
         {
-            if(files == null)
+            if (files == null)
             {
                 return Json(new { success = false, message = "Vui lòng chọn hình ảnh!" });
             }
@@ -272,7 +272,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                                     ConceptDescription = entity.ConceptDescription,
                                 };
                                 //return View(model);
-                                return Json(new {success = true, response = model });
+                                return Json(new { success = true, response = model });
                             }
                         }
                     }
@@ -418,7 +418,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                         if (delImgResponse != null)
                         {
                             var picItem = picService.Get(picEntity.PictureId);
-                        await picService.DeactivateAsync(picItem);
+                            await picService.DeactivateAsync(picItem);
                         }
                     }
                     string delConceptURI = Constant.DEL_CONCEPT_API + conceptId;
@@ -428,7 +428,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                     if (delConceptPesponse != null && trainResponse != null)
                     {
                         await conService.DeactivateAsync(entityConcept);
-                    return Json(new { success = true, message = "Xóa đồ vật thành công!" });
+                        return Json(new { success = true, message = "Xóa đồ vật thành công!" });
                     }
                 }
                 catch (Exception ex)
@@ -477,7 +477,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
             {
                 foreach (var picId in picIdArray)
                 {
-                    if(picId != null)
+                    if (picId != null)
                     {
                         string delImgURI = Constant.DEL_IMG_API + picId;
                         var delImgResponse = HttpClientHelper.Get(delImgURI);
@@ -486,7 +486,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
                             var entity = picService.Get(picId);
                             await picService.DeactivateAsync(entity);
                         }
-                    }                    
+                    }
                 }
                 string trainURI = Constant.TRAIN_API;
                 var trainResponse = HttpClientHelper.Get(trainURI);
