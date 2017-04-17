@@ -36,12 +36,17 @@ namespace AAIV_WEB.Areas.User.Controllers
             var service = this.Service<IAspNetUserService>();
             var personService = this.Service<IPersonService>();
             var faceService = this.Service<IFaceService>();
+            var personCount = 0;
 
-            // PErson Group
+            // Person Group
             var curUser = Util.getCurrentUser(this);
 
             if (curUser != null)
             {
+                //Check quota
+                personCount = personService.GetActive().Where(q => (q.PersonGroupId == curUser.Id)).Count();
+                ViewBag.personCount = personCount;
+
                 //var personList = personService.GetActive(q => q.PersonGroupId == curUser.Id)
                 //    .ProjectTo<PersonEditViewModel>(this.MapperConfig)
                 //    .ToList();
@@ -60,6 +65,10 @@ namespace AAIV_WEB.Areas.User.Controllers
                     }
                 }
 
+                if (TempData["IsOver"] != null)
+                {
+                    ViewBag.IsOver = TempData["IsOver"].ToString();
+                }
                 return this.View(personList);
             }
 
@@ -69,7 +78,27 @@ namespace AAIV_WEB.Areas.User.Controllers
         [HttpGet]
         public ActionResult NewPerson()
         {
+            var personService = this.Service<IPersonService>();
+            var personGroupService = this.Service<IPersonGroupService>();
+            var curUser = Util.getCurrentUser(this);
+            if (null == curUser)
+            {
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
             PersonEditViewModel model = (PersonEditViewModel)TempData["personEditViewModel"];
+
+            var personGroup = personGroupService.Get(curUser.Id);
+            if (personGroup != null)
+            {
+                var personCount = personService.GetActive(q => q.PersonGroupId.Equals(personGroup.PersonGroupId)).Count();
+                if (personCount >= 10)
+                {
+                    TempData["IsOver"] = "isOver";
+                    return this.RedirectToAction("Index","Face");
+                }
+                
+            }
+
             if (model == null)
             {
                 model = new PersonEditViewModel();
@@ -95,101 +124,103 @@ namespace AAIV_WEB.Areas.User.Controllers
                     var user = Util.getCurrentUser(this);
                     var personGroup = personGroupService.Get(user.Id);
 
-                    //create in Microsoft
-                    var personCreateResult = await faceServiceClient.CreatePersonAsync(personGroup.PersonGroupId, person.Name, person.Description);
-                    progressHub.SendMessage("33%", 33);
+                        //create in Microsoft
+                        var personCreateResult = await faceServiceClient.CreatePersonAsync(personGroup.PersonGroupId, person.Name, person.Description);
+                        progressHub.SendMessage("33%", 33);
 
-                    //create in database
-                    var newPerson = new Person
-                    {
-                        Name = person.Name,
-                        Description = person.Description,
-                        PersonGroupId = personGroup.PersonGroupId,
-                        Active = true,
-                        PersonId = personCreateResult.PersonId.ToString(),
-                    };
-                    await personService.CreateAsync(newPerson);
-                    progressHub.SendMessage("50%", 50);
-
-                    //Solve Log image file to MCS + db
-                    if (person.LogImage != null)
-                    {
-                        //create face in Microsoft
-                        var addFaceResult = await faceServiceClient.AddPersonFaceAsync
-                                                (personGroup.PersonGroupId, personCreateResult.PersonId, person.LogImage);
-
-                        //create face in db
-                        var persistedFaceId = addFaceResult.PersistedFaceId.ToString();
-                        var face = new Models.Entities.Face
+                        //create in database
+                        var newPerson = new Person
                         {
-                            ImageURL = person.LogImage,
-                            PersistedFaceId = persistedFaceId,
-                            PersonID = newPerson.PersonId,
-                            Active = true
+                            Name = person.Name,
+                            Description = person.Description,
+                            PersonGroupId = personGroup.PersonGroupId,
+                            Active = true,
+                            PersonId = personCreateResult.PersonId.ToString(),
                         };
+                        await personService.CreateAsync(newPerson);
+                        progressHub.SendMessage("50%", 50);
 
-                        await faceService.CreateAsync(face);
-
-                        //Deactive log in db
-                        await logService.DeactivateAsync(logService.Get(person.LogID));
-
-
-                    }
-
-                    //Upload new chosen iamge files
-                    if (file.FirstOrDefault() != null)
-                    {
-                        foreach (var imageFile in file)
+                        //Solve Log image file to MCS + db
+                        if (person.LogImage != null)
                         {
-                            string pic = System.IO.Path.GetFileName(imageFile.FileName);
-                            string path = System.IO.Path.Combine(
-                                                   Server.MapPath("~/images"), pic);
-                            // file is uploaded
-                            imageFile.SaveAs(path);
-
-                            var uploadParams = new ImageUploadParams()
-                            {
-                                File = new FileDescription(path)
-                            };
-
-                            var uploadResult = cloudinary.Upload(uploadParams).Uri.ToString();
-
                             //create face in Microsoft
-                            var addFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroup.PersonGroupId, personCreateResult.PersonId, uploadResult);
-
+                            var addFaceResult = await faceServiceClient.AddPersonFaceAsync
+                                                    (personGroup.PersonGroupId, personCreateResult.PersonId, person.LogImage);
 
                             //create face in db
                             var persistedFaceId = addFaceResult.PersistedFaceId.ToString();
                             var face = new Models.Entities.Face
                             {
-                                ImageURL = uploadResult,
+                                ImageURL = person.LogImage,
                                 PersistedFaceId = persistedFaceId,
                                 PersonID = newPerson.PersonId,
                                 Active = true
                             };
+
                             await faceService.CreateAsync(face);
+
+                            //Deactive log in db
+                            await logService.DeactivateAsync(logService.Get(person.LogID));
+
 
                         }
 
-                    }
-                    //Set Progress bar
-                    progressHub.SendMessage("70%", 70);
-                    //Train
-                    await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupId);
-                    progressHub.SendMessage("Complete !", 100);
-                    Thread.Sleep(1000);
+                        //Upload new chosen iamge files
+                        if (file.FirstOrDefault() != null)
+                        {
+                            foreach (var imageFile in file)
+                            {
+                                string pic = System.IO.Path.GetFileName(imageFile.FileName);
+                                string path = System.IO.Path.Combine(
+                                                       Server.MapPath("~/images"), pic);
+                                // file is uploaded
+                                imageFile.SaveAs(path);
 
-                    // after successfully uploading redirect the user
-                    if (person.LogID != 0)
-                    {
-                        return RedirectToAction("ShowLogs", "Face");
-                    }
-                    else
-                    {
-                        return RedirectToAction("Index", "Face");
+                                var uploadParams = new ImageUploadParams()
+                                {
+                                    File = new FileDescription(path)
+                                };
+
+                                var uploadResult = cloudinary.Upload(uploadParams).Uri.ToString();
+
+                                //create face in Microsoft
+                                var addFaceResult = await faceServiceClient.AddPersonFaceAsync(personGroup.PersonGroupId, personCreateResult.PersonId, uploadResult);
+
+
+                                //create face in db
+                                var persistedFaceId = addFaceResult.PersistedFaceId.ToString();
+                                var face = new Models.Entities.Face
+                                {
+                                    ImageURL = uploadResult,
+                                    PersistedFaceId = persistedFaceId,
+                                    PersonID = newPerson.PersonId,
+                                    Active = true
+                                };
+                                await faceService.CreateAsync(face);
+
+                            }
+
+                        }
+                        //Set Progress bar
+                        progressHub.SendMessage("70%", 70);
+                        //Train
+                        await faceServiceClient.TrainPersonGroupAsync(personGroup.PersonGroupId);
+                        progressHub.SendMessage("Complete !", 100);
+                        Thread.Sleep(1000);
+
+                        // after successfully uploading redirect the user
+                        if (person.LogID != 0)
+                        {
+                            return RedirectToAction("ShowLogs", "Face");
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index", "Face");
+                        }
                     }
 
-                }
+
+              //  }
                 catch (Exception ex)
                 {
                     throw ex;
@@ -246,7 +277,6 @@ namespace AAIV_WEB.Areas.User.Controllers
             TempData["personEditViewModel"] = model;
 
             return RedirectToAction("NewPerson", "Face");
-
 
         }
 
@@ -857,7 +887,7 @@ namespace AAIV_WEB.Areas.User.Controllers
                                                 break;
                                             }
                                         }
-                                        
+
                                     }
 
                                 }

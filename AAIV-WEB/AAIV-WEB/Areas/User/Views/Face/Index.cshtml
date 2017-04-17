@@ -3,10 +3,12 @@
 
 @{
     ViewBag.Title = "Index";
+    int personCount = ViewBag.personCount;
     var i = 1;
 }
 
 <h1 class="page-header">Danh sách <a href="@Url.Action("NewPerson","Face")" class="btn btn-success pull-right"><i class="glyphicon glyphicon-plus"></i>Thêm mới</a></h1>
+@*<h1 class="page-header">Danh sách <a href="#" onclick="checkQuota()"; return false;" class="btn btn-success pull-right"><i class="glyphicon glyphicon-plus"></i>Thêm mới</a></h1>*@
 
 <table id="myTable" class="table table-hover" cellspacing="0" width="100%">
     <thead>
@@ -51,7 +53,26 @@
 @section scripts{
     <script>
 
+        function checkQuota() {
+            if ("@ViewBag.IsOver" != "") {
+                swal({
+
+                    title: "Lỗi",
+                    text: "Đã quá giới hạn. Vui lòng nâng cấp tài khoản!",
+                    type: 'error',
+                    allowOutsideClick: false,
+                    showCancelButton: true,
+                    confirmButtonText: "Quay về trang quản lý"
+                }).then(
+                    function () {
+                        window.location.href = "@Url.Action("Index", "Face")";
+                    }
+                );
+            }
+        }
+
         $(function () {
+            checkQuota();
             $('#myTable').DataTable();
         });
 

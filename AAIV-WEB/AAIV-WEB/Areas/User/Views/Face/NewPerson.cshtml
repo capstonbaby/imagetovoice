@@ -1,6 +1,6 @@
 ﻿@model PersonEditViewModel
 @{
-    ViewBag.Title = "Tạo mới";
+    ViewBag.Title = "Thêm người mới";
 }
 
 <h1 class="page-header">Thêm người mới</h1>
@@ -77,7 +77,9 @@
 @section scripts{
     <script src="/signalr/hubs"></script>
     <script>
+
         $(document).ready(function () {
+
             var progressNotifier = $.connection.progressHub;
 
             // client-side sendMessage function that will be called from the server-side
@@ -112,7 +114,7 @@
                     var t = window.URL || window.webkitURL;
                     var objectUrl = t.createObjectURL(fileList[i]);
                     $('#imagePreview').append('<div class="col-md-4"><div class="thumbnail" style="width: 135px;height: 140px;overflow: hidden;"><img src="' + objectUrl + '" style="width:100%"/></div></div>');
-        
+
                 }
             })
         }
