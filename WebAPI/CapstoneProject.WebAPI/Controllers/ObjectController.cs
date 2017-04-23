@@ -27,19 +27,17 @@ namespace CapstoneProject.WebAPI.Controllers
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            //var uri = "http://detectobject.herokuapp.com/clarifai/v1.0/image?url=" + urlImage;
             var uri = "http://127.0.0.1:5000/clarifai/v1.0/image?url=" + urlImage;
 
             HttpResponseMessage response = client.GetAsync(uri).Result;
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("success");
                 String strRespone = await response.Content.ReadAsStringAsync();
                 var data = (JObject)JsonConvert.DeserializeObject(strRespone);
-                var test = data["outputs"][0]["data"]["concepts"];
+                var arrObject = data["outputs"][0]["data"]["concepts"];
                 var dataApi = new DataController();
-                var a = test.Count();
-                for (int i=0;i < test.Count(); i++)
+                var numObject = arrObject.Count();
+                for (int i=0;i < numObject; i++)
                 {
                     Double value = Double.Parse(data["outputs"][0]["data"]["concepts"][i]["value"].ToString());
                     if(value > 0.6)
@@ -56,17 +54,6 @@ namespace CapstoneProject.WebAPI.Controllers
                 {
                     conceptDescription = "error";
                 }
-                //Double value = Double.Parse(data["outputs"][0]["data"]["concepts"][0]["value"].ToString());
-                //if(value > 0.6)
-                //{
-                //    int conceptId = int.Parse(data["outputs"][0]["data"]["concepts"][0]["id"].ToString());
-                //    var dataApi = new DataController();
-                //    conceptDescription = dataApi.getDescriptionConcept(conceptId);
-                //}
-                //else
-                //{
-                //    conceptDescription = "error";
-                //}
 
                 return new HttpResponseMessage()
                 {
@@ -80,9 +67,6 @@ namespace CapstoneProject.WebAPI.Controllers
                     Content = new StringContent("error", Encoding.UTF8, "text/html"),
                 };
             }
-            //return response;
-
-            
 
         }
     }
