@@ -36,18 +36,38 @@ namespace CapstoneProject.WebAPI.Controllers
                 Console.WriteLine("success");
                 String strRespone = await response.Content.ReadAsStringAsync();
                 var data = (JObject)JsonConvert.DeserializeObject(strRespone);
-                Double value = Double.Parse(data["outputs"][0]["data"]["concepts"][0]["value"].ToString());
-                if(value > 0.6)
+                var test = data["outputs"][0]["data"]["concepts"];
+                var dataApi = new DataController();
+                var a = test.Count();
+                for (int i=0;i < test.Count(); i++)
                 {
-                    int conceptId = int.Parse(data["outputs"][0]["data"]["concepts"][0]["id"].ToString());
-                    var dataApi = new DataController();
-                    conceptDescription = dataApi.getDescriptionConcept(conceptId);
+                    Double value = Double.Parse(data["outputs"][0]["data"]["concepts"][i]["value"].ToString());
+                    if(value > 0.6)
+                    {
+                        int conceptId = int.Parse(data["outputs"][0]["data"]["concepts"][0]["id"].ToString());
+                        conceptDescription += dataApi.getDescriptionConcept(conceptId);
+                    }else
+                    {
+                        break;
+                    }   
                 }
-                else
+
+                if (conceptDescription == "")
                 {
                     conceptDescription = "error";
                 }
-                
+                //Double value = Double.Parse(data["outputs"][0]["data"]["concepts"][0]["value"].ToString());
+                //if(value > 0.6)
+                //{
+                //    int conceptId = int.Parse(data["outputs"][0]["data"]["concepts"][0]["id"].ToString());
+                //    var dataApi = new DataController();
+                //    conceptDescription = dataApi.getDescriptionConcept(conceptId);
+                //}
+                //else
+                //{
+                //    conceptDescription = "error";
+                //}
+
                 return new HttpResponseMessage()
                 {
                     Content = new StringContent(conceptDescription, Encoding.UTF8, "text/html"),
