@@ -45,7 +45,7 @@ namespace CapstoneProject.WebAPI.Controllers
                     if(value > 0.6)
                     {
                         int conceptId = int.Parse(data["outputs"][0]["data"]["concepts"][0]["id"].ToString());
-                        conceptDescription += dataApi.getDescriptionConcept(conceptId);
+                        conceptDescription += dataApi.getDescriptionConcept(conceptId) + ". ";
                     }else
                     {
                         break;
