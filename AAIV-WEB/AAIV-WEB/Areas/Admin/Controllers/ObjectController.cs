@@ -48,6 +48,10 @@ namespace AAIV_WEB.Areas.Admin.Controllers
             {
                 return Json(new { success = false, message = "Vui lòng chọn hình ảnh!" });
             }
+			if (string.IsNullOrEmpty(conceptDes))
+            {
+                return Json(new { success = false, message = "Mô tả không được bỏ trống!" });
+            }
             //            
             var addConcept = new Concept
             {
