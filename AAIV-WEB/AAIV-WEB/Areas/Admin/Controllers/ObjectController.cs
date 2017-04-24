@@ -477,7 +477,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
             {
                 foreach (var picId in picIdArray)
                 {
-                    if (picId != null)
+                    if (picId != null || picId != "")
                     {
                         string delImgURI = Constant.DEL_IMG_API + picId;
                         var delImgResponse = HttpClientHelper.Get(delImgURI);
