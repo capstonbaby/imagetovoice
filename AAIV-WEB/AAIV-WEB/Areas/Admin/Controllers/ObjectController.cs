@@ -48,6 +48,10 @@ namespace AAIV_WEB.Areas.Admin.Controllers
             {
                 return Json(new { success = false, message = "Vui lòng chọn hình ảnh!" });
             }
+			if (string.IsNullOrEmpty(conceptDes))
+            {
+                return Json(new { success = false, message = "Mô tả không được bỏ trống!" });
+            }
             //            
             var addConcept = new Concept
             {
@@ -477,7 +481,7 @@ namespace AAIV_WEB.Areas.Admin.Controllers
             {
                 foreach (var picId in picIdArray)
                 {
-                    if (picId != null)
+                    if (picId != null || picId != "")
                     {
                         string delImgURI = Constant.DEL_IMG_API + picId;
                         var delImgResponse = HttpClientHelper.Get(delImgURI);
